@@ -5,9 +5,18 @@ using OpenTrenches.Scripting.Datastream;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 
-public class PlayerNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractNetworkHandler(Adapter)
+public class PlayerNetworkHandler : AbstractNetworkHandler
 {
-    public Character Character { get; } = new();
+    private GameState GameState { get; }
+
+    private ushort _characterId;
+    public Character Character => GameState.Characters[_characterId];
+
+    public PlayerNetworkHandler(INetworkConnectionAdapter Adapter, GameState GameState) : base(Adapter)
+    {
+        this.GameState = GameState;
+        _characterId = GameState.CreateCharacter(new Character());
+    }
 
     #region create
     protected override void _DeserializeCreate(CreateDatagram datagram)

@@ -14,11 +14,17 @@ namespace OpenTrenches.Scene;
 [GlobalClass]
 public partial class ClientRoot : Node
 {
+    //* Networking
     private IClientNetworkAdapter NetworkAdapter { get; }
     private ClientNetworkHandler ClientNetworkHandler { get; }
+
+    //* GD
     private WorldNode? World { get; set; }
 
     private KeyboardListener KeyboardListener { get; }
+
+    //* State
+    private GameState? State { get; set; }
 
     public ClientRoot()
     {
@@ -32,7 +38,12 @@ public partial class ClientRoot : Node
     public override void _Ready()
     {
         World = GetNode<WorldNode>("World");
-        ClientNetworkHandler.World = World;
+        
+        State = ClientNetworkHandler.State;
+        if (State is not null)
+        {
+            State.CharacterAddedEvent += World.AddCharacter;
+        }
         World.DisablePhysics();
     }
     public override void _Process(double delta)

@@ -7,17 +7,13 @@ using OpenTrenches.Scripting.Player;
 
 public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractNetworkHandler(Adapter)
 {
-    public WorldNode? World;
+    public GameState? State = new();
 
 
     protected override void _DeserializeCreate(CreateDatagram datagram)
     {
-        switch (datagram.TargetType)
-        {
-            case ObjectCategory.Character:
-                World?.AddCharacter(Serialization.Deserialize<Character>(datagram.Value));
-                break;
-        }
+        // throw new Exception();
+        State?.Create(datagram.TargetType, datagram.TargetId, datagram.Value);
     }
 
 
@@ -35,7 +31,7 @@ public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractN
         switch (datagram.TargetType)
         {
             case ObjectCategory.Character:
-                World?.Character?.Update(datagram.Update);
+                State?.Update(datagram.TargetType, datagram.TargetId, datagram.Update);
                 break;
         }
     }

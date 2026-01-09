@@ -44,24 +44,24 @@ public class StreamDatagram(StreamCategory StreamCategory, byte[] Item) : Datagr
 }
 
 [MessagePackObject]
-public class CreateDatagram(ObjectCategory TargetType, short TargetId, byte[] Item) : Datagram
+public class CreateDatagram(ObjectCategory TargetType, ushort TargetId, byte[] Item) : Datagram
 {
     [Key(0)]
     public ObjectCategory TargetType { get; } = TargetType;
     [Key(1)]
-    public short TargetId { get; } = TargetId;
+    public ushort TargetId { get; } = TargetId;
     [Key(2)]
     public byte[] Value { get; } = Item;
 }
 
 
 [MessagePackObject]
-public class UpdateDatagram(ObjectCategory TargetType, short TargetId, Update Update) : Datagram
+public class UpdateDatagram(ObjectCategory TargetType, ushort TargetId, Update Update) : Datagram
 {
     [Key(0)]
     public ObjectCategory TargetType { get; } = TargetType;
     [Key(1)]
-    public short TargetId = TargetId;
+    public ushort TargetId = TargetId;
     [Key(2)]
     public Update Update { get; } = Update;
 }

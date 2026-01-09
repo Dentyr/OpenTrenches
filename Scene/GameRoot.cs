@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Godot;
@@ -19,8 +21,12 @@ public partial class GameRoot : Node
     public WorldNode World = null!;
 
     private List<PlayerNetworkHandler> _players = [];
+
+    private GameState GameState { get; } = new();
+
     public GameRoot()
     {
+        Console.WriteLine($"PID {Process.GetCurrentProcess().ProcessName}");
         NetworkAdapter = new LiteNetServerAdapter();
         NetworkAdapter.Start();
         NetworkAdapter.ConnectedEvent += Connection;
@@ -33,25 +39,31 @@ public partial class GameRoot : Node
         // IServerAdapter serverInstance = new SocketAdapter();
         // adapter.Listen();
     }
-    private void Connection(INetworkConnectionAdapter adapter)
-    {
-        PlayerNetworkHandler player = new(adapter);
-        _players.Add(player);
-        World.AddChild(new CharacterNode3D(player.Character));
-        adapter.Message(new CreateDatagram(ObjectCategory.Character, 0, Serialization.Serialize(player.Character)));
-    }
-
     public override void _Ready()
     {
         World = GetNode<WorldNode>("World");
+        GameState.CharacterAddedEvent += World.AddCharacter;
+        GameState.CharacterAddedEvent += BroadcastCharacter;
     }
+    private void BroadcastCharacter(ushort id, Character character) 
+        => NetworkAdapter.MessageBroadcast(new CreateDatagram(ObjectCategory.Character, id, Serialization.Serialize(character)));
+
+
+    private void Connection(INetworkConnectionAdapter connection)
+    {
+        PlayerNetworkHandler player = new(connection, GameState);
+        _players.Add(player);
+        foreach (var character in GameState.Characters) player.Adapter.Message(new CreateDatagram(ObjectCategory.Character, character.Key, Serialization.Serialize<Character>(character.Value)));
+        
+    }
+
 
 
 
     public override void _Process(double delta)
     {
         NetworkAdapter.Poll();
-        foreach(var player in _players.Select(x => x.Character)) 
-            NetworkAdapter.StreamBroadcast(new UpdateDatagram(ObjectCategory.Character, 0, player.GetUpdate(Character.UpdateType.Position)));
+        foreach(var playerKvp in GameState.Characters)
+            NetworkAdapter.StreamBroadcast(new UpdateDatagram(ObjectCategory.Character, playerKvp.Key, playerKvp.Value.GetUpdate(Character.UpdateType.Position)));
     }
 }
