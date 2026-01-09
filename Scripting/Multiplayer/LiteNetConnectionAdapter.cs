@@ -23,6 +23,11 @@ public class LiteNetConnectionAdapter : INetworkConnectionAdapter
 
     public void Stream(byte[] datagram)
     {
-        
+        Peer.Send(datagram, DeliveryMethod.Sequenced);
+    }
+
+    public void HandleReceive(byte[] receive)
+    {
+        ReceiveEvent?.Invoke(receive);
     }
 }

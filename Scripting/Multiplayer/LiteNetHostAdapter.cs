@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
     private NetManager Server { get; }
     private EventBasedNetListener Listener { get; }
 
+    private Dictionary<NetPeer, LiteNetConnectionAdapter> _adapterDictionary = [];
+
     public event Action<INetworkConnectionAdapter>? ConnectedEvent;
     
     public LiteNetServerAdapter()
@@ -21,12 +24,20 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
         Listener = new();
         Server = new(Listener);
 
-        Server.Start(NetworkDefines.ServerPort /* port */);
 
         Listener.ConnectionRequestEvent += HandleRequest;
 
         Listener.PeerConnectedEvent += HandleConnect;
 
+        Listener.NetworkReceiveEvent += HandleReceive;
+
+        // Listener.DeliveryEvent 
+
+    }
+
+    private void HandleReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
+    {
+        _adapterDictionary[peer].HandleReceive(reader.GetRemainingBytes());
     }
 
     private void HandleConnect(NetPeer peer)
@@ -35,6 +46,10 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
         NetDataWriter writer = new NetDataWriter();         // Create writer class
         writer.Put("Hello client!");                        // Put some string
         peer.Send(writer, DeliveryMethod.ReliableOrdered);  // Send with reliability
+
+        LiteNetConnectionAdapter connection = new LiteNetConnectionAdapter(peer);
+        _adapterDictionary.Add(peer, connection);
+        ConnectedEvent?.Invoke(connection);
     }
     private void HandleRequest(ConnectionRequest request)
     {
@@ -49,7 +64,10 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
         Server.PollEvents();
     }
 
-    public void Start() => Server.Start();
+    public void Start()
+    {
+        Server.Start(NetworkDefines.ServerPort /* port */);
+    }
 
     public void Stop() => Server.Stop();
 }

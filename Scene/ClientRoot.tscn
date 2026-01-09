@@ -1,12 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://jxsgp61cwdog"]
+[gd_scene load_steps=3 format=3 uid="uid://jxsgp61cwdog"]
 
 [ext_resource type="Script" uid="uid://c64gnah6hkq7o" path="res://Scene/ClientRoot.cs" id="1_7wssd"]
+[ext_resource type="PackedScene" uid="uid://c4mqavbo8bpia" path="res://Scene/World/World.tscn" id="2_ahkmx"]
 
 [node name="ClientRoot" type="Node"]
 script = ExtResource("1_7wssd")
 metadata/_custom_type_script = "uid://c64gnah6hkq7o"
 
 [node name="Label" type="Label" parent="."]
-offset_right = 40.0
+offset_right = 100.0
 offset_bottom = 23.0
-text = "sdf"
+text = "Client"
+
+[node name="World" parent="." instance=ExtResource("2_ahkmx")]
