@@ -33,7 +33,6 @@ public partial class CharacterNode3D : CharacterBody3D
         this.Position = Character.Position;
         this.Velocity += SceneDefines.Physics.g * (float)delta;
         this.Velocity += Character.Movement * (float)delta;
-        Console.WriteLine(Character.Movement);
         this.MoveAndSlide();
         this.Velocity -= Character.Movement * (float)delta;
         Character.Position = this.Position;

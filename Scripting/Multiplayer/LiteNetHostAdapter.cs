@@ -42,11 +42,8 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
 
     private void HandleConnect(NetPeer peer)
     {
-        Console.WriteLine("We got connection: {0}", peer);  // Show peer IP
         NetDataWriter writer = new NetDataWriter();         // Create writer class
-        writer.Put("Hello client!");                        // Put some string
-        peer.Send(writer, DeliveryMethod.ReliableOrdered);  // Send with reliability
-
+        
         LiteNetConnectionAdapter connection = new LiteNetConnectionAdapter(peer);
         _adapterDictionary.Add(peer, connection);
         ConnectedEvent?.Invoke(connection);
