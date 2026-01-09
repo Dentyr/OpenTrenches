@@ -1,6 +1,8 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using LiteNetLib;
+using OpenTrenches.Scripting.Datastream;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 
@@ -14,15 +16,18 @@ public interface INetworkConnectionAdapter
 
     public bool Active { get; }
     
-    public event Action<byte[]> ReceiveEvent;
-    public event Action TerminatedEvent;
+    public event Action<ReadOnlyMemory<byte>>? ReceiveEvent;
+
+
+    public void Stream(Datagram datagram) => Stream(Serialization.Serialize(datagram));
+    public void Message(Datagram datagram) => Message(Serialization.Serialize(datagram));
 
     /// <summary>
     /// Sends <paramref name="datagram"/> to <see cref="Address"/> unreliably but in order.
     /// </summary>
     public void Stream(byte[] datagram);
-    // /// <summary>
-    // /// Sends <paramref name="datagram"/> to <see cref="EndPoint"/> reliably and in order.
-    // /// </summary>
-    // public void Message(byte[] datagram);
+    /// <summary>
+    /// Sends <paramref name="datagram"/> to <see cref="EndPoint"/> reliably and in order.
+    /// </summary>
+    public void Message(byte[] datagram);
 }

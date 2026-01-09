@@ -1,7 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
+
+namespace OpenTrenches.Scripting.Datastream;
 
 /// <summary>
 /// Message pack serialization and deserialization service using custom options
@@ -12,6 +15,19 @@ public static class Serialization
 
     public static byte[] Serialize<T>(T obj) => MessagePackSerializer.Serialize<T>((T)obj, StandardOptions);
     public static T Deserialize<T>(ReadOnlyMemory<byte> message) => MessagePackSerializer.Deserialize<T>(message, StandardOptions);
+    public static bool TryDeserialize<T>(ReadOnlyMemory<byte> message, [NotNullWhen(true)] out T item)
+    {
+        try
+        {
+            item = MessagePackSerializer.Deserialize<T>(message, StandardOptions);
+            return item is not null;
+        }
+        catch 
+        { 
+            item = default!;
+            return false; 
+        }
+    }
 }
 
 /// <summary>
@@ -23,3 +39,4 @@ public sealed class OpenTrenchResolver : IFormatterResolver
 
     public IMessagePackFormatter<T>? GetFormatter<T>() => Instance.GetFormatter<T>();
 }
+

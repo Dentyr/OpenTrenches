@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Godot;
@@ -6,7 +6,9 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTrenches.Scene.World;
 using OpenTrenches.Scripting;
+using OpenTrenches.Scripting.Datastream;
 using OpenTrenches.Scripting.Multiplayer;
+using OpenTrenches.Scripting.Player;
 
 namespace OpenTrenches.Scene;
 
@@ -15,6 +17,8 @@ public partial class GameRoot : Node
 {
     public IServerNetworkAdapter NetworkAdapter;
     public WorldNode World = null!;
+
+    private List<PlayerNetworkHandler> _players = [];
     public GameRoot()
     {
         NetworkAdapter = new LiteNetServerAdapter();
@@ -31,9 +35,10 @@ public partial class GameRoot : Node
     }
     private void Connection(INetworkConnectionAdapter adapter)
     {
-        PlayerConnection player = new(adapter);
+        PlayerNetworkHandler player = new(adapter);
+        _players.Add(player);
         World.AddChild(new CharacterNode3D(player.Character));
-
+        adapter.Message(new CreateDatagram(ObjectCategory.Character, 0, Serialization.Serialize(player.Character)));
     }
 
     public override void _Ready()
@@ -46,46 +51,7 @@ public partial class GameRoot : Node
     public override void _Process(double delta)
     {
         NetworkAdapter.Poll();
-    }
-}
-
-
-public class PlayerConnection
-{
-    public INetworkConnectionAdapter Adapter { get; }
-    public Character Character { get; }
-
-
-    public PlayerConnection(INetworkConnectionAdapter Adapter)
-    {
-        this.Adapter = Adapter;
-        Adapter.ReceiveEvent += HandleInput;
-        Character = new();
-    }
-
-    private void HandleInput(byte[] packet)
-    {
-        var input = Serialization.Deserialize<InputStatus>(packet);
-        Vector3 movement = Vector3.Zero;
-        foreach (UserKey key in input.Keys)
-        {
-            switch(key)
-            {
-                case UserKey.W:
-                movement.X += 1;
-                break;
-                case UserKey.A:
-                movement.Z -= 1;
-                break;
-                case UserKey.S:
-                movement.X -= 1;
-                break;
-                case UserKey.D:
-                movement.Z += 1;
-                break;
-            }
-        }
-        movement *= 250f;
-        Character.Movement = movement;
+        foreach(var player in _players.Select(x => x.Character)) 
+            NetworkAdapter.StreamBroadcast(new UpdateDatagram(ObjectCategory.Character, 0, player.GetUpdate(Character.UpdateType.Position)));
     }
 }

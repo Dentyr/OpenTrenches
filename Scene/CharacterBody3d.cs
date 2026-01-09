@@ -2,6 +2,7 @@ using System;
 using Godot;
 using OpenTrenches.Scene.Resources;
 using OpenTrenches.Scripting.Libraries;
+using OpenTrenches.Scripting.Player;
 
 namespace OpenTrenches.Scene;
 
@@ -27,6 +28,10 @@ public partial class CharacterNode3D : CharacterBody3D
 
     }
 
+    public override void _Process(double delta)
+    {        
+        this.Position = Character.Position;
+    }
 
     public override void _PhysicsProcess(double delta)
     {

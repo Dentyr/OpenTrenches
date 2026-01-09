@@ -1,5 +1,7 @@
 using System;
+using System.Buffers;
 using System.Net;
+using System.Runtime.InteropServices;
 using LiteNetLib;
 
 namespace OpenTrenches.Scripting.Multiplayer;
@@ -13,21 +15,20 @@ public class LiteNetConnectionAdapter : INetworkConnectionAdapter
 
     public bool Active => Peer.ConnectionState == ConnectionState.Connected;
 
-    public event Action<byte[]>? ReceiveEvent;
-    public event Action? TerminatedEvent;
+    public event Action<ReadOnlyMemory<byte>>? ReceiveEvent;
 
     public LiteNetConnectionAdapter(NetPeer Peer)
     {
         this.Peer = Peer;
     }
 
-    public void Stream(byte[] datagram)
-    {
-        Peer.Send(datagram, DeliveryMethod.Sequenced);
-    }
 
     public void HandleReceive(byte[] receive)
     {
-        ReceiveEvent?.Invoke(receive);
+        ReceiveEvent?.Invoke(receive.AsMemory());
     }
+
+    public void Stream(byte[] payload) => Peer.Send(payload, DeliveryMethod.Sequenced);
+
+    public void Message(byte[] payload) => Peer.Send(payload, DeliveryMethod.ReliableOrdered);
 }

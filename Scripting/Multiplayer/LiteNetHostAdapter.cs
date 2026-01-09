@@ -31,13 +31,12 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
 
         Listener.NetworkReceiveEvent += HandleReceive;
 
-        // Listener.DeliveryEvent 
-
     }
 
     private void HandleReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
     {
         _adapterDictionary[peer].HandleReceive(reader.GetRemainingBytes());
+        reader.Recycle();
     }
 
     private void HandleConnect(NetPeer peer)
@@ -67,12 +66,23 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
     }
 
     public void Stop() => Server.Stop();
+
+    public void StreamBroadcast(byte[] datagram)
+    {
+        foreach(var connection in _adapterDictionary.Values) connection.Stream(datagram);
+    }
+
+    public void MessageBroadcast(byte[] datagram)
+    {
+        foreach(var connection in _adapterDictionary.Values) connection.Message(datagram);
+    }
 }
 
 public class LiteNetClientAdapter : IClientNetworkAdapter
 {
     private EventBasedNetListener Listener { get; }
     private NetManager Client { get; }
+    private LiteNetConnectionAdapter? Adapter { get; set; }
     public LiteNetClientAdapter()
     {
         Listener = new();
@@ -82,7 +92,8 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
     }
     private void HandleNetworkReceive(NetPeer peer, NetPacketReader dataReader, byte channel, DeliveryMethod deliveryMethod)
     {
-        Console.WriteLine("We got: {0}", dataReader.GetString(100 /* max length of string */));
+        Adapter?.HandleReceive(dataReader.GetRemainingBytes());
+        // Console.WriteLine("We got: {0}", dataReader.GetString(100 /* max length of string */));
         dataReader.Recycle();
     }
 
@@ -90,7 +101,8 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
 
     public INetworkConnectionAdapter Connect(string hostname)
     {
-        return new LiteNetConnectionAdapter(Client.Connect("localhost", NetworkDefines.ServerPort, NetworkDefines.Key));
+        Adapter = new LiteNetConnectionAdapter(Client.Connect("localhost", NetworkDefines.ServerPort, NetworkDefines.Key));
+        return Adapter;
     }
 
     public void Poll()
