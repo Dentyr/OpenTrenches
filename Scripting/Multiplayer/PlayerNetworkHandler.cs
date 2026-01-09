@@ -9,13 +9,13 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
 {
     private GameState GameState { get; }
 
-    private ushort _characterId;
-    public Character Character => GameState.Characters[_characterId];
+    public ushort CharacterId;
+    public Character Character => GameState.Characters[CharacterId];
 
     public PlayerNetworkHandler(INetworkConnectionAdapter Adapter, GameState GameState) : base(Adapter)
     {
         this.GameState = GameState;
-        _characterId = GameState.CreateCharacter(new Character());
+        CharacterId = GameState.CreateCharacter(new Character());
     }
 
     #region create
@@ -41,16 +41,16 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
             switch(key)
             {
                 case UserKey.W:
-                movement.X += 1;
-                break;
-                case UserKey.A:
                 movement.Z -= 1;
                 break;
-                case UserKey.S:
+                case UserKey.A:
                 movement.X -= 1;
                 break;
-                case UserKey.D:
+                case UserKey.S:
                 movement.Z += 1;
+                break;
+                case UserKey.D:
+                movement.X += 1;
                 break;
             }
         }
@@ -64,4 +64,9 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         throw new NotImplementedException();
     }
     #endregion
+    
+    protected override void _DeserializeMessage(MessageDatagram message)
+    {
+        throw new NotImplementedException();
+    }
 }

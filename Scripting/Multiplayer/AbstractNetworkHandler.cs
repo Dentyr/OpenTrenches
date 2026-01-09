@@ -20,8 +20,10 @@ public abstract class AbstractNetworkHandler
         if (datagram is CreateDatagram create) _DeserializeCreate(create);
         else if (datagram is StreamDatagram stream) _DeserializeStream(stream);
         else if (datagram is UpdateDatagram update) _DeserializeUpdate(update);
+        else if (datagram is MessageDatagram message) _DeserializeMessage(message);
     }
-    protected abstract void _DeserializeCreate(CreateDatagram datagram);
-    protected abstract void _DeserializeStream(StreamDatagram datagram);
-    protected abstract void _DeserializeUpdate(UpdateDatagram datagram);
+    protected abstract void _DeserializeCreate(CreateDatagram create);
+    protected abstract void _DeserializeStream(StreamDatagram stream);
+    protected abstract void _DeserializeUpdate(UpdateDatagram update);
+    protected abstract void _DeserializeMessage(MessageDatagram message);
 }

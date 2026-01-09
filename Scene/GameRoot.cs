@@ -54,6 +54,7 @@ public partial class GameRoot : Node
         PlayerNetworkHandler player = new(connection, GameState);
         _players.Add(player);
         foreach (var character in GameState.Characters) player.Adapter.Message(new CreateDatagram(ObjectCategory.Character, character.Key, Serialization.Serialize<Character>(character.Value)));
+        player.Adapter.Message(new MessageDatagram(MessageCategory.Setplayer, Serialization.Serialize<ushort>(player.CharacterId)));
         
     }
 

@@ -7,6 +7,9 @@ using OpenTrenches.Scripting.Player;
 
 public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractNetworkHandler(Adapter)
 {
+    public ushort? PlayerID;
+    public event Action<ushort>? PlayerCharacterSetEvent;
+
     public GameState? State = new();
 
 
@@ -32,6 +35,16 @@ public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractN
         {
             case ObjectCategory.Character:
                 State?.Update(datagram.TargetType, datagram.TargetId, datagram.Update);
+                break;
+        }
+    }
+
+    protected override void _DeserializeMessage(MessageDatagram message)
+    {
+        switch (message.MessageCategory)
+        {
+            case MessageCategory.Setplayer:
+                PlayerCharacterSetEvent?.Invoke(Serialization.Deserialize<ushort>(message.Item));
                 break;
         }
     }

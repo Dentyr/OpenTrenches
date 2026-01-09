@@ -6,11 +6,13 @@ using OpenTrenches.Scripting.Player;
 
 namespace OpenTrenches.Scene;
 
-public partial class CharacterNode3D : CharacterBody3D
+public partial class CharacterNode : CharacterBody3D
 {
+    private ushort Id { get; }
     private Character Character { get; }
-    public CharacterNode3D(Character Character)
+    public CharacterNode(ushort Id, Character Character)
     {
+        this.Id = Id;
         this.Character = Character;
         Position = Character.Position;
         AddChild(new MeshInstance3D()
@@ -30,15 +32,15 @@ public partial class CharacterNode3D : CharacterBody3D
 
     public override void _Process(double delta)
     {        
-        this.Position = Character.Position;
+        Position = Character.Position;
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        this.Position = Character.Position;
-        this.Velocity += SceneDefines.Physics.g * (float)delta;
+        Position = Character.Position;
+        Velocity += SceneDefines.Physics.g * (float)delta;
         Velocity = new(Character.Movement.X * (float)delta, Velocity.Y, Character.Movement.Z * (float)delta);
-        this.MoveAndSlide();
-        Character.Position = this.Position;
+        MoveAndSlide();
+        Character.Position = Position;
     }
 }

@@ -38,12 +38,14 @@ public partial class ClientRoot : Node
     public override void _Ready()
     {
         World = GetNode<WorldNode>("World");
-        
+
         State = ClientNetworkHandler.State;
         if (State is not null)
         {
             State.CharacterAddedEvent += World.AddCharacter;
         }
+        ClientNetworkHandler.PlayerCharacterSetEvent += World.CameraFocusCharacter;
+
         World.DisablePhysics();
     }
     public override void _Process(double delta)
