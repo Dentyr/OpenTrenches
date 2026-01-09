@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4xe1c6mmwshf"]
+
+[ext_resource type="ArrayMesh" uid="uid://cj2pp4ybkgwe4" path="res://Mesh/TrenchWall.res" id="1_5n1f8"]
+
+[node name="Terrain" type="Node3D"]
+
+[node name="TrenchWall" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4406593, 0, 3.8579884)
+mesh = ExtResource("1_5n1f8")

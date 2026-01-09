@@ -32,6 +32,8 @@ public partial class GameRoot : Node
     private void Connection(INetworkConnectionAdapter adapter)
     {
         PlayerConnection player = new(adapter);
+        World.AddChild(new CharacterNode3D(player.Character));
+
     }
 
     public override void _Ready()
@@ -64,23 +66,26 @@ public class PlayerConnection
     private void HandleInput(byte[] packet)
     {
         var input = Serialization.Deserialize<InputStatus>(packet);
+        Vector3 movement = Vector3.Zero;
         foreach (UserKey key in input.Keys)
         {
-            Vector3 movement = Vector3.Zero;
             switch(key)
             {
                 case UserKey.W:
-                Console.WriteLine("W");
-                movement.Y -= 5;
+                movement.X += 1;
                 break;
                 case UserKey.A:
+                movement.Z -= 1;
                 break;
                 case UserKey.S:
+                movement.X -= 1;
                 break;
                 case UserKey.D:
+                movement.Z += 1;
                 break;
             }
-            Character.Movement += movement;
         }
+        movement *= 250f;
+        Character.Movement = movement;
     }
 }
