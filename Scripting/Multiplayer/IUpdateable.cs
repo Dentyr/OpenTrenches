@@ -2,9 +2,10 @@ using MessagePack;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 
-public interface IUpdateable
+public interface IUpdateable<UpdateType>
 {
     public void Update(Update update);
+    public Update GetUpdate(UpdateType type);
 }
 
 [MessagePackObject]

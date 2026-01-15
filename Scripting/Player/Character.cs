@@ -8,14 +8,19 @@ using MessagePack;
 namespace OpenTrenches.Scripting.Player;
 
 [MessagePackObject]
-public class Character : IUpdateable
+public class Character : IUpdateable<Character.UpdateType>
 {
     [Key(0)]
-    public Vector3 Position = new (0, 10, 0);
+    public Vector3 Position { get; set; } = new (0, 10, 0);
+
+    [Key(1)]
+    public float Health { get; } = 10f;
 
     [IgnoreMember]
     public Vector3 Movement = Vector3.Zero;
 
+
+    //* Updates
 
     public void Update(Update update)
     {

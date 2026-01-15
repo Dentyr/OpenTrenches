@@ -15,7 +15,6 @@ public class GameState
 
     public ushort CreateCharacter(Character Character)
     {
-        Console.WriteLine("New Char");
         ushort id = _charId ++;
         _characters.Add(id, Character);
         CharacterAddedEvent?.Invoke(id, Character);
