@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Scripting.Player;
+using OpenTrenches.Common.Contracts;
+
 
 public class GameState
 {

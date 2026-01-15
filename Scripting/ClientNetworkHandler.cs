@@ -1,8 +1,6 @@
 
-using System;
-using OpenTrenches.Scene.World;
 using OpenTrenches.Common.Multiplayer;
-using OpenTrenches.Scripting.Player;
+using OpenTrenches.Common.Contracts;
 
 namespace OpenTrenches.Scripting;
 
