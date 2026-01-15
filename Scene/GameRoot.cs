@@ -22,7 +22,7 @@ public partial class GameRoot : Node
 
     private List<PlayerNetworkHandler> _players = [];
 
-    private GameState GameState { get; } = new();
+    private ServerState GameState { get; } = new();
 
     public GameRoot()
     {

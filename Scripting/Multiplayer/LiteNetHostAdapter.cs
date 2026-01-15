@@ -97,8 +97,6 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
         dataReader.Recycle();
     }
 
-    public event Action<INetworkConnectionAdapter>? ConnectedEvent;
-
     public INetworkConnectionAdapter Connect(string hostname)
     {
         Adapter = new LiteNetConnectionAdapter(Client.Connect("localhost", NetworkDefines.ServerPort, NetworkDefines.Key));

@@ -24,7 +24,7 @@ public partial class ClientRoot : Node
     private KeyboardListener KeyboardListener { get; }
 
     //* State
-    private GameState? State { get; set; }
+    private ClientState? State { get; set; }
 
     public ClientRoot()
     {
@@ -43,8 +43,8 @@ public partial class ClientRoot : Node
         if (State is not null)
         {
             State.CharacterAddedEvent += World.AddCharacter;
+            State.PlayerCharacterSetEvent += World.CameraFocusCharacter;
         }
-        ClientNetworkHandler.PlayerCharacterSetEvent += World.CameraFocusCharacter;
 
         World.DisablePhysics();
     }

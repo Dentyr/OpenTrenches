@@ -14,6 +14,14 @@ ambient_light_energy = 0.5
 [node name="World" type="Node3D"]
 script = ExtResource("1_8yo82")
 
+[node name="Control" type="CanvasLayer" parent="."]
+
+[node name="Character" type="Control" parent="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
 [node name="GridMap" type="GridMap" parent="."]
 mesh_library = ExtResource("1_njlop")
 cell_size = Vector3(1, 2, 1)

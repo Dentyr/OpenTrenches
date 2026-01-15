@@ -7,12 +7,12 @@ namespace OpenTrenches.Scripting.Multiplayer;
 
 public class PlayerNetworkHandler : AbstractNetworkHandler
 {
-    private GameState GameState { get; }
+    private ServerState GameState { get; }
 
     public ushort CharacterId;
     public Character Character => GameState.Characters[CharacterId];
 
-    public PlayerNetworkHandler(INetworkConnectionAdapter Adapter, GameState GameState) : base(Adapter)
+    public PlayerNetworkHandler(INetworkConnectionAdapter Adapter, ServerState GameState) : base(Adapter)
     {
         this.GameState = GameState;
         CharacterId = GameState.CreateCharacter(new Character());
