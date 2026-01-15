@@ -43,7 +43,7 @@ public partial class ClientRoot : Node
         if (State is not null)
         {
             State.CharacterAddedEvent += World.AddCharacter;
-            State.PlayerCharacterSetEvent += World.CameraFocusCharacter;
+            State.PlayerCharacterSetEvent += World.AddPlayerComponents;
         }
 
         World.DisablePhysics();

@@ -53,7 +53,7 @@ public partial class GameRoot : Node
     {
         PlayerNetworkHandler player = new(connection, GameState);
         _players.Add(player);
-        foreach (var character in GameState.Characters) player.Adapter.Message(new CreateDatagram(ObjectCategory.Character, character.Key, Serialization.Serialize<Character>(character.Value)));
+        foreach (var character in GameState.Characters) player.Adapter.Send(new CreateDatagram(ObjectCategory.Character, character.Key, Serialization.Serialize<Character>(character.Value)));
         player.Adapter.Send(new MessageDatagram(MessageCategory.Setplayer, Serialization.Serialize<ushort>(player.CharacterId)));
         
     }
@@ -65,6 +65,6 @@ public partial class GameRoot : Node
     {
         NetworkAdapter.Poll();
         foreach(var playerKvp in GameState.Characters)
-            NetworkAdapter.StreamBroadcast(new UpdateDatagram(ObjectCategory.Character, playerKvp.Key, playerKvp.Value.GetUpdate(Character.UpdateType.Position)));
+            NetworkAdapter.Send(new UpdateDatagram(ObjectCategory.Character, playerKvp.Key, playerKvp.Value.GetUpdate(Character.UpdateType.Position)));
     }
 }

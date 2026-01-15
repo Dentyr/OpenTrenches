@@ -42,6 +42,6 @@ public class LiteNetConnectionAdapter : INetworkConnectionAdapter
     public void Send(Datagram datagram)
     {
         if (datagram is IStreamedDatagram) Stream(Serialization.Serialize<Datagram>(datagram));
-        else if (datagram is IStreamedDatagram) Message(Serialization.Serialize<Datagram>(datagram));
+        else if (datagram is IMessageDatagram) Message(Serialization.Serialize<Datagram>(datagram));
     }
 }

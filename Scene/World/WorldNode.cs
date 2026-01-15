@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using OpenTrenches.Scripting.Player;
 
@@ -7,11 +8,6 @@ namespace OpenTrenches.Scene.World;
 
 public partial class WorldNode : Node3D
 {
-    //* Camera
-    private ushort _focusCharacter;
-
-    private FocusCamera Camera { get; }
-
     //* Characters
     private Dictionary<ushort, (CharacterNode CharacterNode, Label Label)> _characters = [];
     private Node3D _characterLayer { get; }
@@ -32,8 +28,6 @@ public partial class WorldNode : Node3D
         };
         AddChild(_characterLayer);
         
-        Camera = new();
-        AddChild(Camera);
 
         _characterUILayer = new();
         AddChild(_characterUILayer);
@@ -41,7 +35,6 @@ public partial class WorldNode : Node3D
 
     public void AddCharacter(ushort id, Character character)
     {
-        Console.WriteLine("NEW CHAR");
         if (_characters.TryAdd(id, new(new CharacterNode(id, character), new Label())))
         {
             CharacterNode node = _characters[id].CharacterNode;
@@ -57,19 +50,17 @@ public partial class WorldNode : Node3D
         foreach(var node in _characterLayer.GetChildren()) node.SetPhysicsProcess(false);
     }
 
-    public void CameraFocusCharacter(ushort id)
+    public void AddPlayerComponents(ushort id)
     {
-        Console.WriteLine(id);
-        _focusCharacter = id;
+        if (_characters.TryGetValue(id, out var tuple)) 
+        {
+            tuple.CharacterNode.AddChild(new FocusCamera());
+        }
 
     }
 
     public override void _Process(double delta)
     {
-        if (_characters.TryGetValue(_focusCharacter, out var thing)) 
-        {
-            Camera.Focus(thing.CharacterNode);
-        }
 
         //* ui elements
 

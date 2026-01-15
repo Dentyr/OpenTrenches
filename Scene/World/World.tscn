@@ -35,6 +35,3 @@ environment = SubResource("Environment_2142r")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.511355, 2.769137, 0)
 mesh = SubResource("BoxMesh_hc2g2")
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1.1924881e-08, 1, 0, -1, 1.1924881e-08, 0, 9.421462, 0)
