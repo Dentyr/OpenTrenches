@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Net;
 using System.Runtime.InteropServices;
 using LiteNetLib;
-using OpenTrenches.Scripting.Datastream;
+using OpenTrenches.Scripting.Multiplayer;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 

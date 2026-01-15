@@ -1,5 +1,5 @@
 using MessagePack;
-using OpenTrenches.Scripting.Datastream;
+using OpenTrenches.Scripting.Multiplayer;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 

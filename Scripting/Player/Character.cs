@@ -3,7 +3,7 @@
 using System;
 using Godot;
 using OpenTrenches.Scripting.Multiplayer;
-using OpenTrenches.Scripting.Datastream;
+using OpenTrenches.Scripting.Multiplayer;
 using MessagePack;
 namespace OpenTrenches.Scripting.Player;
 

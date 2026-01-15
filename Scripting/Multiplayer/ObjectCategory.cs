@@ -1,4 +1,4 @@
-namespace OpenTrenches.Scripting.Datastream;
+namespace OpenTrenches.Scripting.Multiplayer;
 
 public enum ObjectCategory : byte
 {

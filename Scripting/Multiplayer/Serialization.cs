@@ -4,7 +4,7 @@ using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
 
-namespace OpenTrenches.Scripting.Datastream;
+namespace OpenTrenches.Scripting.Multiplayer;
 
 /// <summary>
 /// Message pack serialization and deserialization service using custom options

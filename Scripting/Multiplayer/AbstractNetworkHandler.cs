@@ -1,6 +1,6 @@
 using System;
 using System.Numerics;
-using OpenTrenches.Scripting.Datastream;
+using OpenTrenches.Scripting.Multiplayer;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 

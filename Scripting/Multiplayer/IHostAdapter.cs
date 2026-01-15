@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenTrenches.Scripting.Datastream;
+using OpenTrenches.Scripting.Multiplayer;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 

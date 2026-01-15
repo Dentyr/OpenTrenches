@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTrenches.Scene;
-using OpenTrenches.Scripting.Datastream;
+using OpenTrenches.Scripting.Multiplayer;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 
