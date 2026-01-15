@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using OpenTrenches.Common.Multiplayer;
-using OpenTrenches.Scripting.Player;
+using OpenTrenches.Core.Scripting.Player;
 using OpenTrenches.Common.Contracts;
 
-
+namespace OpenTrenches.Core.Scripting;
 public class GameState
 {
     private Dictionary<ushort, Character> _characters = [];

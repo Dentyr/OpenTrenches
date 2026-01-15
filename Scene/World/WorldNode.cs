@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using OpenTrenches.Scripting.Player;
+using OpenTrenches.Core.Scripting.Player;
 
 namespace OpenTrenches.Scene.World;
 

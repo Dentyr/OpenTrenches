@@ -1,8 +1,8 @@
 using System;
 using Godot;
 using OpenTrenches.Scene.Resources;
-using OpenTrenches.Scripting.Libraries;
-using OpenTrenches.Scripting.Player;
+using OpenTrenches.Core.Scripting.Libraries;
+using OpenTrenches.Core.Scripting.Player;
 
 namespace OpenTrenches.Scene.World;
 

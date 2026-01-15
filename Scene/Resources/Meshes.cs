@@ -1,6 +1,6 @@
 using Godot;
 
-namespace OpenTrenches.Scripting.Libraries;
+namespace OpenTrenches.Core.Scripting.Libraries;
 
 public static class Meshes
 {

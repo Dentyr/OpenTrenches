@@ -1,7 +1,7 @@
 using Godot;
 using OpenTrenches.Scene.World;
 using OpenTrenches.Common.Multiplayer;
-using OpenTrenches.Scripting;
+using OpenTrenches.Core.Scripting;
 using OpenTrenches.Common.Contracts;
 
 namespace OpenTrenches.Scene;

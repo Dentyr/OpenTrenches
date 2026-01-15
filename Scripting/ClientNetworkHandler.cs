@@ -2,7 +2,7 @@
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Common.Contracts;
 
-namespace OpenTrenches.Scripting;
+namespace OpenTrenches.Core.Scripting;
 
 public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractNetworkHandler(Adapter)
 {

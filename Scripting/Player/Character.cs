@@ -5,7 +5,7 @@ using Godot;
 using MessagePack;
 using OpenTrenches.Common.Contracts;
 
-namespace OpenTrenches.Scripting.Player;
+namespace OpenTrenches.Core.Scripting.Player;
 
 [MessagePackObject]
 public class Character : IUpdateable<Character.UpdateType>
