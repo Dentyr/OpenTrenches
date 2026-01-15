@@ -11,10 +11,19 @@ namespace OpenTrenches.Scripting.Multiplayer;
 public abstract class Datagram() {}
 
 /// <summary>
+/// Marker Interface for datagrams that should use the ordered reliable channel
+/// </summary>
+public interface IMessageDatagram{}
+/// <summary>
+/// Marker Interface for datagrams that should use the ordered channel
+/// </summary>
+public interface IStreamedDatagram{}
+
+/// <summary>
 /// Datagram for generic streamed data
 /// </summary>
 [MessagePackObject]
-public class StreamDatagram(StreamCategory StreamCategory, byte[] Item) : Datagram
+public class StreamDatagram(StreamCategory StreamCategory, byte[] Item) : Datagram, IStreamedDatagram
 {
     [Key(0)]
     public StreamCategory StreamCategory { get; } = StreamCategory;
@@ -27,7 +36,7 @@ public class StreamDatagram(StreamCategory StreamCategory, byte[] Item) : Datagr
 /// Datagram for generic messages
 /// </summary>
 [MessagePackObject]
-public class MessageDatagram(MessageCategory MessageCategory, byte[] Item) : Datagram
+public class MessageDatagram(MessageCategory MessageCategory, byte[] Item) : Datagram, IMessageDatagram
 {
     [Key(0)]
     public MessageCategory MessageCategory { get; } = MessageCategory;
@@ -36,7 +45,7 @@ public class MessageDatagram(MessageCategory MessageCategory, byte[] Item) : Dat
 }
 
 [MessagePackObject]
-public class CreateDatagram(ObjectCategory TargetType, ushort TargetId, byte[] Item) : Datagram
+public class CreateDatagram(ObjectCategory TargetType, ushort TargetId, byte[] Item) : Datagram, IMessageDatagram
 {
     [Key(0)]
     public ObjectCategory TargetType { get; } = TargetType;
@@ -48,7 +57,7 @@ public class CreateDatagram(ObjectCategory TargetType, ushort TargetId, byte[] I
 
 
 [MessagePackObject]
-public class UpdateDatagram(ObjectCategory TargetType, ushort TargetId, Update Update) : Datagram
+public class UpdateDatagram(ObjectCategory TargetType, ushort TargetId, Update Update) : Datagram, IStreamedDatagram
 {
     [Key(0)]
     public ObjectCategory TargetType { get; } = TargetType;

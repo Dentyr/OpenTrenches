@@ -42,15 +42,5 @@ public interface IServerNetworkAdapter : IHostNetworkAdapter
 {
     public event Action<INetworkConnectionAdapter> ConnectedEvent;
 
-    public void StreamBroadcast(Datagram datagram) => StreamBroadcast(Serialization.Serialize(datagram));
-    public void MessageBroadcast(Datagram datagram) => MessageBroadcast(Serialization.Serialize(datagram));
-
-    /// <summary>
-    /// Sends <paramref name="datagram"/> to <see cref="Address"/> unreliably but in order.
-    /// </summary>
-    public void StreamBroadcast(byte[] datagram);
-    /// <summary>
-    /// Sends <paramref name="datagram"/> to <see cref="EndPoint"/> reliably and in order.
-    /// </summary>
-    public void MessageBroadcast(byte[] datagram);
+    public void Send(Datagram datagram);
 }

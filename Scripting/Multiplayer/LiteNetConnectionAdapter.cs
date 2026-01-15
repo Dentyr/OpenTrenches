@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Net;
 using System.Runtime.InteropServices;
 using LiteNetLib;
+using OpenTrenches.Scripting.Datastream;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 
@@ -28,7 +29,19 @@ public class LiteNetConnectionAdapter : INetworkConnectionAdapter
         ReceiveEvent?.Invoke(receive.AsMemory());
     }
 
+    /// <summary>
+    /// Sequenced channel delivery
+    /// </summary>
     public void Stream(byte[] payload) => Peer.Send(payload, DeliveryMethod.Sequenced);
 
+    /// <summary>
+    /// reliable ordered channel delivery
+    /// </summary>
     public void Message(byte[] payload) => Peer.Send(payload, DeliveryMethod.ReliableOrdered);
+
+    public void Send(Datagram datagram)
+    {
+        if (datagram is IStreamedDatagram) Stream(Serialization.Serialize<Datagram>(datagram));
+        else if (datagram is IStreamedDatagram) Message(Serialization.Serialize<Datagram>(datagram));
+    }
 }

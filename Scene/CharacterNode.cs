@@ -4,7 +4,7 @@ using OpenTrenches.Scene.Resources;
 using OpenTrenches.Scripting.Libraries;
 using OpenTrenches.Scripting.Player;
 
-namespace OpenTrenches.Scene;
+namespace OpenTrenches.Scene.World;
 
 public partial class CharacterNode : CharacterBody3D
 {
@@ -28,6 +28,11 @@ public partial class CharacterNode : CharacterBody3D
             }
         });
 
+
+        AddChild(new Label()
+        {
+            Text = "Label Test",
+        });
     }
 
     public override void _Process(double delta)

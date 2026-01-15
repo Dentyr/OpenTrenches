@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTrenches.Scene;
+using OpenTrenches.Scripting.Datastream;
 
 namespace OpenTrenches.Scripting.Multiplayer;
 
@@ -67,14 +68,11 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
 
     public void Stop() => Server.Stop();
 
-    public void StreamBroadcast(byte[] datagram)
-    {
-        foreach(var connection in _adapterDictionary.Values) connection.Stream(datagram);
-    }
 
-    public void MessageBroadcast(byte[] datagram)
+    void IServerNetworkAdapter.Send(Datagram datagram)
     {
-        foreach(var connection in _adapterDictionary.Values) connection.Message(datagram);
+        if (datagram is IStreamedDatagram) foreach (var connecttion in _adapterDictionary.Values) connecttion.Stream(Serialization.Serialize<Datagram>(datagram));
+        else if (datagram is IMessageDatagram) foreach (var connecttion in _adapterDictionary.Values) connecttion.Message(Serialization.Serialize<Datagram>(datagram));
     }
 }
 

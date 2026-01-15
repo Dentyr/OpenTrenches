@@ -46,7 +46,7 @@ public partial class GameRoot : Node
         GameState.CharacterAddedEvent += BroadcastCharacter;
     }
     private void BroadcastCharacter(ushort id, Character character) 
-        => NetworkAdapter.MessageBroadcast(new CreateDatagram(ObjectCategory.Character, id, Serialization.Serialize(character)));
+        => NetworkAdapter.Send(new CreateDatagram(ObjectCategory.Character, id, Serialization.Serialize(character)));
 
 
     private void Connection(INetworkConnectionAdapter connection)
@@ -54,7 +54,7 @@ public partial class GameRoot : Node
         PlayerNetworkHandler player = new(connection, GameState);
         _players.Add(player);
         foreach (var character in GameState.Characters) player.Adapter.Message(new CreateDatagram(ObjectCategory.Character, character.Key, Serialization.Serialize<Character>(character.Value)));
-        player.Adapter.Message(new MessageDatagram(MessageCategory.Setplayer, Serialization.Serialize<ushort>(player.CharacterId)));
+        player.Adapter.Send(new MessageDatagram(MessageCategory.Setplayer, Serialization.Serialize<ushort>(player.CharacterId)));
         
     }
 
