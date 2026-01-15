@@ -11,4 +11,7 @@
     <PackageReference Include="MessagePack" Version="3.1.4" />
     <PackageReference Include="MessagePackGodot" Version="1.0.2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\opentrenches-shared\OpenTrenches Utilities.csproj" />
+  </ItemGroup>
 </Project>

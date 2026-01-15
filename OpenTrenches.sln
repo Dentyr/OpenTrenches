@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Open Trenches", "Open Trenches.csproj", "{4D270014-FDB7-49CC-BE6B-98413CDCDD4F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Open Trenches", "OpenTrenches.csproj", "{4D270014-FDB7-49CC-BE6B-98413CDCDD4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

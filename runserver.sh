@@ -1,1 +1,0 @@
-godot-mono Scene/GameRoot.tscn

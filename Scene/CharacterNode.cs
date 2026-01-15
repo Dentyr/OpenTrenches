@@ -6,7 +6,7 @@ using OpenTrenches.Scripting.Player;
 
 namespace OpenTrenches.Scene.World;
 
-public partial class CharacterNode : CharacterBody3D
+public partial class CharacterNode : Node3D
 {
     private ushort Id { get; }
     private Character Character { get; }
@@ -40,12 +40,4 @@ public partial class CharacterNode : CharacterBody3D
         Position = Character.Position;
     }
 
-    public override void _PhysicsProcess(double delta)
-    {
-        Position = Character.Position;
-        Velocity += SceneDefines.Physics.g * (float)delta;
-        Velocity = new(Character.Movement.X * (float)delta, Velocity.Y, Character.Movement.Z * (float)delta);
-        MoveAndSlide();
-        Character.Position = Position;
-    }
 }

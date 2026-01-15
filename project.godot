@@ -11,13 +11,13 @@ config_version=5
 [application]
 
 config/name="Open Trenches"
-run/main_scene="uid://c4mqavbo8bpia"
+run/main_scene="uid://jxsgp61cwdog"
 config/features=PackedStringArray("4.5", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [dotnet]
 
-project/assembly_name="Open Trenches"
+project/assembly_name="OpenTrenches"
 
 [rendering]
 
