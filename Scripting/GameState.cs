@@ -1,8 +1,7 @@
 
 using System;
 using System.Collections.Generic;
-using OpenTrenches.Scripting.Multiplayer;
-using OpenTrenches.Scripting.Multiplayer;
+using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Scripting.Player;
 
 public class GameState

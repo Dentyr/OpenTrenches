@@ -6,8 +6,8 @@ using System.Threading;
 using Godot;
 using LiteNetLib;
 using OpenTrenches.Scene.World;
-using OpenTrenches.Scripting.Multiplayer;
-using OpenTrenches.Scripting.Multiplayer;
+using OpenTrenches.Common.Multiplayer;
+using OpenTrenches.Scripting;
 
 namespace OpenTrenches.Scene;
 

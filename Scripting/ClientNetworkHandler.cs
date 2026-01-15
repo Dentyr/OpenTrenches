@@ -1,9 +1,10 @@
 
 using System;
 using OpenTrenches.Scene.World;
-using OpenTrenches.Scripting.Multiplayer;
-using OpenTrenches.Scripting.Multiplayer;
+using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Scripting.Player;
+
+namespace OpenTrenches.Scripting;
 
 public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractNetworkHandler(Adapter)
 {

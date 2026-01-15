@@ -2,8 +2,7 @@
 // namespace 
 using System;
 using Godot;
-using OpenTrenches.Scripting.Multiplayer;
-using OpenTrenches.Scripting.Multiplayer;
+using OpenTrenches.Common.Multiplayer;
 using MessagePack;
 namespace OpenTrenches.Scripting.Player;
 
