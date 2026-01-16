@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Core.Scripting.Player;
 using OpenTrenches.Common.Contracts;
+using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Core.Scripting.Adapter;
 
 namespace OpenTrenches.Core.Scripting;
 public class GameState
@@ -11,11 +13,11 @@ public class GameState
     private Dictionary<ushort, Character> _characters = [];
     public IReadOnlyDictionary<ushort, Character> Characters => _characters;
 
-    public event Action<ushort, Character>? CharacterAddedEvent; 
+    public event Action<Character>? CharacterAddedEvent; 
 
-    protected void AddCharacter(ushort id, Character Character)
+    protected void AddCharacter(Character Character)
     {
-        if (_characters.TryAdd(id, Character)) CharacterAddedEvent?.Invoke(id, Character);
+        if (_characters.TryAdd(Character.ID, Character)) CharacterAddedEvent?.Invoke(Character);
     }
 
 }
@@ -35,12 +37,13 @@ public class ClientState : GameState
                 break;
         }
     }
-    public void Create(ObjectCategory category, ushort id, ReadOnlyMemory<byte> bytes)
+    public void Create(ObjectCategory category, AbstractDTO dTO)
     {
+        if (dTO is CharacterDTO character) AddCharacter(FromDTO.Convert(character));
         switch (category)
         {
             case ObjectCategory.Character:
-                AddCharacter(id, Serialization.Deserialize<Character>(bytes));
+                
                 break;
             default:
                 break;
@@ -54,16 +57,5 @@ public class ClientState : GameState
                 PlayerCharacterSetEvent?.Invoke(Serialization.Deserialize<ushort>(message));
                 break;
         }
-    }
-}
-
-public class ServerState : GameState
-{
-    private ushort _charId = 0;
-    public ushort CreateCharacter(Character Character)
-    {
-        ushort id = _charId ++;
-        AddCharacter(id, Character);
-        return id;
     }
 }

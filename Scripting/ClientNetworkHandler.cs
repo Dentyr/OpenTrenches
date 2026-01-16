@@ -11,7 +11,7 @@ public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractN
     public ClientState? State = new();
 
 
-    protected override void _DeserializeCreate(CreateDatagram datagram) => State?.Create(datagram.TargetType, datagram.TargetId, datagram.Value);
+    protected override void _DeserializeCreate(CreateDatagram datagram) => State?.Create(datagram.TargetType, datagram.DTO);
 
 
     protected override void _DeserializeStream(StreamDatagram datagram)

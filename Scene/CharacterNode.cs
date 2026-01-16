@@ -8,11 +8,9 @@ namespace OpenTrenches.Scene.World;
 
 public partial class CharacterNode : Node3D
 {
-    private ushort Id { get; }
     private Character Character { get; }
-    public CharacterNode(ushort Id, Character Character)
+    public CharacterNode(Character Character)
     {
-        this.Id = Id;
         this.Character = Character;
         Position = Character.Position;
         AddChild(new MeshInstance3D()

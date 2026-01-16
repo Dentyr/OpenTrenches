@@ -33,12 +33,12 @@ public partial class WorldNode : Node3D
         AddChild(_characterUILayer);
     }
 
-    public void AddCharacter(ushort id, Character character)
+    public void AddCharacter(Character character)
     {
-        if (_characters.TryAdd(id, new(new CharacterNode(id, character), new Label())))
+        if (_characters.TryAdd(character.ID, new(new CharacterNode(character), new Label())))
         {
-            CharacterNode node = _characters[id].CharacterNode;
-            Label label = _characters[id].Label;
+            CharacterNode node = _characters[character.ID].CharacterNode;
+            Label label = _characters[character.ID].Label;
             _characterLayer.AddChild(node);
             _characterUILayer.AddChild(label);
             node.SetPhysicsProcess(ChildPhysicsEnabled);
