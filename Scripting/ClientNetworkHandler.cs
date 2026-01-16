@@ -1,6 +1,8 @@
 
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Common.Contracts;
+using OpenTrenches.Common.Contracts.DTO;
+using System;
 
 namespace OpenTrenches.Core.Scripting;
 
@@ -11,19 +13,15 @@ public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractN
     public ClientState? State = new();
 
 
-    protected override void _DeserializeCreate(CreateDatagram datagram) => State?.Create(datagram.TargetType, datagram.DTO);
+    protected override void _DeserializeCreate(CreateDatagram datagram) => State?.Create(datagram.DTO);
 
 
     protected override void _DeserializeStream(StreamDatagram datagram)
     {
-        switch (datagram.StreamCategory)
-        {
-            default:
-                break;
-        }
+        throw new NotImplementedException();
     }
 
-    protected override void _DeserializeUpdate(UpdateDatagram datagram) => State?.Update(datagram.TargetType, datagram.TargetId, datagram.Update);
+    protected override void _DeserializeUpdate(UpdateDatagram datagram) => State?.Update(datagram.Update);
 
-    protected override void _DeserializeMessage(MessageDatagram message) => State?.Receive(message.MessageCategory, message.Item);
+    protected override void _DeserializeMessage(CommandDatagram message) => State?.Receive(message.DTO);
 }

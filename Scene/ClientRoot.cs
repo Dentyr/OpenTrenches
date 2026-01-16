@@ -48,6 +48,6 @@ public partial class ClientRoot : Node
         NetworkAdapter.Poll();
 
         // Stream user key and mouse input
-        ClientNetworkHandler.Adapter.Send(new StreamDatagram(StreamCategory.Input, Serialization.Serialize(KeyboardListener.GetStatus())));
+        ClientNetworkHandler.Adapter.Send(KeyboardListener.GetStatus());
     }
 }

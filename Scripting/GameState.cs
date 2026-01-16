@@ -26,36 +26,16 @@ public class ClientState : GameState
 {
     public event Action<ushort>? PlayerCharacterSetEvent;
     
-    public void Update(ObjectCategory category, ushort id, Update update)
+    public void Update(AbstractUpdateDTO update)
     {
-        switch (category)
-        {
-            case ObjectCategory.Character:
-                if (Characters.TryGetValue(id, out var character)) character.Update(update);
-                break;
-            default:
-                break;
-        }
+        if (update is CharacterUpdateDTO characterUpdateDTO) if (Characters.TryGetValue(characterUpdateDTO.TargetId, out var character)) character.Update(characterUpdateDTO);
     }
-    public void Create(ObjectCategory category, AbstractDTO dTO)
+    public void Create(AbstractDTO dTO)
     {
         if (dTO is CharacterDTO character) AddCharacter(FromDTO.Convert(character));
-        switch (category)
-        {
-            case ObjectCategory.Character:
-                
-                break;
-            default:
-                break;
-        }
     }
-    public void Receive(MessageCategory messageType, byte[] message)
+    public void Receive(AbstractCommandDTO dto)
     {
-        switch (messageType)
-        {
-            case MessageCategory.Setplayer:
-                PlayerCharacterSetEvent?.Invoke(Serialization.Deserialize<ushort>(message));
-                break;
-        }
+        if (dto is SetPlayerCommandDTO setPlayerCommand) PlayerCharacterSetEvent?.Invoke(setPlayerCommand.PlayerID);
     }
 }

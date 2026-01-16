@@ -24,15 +24,15 @@ public class Character : IIdObject
 
     //* Updates
 
-    public void Update(Update update)
+    public void Update(CharacterUpdateDTO update)
     {
-        switch ((CharacterAttribute)update.Type)
+        switch (update.Attribute)
         {
             case CharacterAttribute.Position:
-                Position = CharacterUpdateHelper.FromPositionUpdate(update.Payload);
+                Position = Serialization.Deserialize<Vector3>(update.Payload);
                 break;
             case CharacterAttribute.Health:
-                Health = CharacterUpdateHelper.FromHealthUpdate(update.Payload);
+                Health = Serialization.Deserialize<float>(update.Payload);
                 break;
         }
     }

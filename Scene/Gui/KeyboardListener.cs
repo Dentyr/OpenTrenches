@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using MessagePack;
+using OpenTrenches.Common.Contracts.DTO;
 
 public partial class KeyboardListener : Node
 {
@@ -57,9 +58,9 @@ public partial class KeyboardListener : Node
         }
     }
 
-    public InputStatus GetStatus()
+    public InputStatusDTO GetStatus()
     {
-        return new InputStatus()
+        return new InputStatusDTO()
         {
             Keys = [.. GetKeyList()],
             MousePos = MPos,
@@ -76,22 +77,3 @@ public partial class KeyboardListener : Node
     }
 }
 
-[MessagePackObject]
-public class InputStatus
-{
-    [Key(0)]
-    public required UserKey[] Keys;
-    [Key(1)]
-    public required Vector2 MousePos;
-}
-
-public enum UserKey : byte
-{
-    W,
-    A,
-    S,
-    D,
-    LMB,
-    RMB,
-    R,
-}
