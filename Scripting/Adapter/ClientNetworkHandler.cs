@@ -4,7 +4,7 @@ using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
 using System;
 
-namespace OpenTrenches.Core.Scripting;
+namespace OpenTrenches.Core.Scripting.Adapter;
 
 public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractNetworkHandler(Adapter)
 {
