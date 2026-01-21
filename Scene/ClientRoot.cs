@@ -3,6 +3,7 @@ using OpenTrenches.Scene.World;
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Common.Contracts;
+using OpenTrenches.Core.Scripting.Adapter;
 
 namespace OpenTrenches.Scene;
 
@@ -39,6 +40,8 @@ public partial class ClientRoot : Node
         {
             State.CharacterAddedEvent += World.AddCharacter;
             State.PlayerCharacterSetEvent += World.AddPlayerComponents;
+            State.PlayerCharacterSetEvent += KeyboardListener.SetPlayer;
+            State.FireEvent += World.RenderProjectile;
         }
 
         World.DisablePhysics();

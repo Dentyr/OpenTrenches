@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using OpenTrenches.Core.Scripting.Player;
+using OpenTrenches.Scene.Combat;
 
 namespace OpenTrenches.Scene.World;
 
@@ -50,9 +51,9 @@ public partial class WorldNode : Node3D
         foreach(var node in _characterLayer.GetChildren()) node.SetPhysicsProcess(false);
     }
 
-    public void AddPlayerComponents(ushort id)
+    public void AddPlayerComponents(Character character)
     {
-        if (_characters.TryGetValue(id, out var tuple)) 
+        if (_characters.TryGetValue(character.ID, out var tuple)) 
         {
             tuple.CharacterNode.AddChild(new FocusCamera());
         }
@@ -69,5 +70,10 @@ public partial class WorldNode : Node3D
             tuple.Label.Position = new (tuple.CharacterNode.Position.X, tuple.CharacterNode.Position.Z);
             // tuple.Label.Position -= ne
         }
+    }
+
+    public void RenderProjectile(Vector3 start, Vector3 end)
+    {
+        AddChild(new BulletRay3D(start, end));
     }
 }

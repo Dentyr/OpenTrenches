@@ -6,6 +6,7 @@ using OpenTrenches.Core.Scripting.Player;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Core.Scripting.Adapter;
+using Godot;
 
 namespace OpenTrenches.Core.Scripting;
 public class GameState
@@ -24,7 +25,9 @@ public class GameState
 
 public class ClientState : GameState
 {
-    public event Action<ushort>? PlayerCharacterSetEvent;
+    public event Action<Character>? PlayerCharacterSetEvent;
+
+    public event Action<Vector3, Vector3>? FireEvent;
     
     public void Update(AbstractUpdateDTO update)
     {
@@ -36,6 +39,14 @@ public class ClientState : GameState
     }
     public void Receive(AbstractCommandDTO dto)
     {
-        if (dto is SetPlayerCommandDTO setPlayerCommand) PlayerCharacterSetEvent?.Invoke(setPlayerCommand.PlayerID);
+        if (dto is SetPlayerCommandDTO setPlayerCommand) 
+        {
+            if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character)) PlayerCharacterSetEvent?.Invoke(character);
+            else throw new NotImplementedException("Request another ID not implemented");
+        }
+        else if (dto is ProjectileNotificationCommand projectile)
+        {
+            FireEvent?.Invoke(projectile.Start, projectile.End);
+        }
     }
 }
