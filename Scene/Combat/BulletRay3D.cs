@@ -8,7 +8,7 @@ public partial class BulletRay3D : MeshInstance3D
     private readonly double _decayTarget;
     private double _decay = 0;
     private OmniLight3D _omni;
-    public BulletRay3D(Vector3 begin, Vector3 end, double decayTarget = 0.2d)
+    public BulletRay3D(Vector3 begin, Vector3 end, double decayTarget = 0.05d)
     {
         begin += (end-begin).LimitLength(0.3f);
         Position = begin;
