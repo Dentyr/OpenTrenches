@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using OpenTrenches.Core.Scene.World;
 using OpenTrenches.Core.Scripting.Player;
 using OpenTrenches.Scene.Combat;
 
@@ -10,7 +11,7 @@ namespace OpenTrenches.Scene.World;
 public partial class WorldNode : Node3D
 {
     //* Characters
-    private Dictionary<ushort, (CharacterNode CharacterNode, Label Label)> _characters = [];
+    private readonly Dictionary<ushort, (CharacterNode CharacterNode, CharacterFloat Label)> _characters = [];
     private Node3D _characterLayer { get; }
 
 
@@ -36,12 +37,14 @@ public partial class WorldNode : Node3D
 
     public void AddCharacter(Character character)
     {
-        if (_characters.TryAdd(character.ID, new(new CharacterNode(character), new Label())))
+        if (_characters.TryAdd(character.ID, new(new CharacterNode(character), new CharacterFloat(character))))
         {
             CharacterNode node = _characters[character.ID].CharacterNode;
-            Label label = _characters[character.ID].Label;
             _characterLayer.AddChild(node);
+
+            CharacterFloat label = _characters[character.ID].Label;
             _characterUILayer.AddChild(label);
+            
             node.SetPhysicsProcess(ChildPhysicsEnabled);
         }
     }
