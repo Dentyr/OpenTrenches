@@ -1,11 +1,10 @@
 using Godot;
-using OpenTrenches.Scene.World;
+using OpenTrenches.Core.Scene.World;
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Core.Scripting;
-using OpenTrenches.Common.Contracts;
 using OpenTrenches.Core.Scripting.Adapter;
 
-namespace OpenTrenches.Scene;
+namespace OpenTrenches.Core.Scene;
 
 [GlobalClass]
 public partial class ClientRoot : Node

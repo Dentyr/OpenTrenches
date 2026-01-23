@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
-using OpenTrenches.Core.Scene.World;
 using OpenTrenches.Core.Scripting.Player;
-using OpenTrenches.Scene.Combat;
+using OpenTrenches.Core.Scene.Combat;
 
-namespace OpenTrenches.Scene.World;
+namespace OpenTrenches.Core.Scene.World;
 
 public partial class WorldNode : Node3D
 {

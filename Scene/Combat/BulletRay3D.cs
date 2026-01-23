@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-namespace OpenTrenches.Scene.Combat;
+namespace OpenTrenches.Core.Scene.Combat;
 
 public partial class BulletRay3D : MeshInstance3D
 {

@@ -1,5 +1,5 @@
 using Godot;
-namespace OpenTrenches.Scene;
+namespace OpenTrenches.Core.Scene;
 
 public static class SceneDefines
 {

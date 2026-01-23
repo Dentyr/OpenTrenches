@@ -1,10 +1,10 @@
 using System;
 using Godot;
-using OpenTrenches.Scene.Resources;
+using OpenTrenches.Core.Scene.Resources;
 using OpenTrenches.Core.Scripting.Libraries;
 using OpenTrenches.Core.Scripting.Player;
 
-namespace OpenTrenches.Scene.World;
+namespace OpenTrenches.Core.Scene.World;
 
 public partial class CharacterNode : Node3D
 {

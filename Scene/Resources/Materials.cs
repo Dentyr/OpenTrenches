@@ -1,6 +1,6 @@
 using Godot;
 
-namespace OpenTrenches.Scene.Resources;
+namespace OpenTrenches.Core.Scene.Resources;
 
 public static class Materials
 {

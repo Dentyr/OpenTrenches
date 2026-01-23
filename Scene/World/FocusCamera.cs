@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-namespace OpenTrenches.Scene.World;
+namespace OpenTrenches.Core.Scene.World;
 /// <summary>
 /// <see cref="CharacterNode"/> component for a client's player character.
 /// </summary>
