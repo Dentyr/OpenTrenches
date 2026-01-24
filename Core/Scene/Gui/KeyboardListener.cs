@@ -5,7 +5,6 @@ using Godot;
 using MessagePack;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Core.Scripting;
-using OpenTrenches.Core.Scripting.Libraries;
 using OpenTrenches.Core.Scripting.Player;
 
 public partial class KeyboardListener : Node

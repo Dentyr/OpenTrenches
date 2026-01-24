@@ -1,8 +1,4 @@
-using System;
 using Godot;
-using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Server.Scene.Resources;
-using OpenTrenches.Server.Scripting.Libraries;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scene.World;
