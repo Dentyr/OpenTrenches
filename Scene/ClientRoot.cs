@@ -38,6 +38,9 @@ public partial class ClientRoot : Node
         if (State is not null)
         {
             State.CharacterAddedEvent += World.AddCharacter;
+            State.ChunkSetEvent += World.AddChunk;
+
+
             State.PlayerCharacterSetEvent += World.AddPlayerComponents;
             State.PlayerCharacterSetEvent += KeyboardListener.SetPlayer;
             State.FireEvent += World.RenderProjectile;

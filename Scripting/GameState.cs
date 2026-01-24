@@ -7,6 +7,9 @@ using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Core.Scripting.Adapter;
 using Godot;
+using OpenTrenches.Core.Scene;
+using OpenTrenches.Common.Contracts.Defines;
+using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Core.Scripting;
 public class GameState
@@ -25,7 +28,20 @@ public class GameState
 
 public class ClientState : GameState
 {
+    //* 
+    public ChunkArray2D Chunks { get; } = new(); //TODO send required size in create message
+
+
+    //*
+    private void SetChunk(ChunkRecord record)
+    {
+        Chunks[record.X, record.Y] = record.Chunk;
+        ChunkSetEvent?.Invoke(record);
+    }
+
+    //* Events
     public event Action<Character>? PlayerCharacterSetEvent;
+    public event Action<ChunkRecord>? ChunkSetEvent;
 
     public event Action<Vector3, Vector3>? FireEvent;
     
@@ -36,6 +52,7 @@ public class ClientState : GameState
     public void Create(AbstractDTO dTO)
     {
         if (dTO is CharacterDTO character) AddCharacter(FromDTO.Convert(character));
+        else if (dTO is WorldChunkDTO chunk) SetChunk(CommonFromDTO.Convert(chunk));
     }
     public void Receive(AbstractCommandDTO dto)
     {

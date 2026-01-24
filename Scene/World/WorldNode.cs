@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using OpenTrenches.Core.Scripting.Player;
 using OpenTrenches.Core.Scene.Combat;
+using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Core.Scene.World;
 
@@ -11,6 +12,8 @@ public partial class WorldNode : Node3D
     private readonly Dictionary<ushort, (CharacterNode CharacterNode, CharacterFloat Label)> _characters = [];
     private Node3D _characterLayer { get; }
 
+    //* tiles
+    private ChunkLayer ChunkLayer { get; }
 
     //* UI
 
@@ -26,10 +29,21 @@ public partial class WorldNode : Node3D
             Name = "Characters",
         };
         AddChild(_characterLayer);
+
+        ChunkLayer = new()
+        {
+            
+        };
+        AddChild(ChunkLayer);
         
 
         _characterUILayer = new();
         AddChild(_characterUILayer);
+    }
+
+    public void AddChunk(ChunkRecord record)
+    {
+        ChunkLayer.SetChunk(record);
     }
 
     public void AddCharacter(Character character)
