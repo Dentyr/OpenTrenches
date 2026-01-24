@@ -1,2 +1,2 @@
 dotnet build
-godot-mono Scene/ClientRoot.tscn --debug-collisions
+godot-mono Core/Scene/ClientRoot.tscn --debug-collisions

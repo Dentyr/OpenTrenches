@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://dcfr8xpqb0nsr"]
+
+[ext_resource type="Script" uid="uid://bho02vra6ps78" path="res://Core/Scene/ClientRoot.cs" id="1_2i6bf"]
+[ext_resource type="PackedScene" uid="uid://bu0n3xws36xki" path="res://Core/Scene/World/World.tscn" id="2_nwkj3"]
+
+[node name="ClientRoot" type="Node"]
+script = ExtResource("1_2i6bf")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Client"
+
+[node name="World" parent="." instance=ExtResource("2_nwkj3")]

@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://s5kvkvurkdx1"]
+
+[ext_resource type="Script" uid="uid://162wa4p3sbqw" path="res://Server/Scene/GameRoot.cs" id="1_23sxr"]
+[ext_resource type="PackedScene" uid="uid://c4mqavbo8bpia" path="res://Server/Scene/World/World.tscn" id="2_qu4wy"]
+
+[node name="GameRoot" type="Node"]
+script = ExtResource("1_23sxr")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Game Server"
+
+[node name="World" parent="." instance=ExtResource("2_qu4wy")]
