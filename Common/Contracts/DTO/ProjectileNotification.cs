@@ -4,7 +4,7 @@ using MessagePack;
 namespace OpenTrenches.Common.Contracts.DTO;
 
 [MessagePackObject]
-public class ProjectileNotificationCommand(Vector3 Start, Vector3 End) : AbstractCommandDTO
+public record class ProjectileNotificationCommand(Vector3 Start, Vector3 End) : AbstractCommandDTO
 {
     [Key(0)]
     public Vector3 Start { get; } = Start;

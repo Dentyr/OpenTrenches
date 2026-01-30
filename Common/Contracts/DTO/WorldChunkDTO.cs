@@ -4,7 +4,7 @@ using MessagePack;
 namespace OpenTrenches.Common.Contracts.DTO;
 
 [MessagePackObject]
-public class WorldChunkDTO(TileRecord?[][] Gridmap, byte X, byte Y) : AbstractDTO
+public record class WorldChunkDTO(TileRecord?[][] Gridmap, byte X, byte Y) : AbstractDTO
 {
     [Key(0)]
     public TileRecord?[][] Gridmap { get; } = Gridmap;
@@ -28,7 +28,7 @@ public enum GridTilettribute : byte
 
 
 [MessagePackObject]
-public class WorldGridAttributeUpdateDTO(GridTilettribute Attribute, byte ChunkX, byte ChunkY, byte X, byte Y, byte[] Payload) : AbstractUpdateDTO
+public record class WorldGridAttributeUpdateDTO(GridTilettribute Attribute, byte ChunkX, byte ChunkY, byte X, byte Y, byte[] Payload) : AbstractUpdateDTO
 {
     public static WorldGridAttributeUpdateDTO CreateTerrain(byte ChunkX, byte ChunkY, byte X, byte Y, TileType Target) => new(GridTilettribute.Terrain, ChunkX, ChunkY, X, Y, Serialization.Serialize(Target));
     public static WorldGridAttributeUpdateDTO CreateHealth(byte ChunkX, byte ChunkY, byte X, byte Y, float Target) => new(GridTilettribute.Health, ChunkX, ChunkY, X, Y, Serialization.Serialize(Target));

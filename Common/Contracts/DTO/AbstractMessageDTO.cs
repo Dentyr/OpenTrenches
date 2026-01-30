@@ -5,22 +5,19 @@ namespace OpenTrenches.Common.Contracts.DTO;
 
 [MessagePackObject]
 [Union(0, typeof(InputStatusDTO))]
-public abstract class AbstractStreamDTO
-{
-    
-}
+public abstract record class AbstractStreamDTO {}
 
+/// <summary>
+/// Represents the input state of the user
+/// </summary>
+/// <param name="Keys">Keys pressed by the user</param>
+/// <param name="MousePos">Position of mouse within the world</param>
 [MessagePackObject]
-public class InputStatusDTO : AbstractStreamDTO
-{
-    [Key(0)]
-    public required UserKey[] Keys;
-    /// <summary>
-    /// Where the mouse is targeting in-world
-    /// </summary>
-    [Key(1)]
-    public required Vector2 MousePos;
-}
+public record class InputStatusDTO(
+    [property: Key(0)] UserKey[] Keys,
+    [property: Key(1)] Vector2 MousePos
+) : AbstractStreamDTO
+{}
 
 public enum UserKey : byte
 {
