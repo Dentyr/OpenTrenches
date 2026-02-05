@@ -15,7 +15,7 @@ public partial class WorldView : Node3D
     private Node3D _characterLayer { get; }
 
     //* tiles
-    private ChunkViewLayer ChunkLayer { get; set; } = null!;
+    private RenderChunkLayer ChunkLayer { get; set; } = null!;
 
     //* UI
 

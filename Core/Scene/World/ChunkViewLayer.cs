@@ -6,8 +6,10 @@ using OpenTrenches.Common.Scene.World;
 using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Core.Scene.World;
-public partial class ChunkViewLayer : AbstractChunkLayer<BaseChunkNode>
+public partial class RenderChunkLayer : AbstractChunkLayer<BaseChunkNode>
 {
-    public ChunkViewLayer(ChunkArray2D ChunkGrid) : base(ChunkGrid)
+    public RenderChunkLayer(ChunkArray2D ChunkGrid) : base(ChunkGrid)
     {}
+
+    protected override BaseChunkNode _Initialize(IChunk chunk) => new BaseChunkNode(chunk);
 }

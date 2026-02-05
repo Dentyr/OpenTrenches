@@ -14,7 +14,7 @@ public partial class WorldNode : Node3D, IWorldSimulator
     private Node3D CharacterLayer { get; }
 
     //* gridmap
-    private ChunkLayer? ChunkLayer { get; set; } 
+    private ServerChunkLayer? ChunkLayer { get; set; } 
 
     public WorldNode()
     {

@@ -5,9 +5,9 @@ using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Common.Scene.World;
 
-public partial class AbstractChunkLayer<TChunkNode> : Node3D where TChunkNode : BaseChunkNode
+public abstract partial class AbstractChunkLayer<TChunkNode> : Node3D where TChunkNode : BaseChunkNode
 {
-    protected Grid2D<BaseChunkNode> Nodes { get; set; }
+    protected Grid2D<TChunkNode> Nodes { get; set; }
     protected ChunkArray2D Source { get; }
 
     public AbstractChunkLayer(ChunkArray2D ChunkGrid)
@@ -15,22 +15,27 @@ public partial class AbstractChunkLayer<TChunkNode> : Node3D where TChunkNode : 
         Source = ChunkGrid;
         Source.ChunkChangedEvent += SetChunk;
 
+
         // set chunks 
         Nodes = new(CommonDefines.WorldSize, CommonDefines.WorldSize);
-        foreach (BaseChunkNode node in Nodes.GetGridItems()) node?.QueueFree();
         for (int x = 0; x < ChunkGrid.SizeX; x ++) 
         {
             for (int y = 0; y < ChunkGrid.SizeY; y ++) 
             {
-                BaseChunkNode node = new(ChunkGrid[x, y])
-                {
-                    Position = new(x * CommonDefines.ChunkSize, 0, y * CommonDefines.ChunkSize)
-                };
+                TChunkNode node = Initialize(x, y, ChunkGrid[x, y]);
                 Nodes[x, y] = node;
                 AddChild(node);
             }
         }
     }
+
+    private TChunkNode Initialize(int x, int y, IChunk chunk)
+    {
+        TChunkNode node = _Initialize(chunk);
+        node.Position = new(x * CommonDefines.ChunkSize, 0, y * CommonDefines.ChunkSize);
+        return node;
+    }
+    protected abstract TChunkNode _Initialize(IChunk chunk);
 
 
     private void SetChunk(ChunkRecord record)
@@ -40,11 +45,7 @@ public partial class AbstractChunkLayer<TChunkNode> : Node3D where TChunkNode : 
     private void SetChunk(int x, int y, Chunk chunk)
     {
         Nodes[x, y]?.QueueFree();
-        BaseChunkNode node = new(chunk)
-        {
-            Position = new(x * CommonDefines.ChunkSize, 0, y * CommonDefines.ChunkSize)
-        };
-        Nodes[x, y] = node;
+        TChunkNode node = Initialize(x, y, chunk);
         AddChild(node);
     }
 }
