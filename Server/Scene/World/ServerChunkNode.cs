@@ -8,7 +8,6 @@ public partial class ServerChunkNode : BaseChunkNode
 {
     public ServerChunkNode(IChunk Chunk) : base(Chunk)
     {
-        Console.WriteLine("hi");
         CollisionLayer = SceneDefines.Map.TerrainLayer;
         CollisionMask = SceneDefines.Map.NilLayer;
     }
