@@ -17,14 +17,16 @@ public partial class WorldView : Node3D
     //* tiles
     private RenderChunkLayer ChunkLayer { get; set; } = null!;
 
-    //* UI
+    //* UI floats
+    private Node CharacterUILayer { get; }
 
-    private Node _characterUILayer;
+    //* environment settings
+    private WorldEnvironment WorldEnvironment { get; }
     
 
     private bool ChildPhysicsEnabled { get; set; } = true;
 
-    public WorldView()
+    public WorldView(ClientState State)
     {
         _characterLayer = new()
         {
@@ -34,15 +36,20 @@ public partial class WorldView : Node3D
 
         
 
-        _characterUILayer = new();
-        AddChild(_characterUILayer);
-    }
+        CharacterUILayer = new();
+        AddChild(CharacterUILayer);
 
-    public void LoadState(ClientState state)
-    {
-        ChunkLayer = new(state.Chunks);
+        WorldEnvironment = new()
+        {
+            Environment = SceneDefines.IlluminatedEnvironment,
+        };
+        AddChild(WorldEnvironment);
+
+
+        ChunkLayer = new(State.Chunks);
         AddChild(ChunkLayer);
     }
+
 
 
     public void AddCharacter(Character character)
@@ -53,7 +60,7 @@ public partial class WorldView : Node3D
             _characterLayer.AddChild(node);
 
             CharacterFloat label = _characters[character.ID].Label;
-            _characterUILayer.AddChild(label);
+            CharacterUILayer.AddChild(label);
             
             node.SetPhysicsProcess(ChildPhysicsEnabled);
         }

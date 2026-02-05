@@ -16,7 +16,7 @@ namespace OpenTrenches.Server.Scene;
 public partial class GameRoot : Node
 {
     public IServerNetworkAdapter NetworkAdapter;
-    public WorldNode World = null!;
+    private WorldNode World { get; }
 
     private readonly List<PlayerNetworkHandler> _players = [];
 
@@ -24,21 +24,26 @@ public partial class GameRoot : Node
 
     public GameRoot()
     {
+        //* network setup
         Console.WriteLine($"PID {Process.GetCurrentProcess().ProcessName}");
         NetworkAdapter = new LiteNetServerAdapter();
         NetworkAdapter.Start();
         NetworkAdapter.ConnectedEvent += Connection;
         
-    }
-    public override void _Ready()
-    {
-        World = GetNode<WorldNode>("World");
-        World.LoadState(GameState);
+        //* model and adapter
+        GameState = new();
+        World = new(GameState);
+        World.AddChild(new WorldEnvironment() {Environment = Core.Scene.SceneDefines.IlluminatedEnvironment});
+        AddChild(World);
 
+        //* debug camera
+        World.AddChild(new Camera3D() {Position = new Vector3(0, 80, 0), Rotation = new Vector3((float)(-Math.PI / 2), 0f, 0f), Current = true});
 
+        //* events
         GameState.CharacterAddedEvent += World.AddCharacter;
         GameState.CharacterAddedEvent += BroadcastCharacter;
     }
+
     private void BroadcastCharacter(Character character) 
         => NetworkAdapter.Send(new CreateDatagram(ObjectToDTO.Convert(character)));
 

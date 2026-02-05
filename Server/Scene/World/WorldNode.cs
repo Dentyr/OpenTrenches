@@ -16,26 +16,13 @@ public partial class WorldNode : Node3D, IWorldSimulator
     //* gridmap
     private ServerChunkLayer? ChunkLayer { get; set; } 
 
-    public WorldNode()
+    public WorldNode(ServerState serverState)
     {
         CharacterLayer = new()
         {
             Name = "Characters",
         };
         AddChild(CharacterLayer);
-
-    }
-
-
-    public void LoadState(ServerState serverState)
-    {
-        //* cleaning
-
-        foreach (CharacterSimulator simulator in _characters.Values) simulator.QueueFree();
-        _characters.Clear();
-
-        //* loading
-
 
         ChunkLayer = new(serverState.Chunks)
         {

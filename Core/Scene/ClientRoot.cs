@@ -33,25 +33,26 @@ public partial class ClientRoot : Node
     }
     public override void _Ready()
     {
-        World = GetNode<WorldView>("World");
-
-        
         if (ClientNetworkHandler.State is not null) LoadGame(ClientNetworkHandler.State);
-
-        World.DisablePhysics();
     }
 
     private void LoadGame(ClientState state) //TODO load when server decides on new game
     {
         State = state;
+        SetWorld(state);
 
-        World.LoadState(State);
         State.CharacterAddedEvent += World.AddCharacter;
 
 
         State.PlayerCharacterSetEvent += World.AddPlayerComponents;
         State.PlayerCharacterSetEvent += KeyboardListener.SetPlayer;
         State.FireEvent += World.RenderProjectile;
+    }
+    private void SetWorld(ClientState state)
+    {
+        World = new(state);
+        World.DisablePhysics();
+        AddChild(World);
     }
 
 
