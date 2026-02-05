@@ -10,9 +10,9 @@ using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Adapter;
 namespace OpenTrenches.Server.Scripting.Player;
 
-public class Character(IServerState State, ushort ID) : IIdObject
+public class Character(IServerState ServerState, ushort ID) : IIdObject
 {
-    private IServerState GameState { get; } = State;
+    private IServerState ServerState { get; } = ServerState;
     public ushort ID { get; } = ID;
 
     public Vector3 Position { get; set; } = new (0, 10, 0);
@@ -28,13 +28,16 @@ public class Character(IServerState State, ushort ID) : IIdObject
         set => _direction.Value = value;
     }
 
-    public Vector3 Movement { get; set; } = Vector3.Zero;
+    /// <summary>
+    /// Cardinal velocity
+    /// </summary>
+    public Vector3 MovementVelocity { get; set; } = Vector3.Zero;
 
     private readonly UpdateableProperty<float> _health = new(10);
     public float Health 
     { 
         get => _health;
-        set => _health.Value = value;
+        private set => _health.Value = value;
     }
 
     private UpdateableProperty<CharacterState> _state = new(CharacterState.Idle); 
@@ -49,7 +52,7 @@ public class Character(IServerState State, ushort ID) : IIdObject
     public TileType BuildTarget { get; private set; }
     public Vector2I BuildCell { get; private set; }
 
-    public readonly UpdateableProperty<float> _cooldown = new(0);
+    private readonly UpdateableProperty<float> _cooldown = new(0);
 
 
     public float Cooldown
@@ -69,51 +72,56 @@ public class Character(IServerState State, ushort ID) : IIdObject
     {
         // Ability usage
 
+
         Cooldown -= delta;
+        
+
         if (Cooldown < 0) 
         {
             Cooldown = 0;
+
+            //* shooting
+            
             if (State == CharacterState.Shooting)
             {
                 if (Position != Direction)
                 {
                     var target = Position + ((Direction - Position).Normalized() * 1000);
-                    Character? hit = adapter.AdaptFire(target);
-                    if (hit is not null)
-                    {
-                        hit._health.Value -= 4;
-                    }
-                    FireEvent?.Invoke(this, target);
+                    FireHitResult result = adapter.AdaptFire(target);
+                    if (result is FireHitResult.Hit hit) hit.Character.ApplyDamage(4);
+                    
+                    FireEvent?.Invoke(this, result.Position);
                     Cooldown = 0.1f;
                 }
             }
         }
 
-        // building
+        //* building
+
         if (State == CharacterState.Building)
         {
-            if (GetCell().DistanceTo(BuildCell) < CommonDefines.CellSize) 
+            if (GetCell().DistanceTo(BuildCell) > CommonDefines.CellSize) 
             {
-                adapter.AdaptBuild(BuildCell, BuildTarget, delta);
+                CancelTask();
+                return;
             }
 
             // only proceed if position is valid
-            if (GameState.Chunks.TryGetTile(BuildCell, out Tile? tile))
+            if (ServerState.Chunks.TryGetTile(BuildCell, out Tile? tile))
             {
                 if (tile is null)
                 {   //if no tile exists at position, make one with a build status.
-                    tile = new(TileType.Clear, -1, new BuildStatus(BuildTarget, delta));
-                    GameState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
+                    ServerState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
                 }
                 else if (tile.Type == BuildTarget)
                     CancelTask(); // already constructed, no further action
                 else if (tile.Building is BuildStatus status && status.BuildTarget == BuildTarget) 
                 {   // If build status is not null, make progress on building status if the target is the same
-                    if (GameState.Chunks.ProgressBuild(BuildCell, delta)) CancelTask();
+                    if (ServerState.Chunks.ProgressBuild(BuildCell, delta)) CancelTask();
                 }
                 else if (tile.Building is null)
                 {   // if a tile exists, isn't the build target, and can be built, 
-                    GameState.Chunks.StartBuild(BuildCell, BuildTarget);
+                    ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
                 }
                 else CancelTask();
             }
@@ -144,6 +152,20 @@ public class Character(IServerState State, ushort ID) : IIdObject
         }
         State = newState;
     }
+
+    //* combat
+    private void ApplyDamage(float hp)
+    {
+        Health -= hp;
+    }
+
+
+    //* build
+    private void StartBuild()
+    {
+        ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
+    }
+
 
     //* Updates
 

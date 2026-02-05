@@ -6,6 +6,6 @@ namespace OpenTrenches.Server.Scripting.Adapter;
 public static class ObjectToDTO
 {
     public static CharacterDTO Convert(Character character)
-        => new (character.ID, character.Movement, character.Health);
+        => new (character.ID, character.MovementVelocity, character.Health);
 
 }

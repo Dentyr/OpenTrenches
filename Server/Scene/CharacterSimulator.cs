@@ -8,7 +8,10 @@ namespace OpenTrenches.Server.Scene.World;
 public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
 {
     public Character Character { get; }
+    
     private IWorldSimulator World { get; } 
+    IWorldSimulator ICharacterAdapter.World => World;
+
     public CharacterSimulator(Character Character, IWorldSimulator World)
     {
         //* World DI
@@ -27,7 +30,7 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
             }
         });
         CollisionLayer = SceneDefines.Map.CharacterLayer;
-        CollisionMask = SceneDefines.Map.AllMask;
+        CollisionMask = SceneDefines.Map.TerrainLayer;
     }
 
     public override void _Process(double delta)
@@ -48,30 +51,26 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
     {
         
         Position = Character.Position;
+        Velocity = new(Character.MovementVelocity.X, Velocity.Y, Character.MovementVelocity.Z);
         Velocity += SceneDefines.Physics.g * delta;
-        Velocity = new(Character.Movement.X * delta, Velocity.Y, Character.Movement.Z * delta);
         MoveAndSlide();
         Character.Position = Position;
     }
 
-    Character? ICharacterAdapter.AdaptFire(Vector3 target)
+    FireHitResult ICharacterAdapter.AdaptFire(Vector3 target)
     {
         var hits = GetViewport().World3D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters3D()
         {
             From = Character.Position,
             To = target,
-            CollisionMask = SceneDefines.Map.CharacterLayer,
+            CollisionMask = SceneDefines.Map.BulletMask,
         });
-        if (hits.Count == 0) return null;
+        // hit nothing
+        if (hits.Count == 0) return new FireHitResult.Miss(target);
+        // hit character
         else if (hits[SceneDefines.PhysicsKey.Collider].AsGodotObject() is CharacterSimulator hitsim)
-        {
-            return hitsim.Character;
-        }
-        return null;
-    }
-
-    void ICharacterAdapter.AdaptBuild(Vector2I cell, TileType buildTarget, float progress)
-    {
-        World.Build(cell, buildTarget, progress);
+            return new FireHitResult.Hit(hits[SceneDefines.PhysicsKey.Position].AsVector3(), hitsim.Character);
+        // hit something else
+        return new FireHitResult.Miss(hits[SceneDefines.PhysicsKey.Position].AsVector3());
     }
 }
