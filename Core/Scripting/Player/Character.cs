@@ -3,6 +3,7 @@
 using System;
 using Godot;
 using OpenTrenches.Common.Contracts;
+using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 
 namespace OpenTrenches.Core.Scripting.Player;
@@ -28,6 +29,8 @@ public class Character : IIdObject
 
     public ushort ID { get; }
 
+    public CharacterState State { get; private set; }
+
     public Character(ushort ID, Vector3 Position, float Health)
     {
         DiedEvent += () => Console.WriteLine("Died");
@@ -48,6 +51,13 @@ public class Character : IIdObject
                 break;
             case CharacterAttribute.Health:
                 Health = Serialization.Deserialize<float>(update.Payload);
+                break;
+            case CharacterAttribute.Direction:
+                break;
+            case CharacterAttribute.Cooldown:
+                break;
+            case CharacterAttribute.State:
+                State = Serialization.Deserialize<CharacterState>(update.Payload);
                 break;
         }
     }

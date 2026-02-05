@@ -1,4 +1,6 @@
+using System;
 using Godot;
+using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scene.World;
@@ -6,8 +8,12 @@ namespace OpenTrenches.Server.Scene.World;
 public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
 {
     public Character Character { get; }
-    public CharacterSimulator(Character Character)
+    private IWorldSimulator World { get; } 
+    public CharacterSimulator(Character Character, IWorldSimulator World)
     {
+        //* World DI
+        this.World = World;
+
         //* character
         this.Character = Character;
         Position = Character.Position;
@@ -62,5 +68,10 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
             return hitsim.Character;
         }
         return null;
+    }
+
+    void ICharacterAdapter.AdaptBuild(Vector2I cell, TileType buildTarget, float progress)
+    {
+        World.Build(cell, buildTarget, progress);
     }
 }

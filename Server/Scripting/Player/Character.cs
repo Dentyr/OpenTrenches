@@ -6,11 +6,13 @@ using Godot;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Adapter;
 namespace OpenTrenches.Server.Scripting.Player;
 
-public class Character(ushort ID) : IIdObject
+public class Character(IServerState State, ushort ID) : IIdObject
 {
+    private IServerState GameState { get; } = State;
     public ushort ID { get; } = ID;
 
     public Vector3 Position { get; set; } = new (0, 10, 0);
@@ -42,7 +44,14 @@ public class Character(ushort ID) : IIdObject
         set => _state.Value = value;
     }
 
+
+    //* build target
+    public TileType BuildTarget { get; private set; }
+    public Vector2I BuildCell { get; private set; }
+
     public readonly UpdateableProperty<float> _cooldown = new(0);
+
+
     public float Cooldown
     { 
         get => _cooldown;
@@ -58,9 +67,12 @@ public class Character(ushort ID) : IIdObject
     /// <param name="adapter"></param>
     public void AdapterSimulate(float delta, ICharacterAdapter adapter)
     {
+        // Ability usage
+
         Cooldown -= delta;
         if (Cooldown < 0) 
         {
+            Cooldown = 0;
             if (State == CharacterState.Shooting)
             {
                 if (Position != Direction)
@@ -76,6 +88,42 @@ public class Character(ushort ID) : IIdObject
                 }
             }
         }
+
+        // building
+        if (State == CharacterState.Building)
+        {
+            if (GetCell().DistanceTo(BuildCell) < CommonDefines.CellSize) 
+            {
+                adapter.AdaptBuild(BuildCell, BuildTarget, delta);
+            }
+
+            // only proceed if position is valid
+            if (GameState.Chunks.TryGetTile(BuildCell, out Tile? tile))
+            {
+                if (tile is null)
+                {   //if no tile exists at position, make one with a build status.
+                    tile = new(TileType.Clear, -1, new BuildStatus(BuildTarget, delta));
+                    GameState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
+                }
+                else if (tile.Type == BuildTarget)
+                    CancelTask(); // already constructed, no further action
+                else if (tile.Building is BuildStatus status && status.BuildTarget == BuildTarget) 
+                {   // If build status is not null, make progress on building status if the target is the same
+                    if (GameState.Chunks.ProgressBuild(BuildCell, delta)) CancelTask();
+                }
+                else if (tile.Building is null)
+                {   // if a tile exists, isn't the build target, and can be built, 
+                    GameState.Chunks.StartBuild(BuildCell, BuildTarget);
+                }
+                else CancelTask();
+            }
+
+            else CancelTask();
+        }
+    }
+    private void CancelTask()
+    {
+        State = CharacterState.Idle;
     }
 
     public void TrySwitch(CharacterState newState)
@@ -90,6 +138,8 @@ public class Character(ushort ID) : IIdObject
                 if (State == CharacterState.Reloading) return;
                 break;
             case CharacterState.Reloading:
+                break;
+            case CharacterState.Building:
                 break;
         }
         State = newState;
@@ -124,8 +174,21 @@ public class Character(ushort ID) : IIdObject
 
     public IEnumerable<AbstractUpdateDTO> PollUpdates()
     {
-        if (_health.PollChanged()) yield return GetUpdate(CharacterAttribute.Health);
-        if (_direction.PollChanged()) yield return GetUpdate(CharacterAttribute.Direction);
-        if (_state.PollChanged()) yield return GetUpdate(CharacterAttribute.State);
+        if (_health.PollChanged())      yield return GetUpdate(CharacterAttribute.Health);
+        if (_direction.PollChanged())   yield return GetUpdate(CharacterAttribute.Direction);
+        if (_state.PollChanged())       yield return GetUpdate(CharacterAttribute.State);
+    }
+
+    public void SetBuildTarget(int x, int y, TileType tile)
+    {
+        BuildTarget = tile;
+        BuildCell = new(x, y);
+
+        State = CharacterState.Building;
+    }
+
+    internal Vector2I GetCell()
+    {
+        return new((int)(Position.X / CommonDefines.CellSize), (int)(Position.Z / CommonDefines.CellSize));
     }
 }

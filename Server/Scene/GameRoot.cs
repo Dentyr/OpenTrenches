@@ -69,6 +69,6 @@ public partial class GameRoot : Node
         }
 
         // outgoing messages
-        foreach (AbstractCommandDTO command in GameState.FlushEvente()) NetworkAdapter.Send(command);
+        foreach (AbstractCommandDTO command in GameState.PollEvents()) NetworkAdapter.Send(command);
     }
 }

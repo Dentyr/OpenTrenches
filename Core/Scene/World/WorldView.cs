@@ -3,6 +3,8 @@ using Godot;
 using OpenTrenches.Core.Scripting.Player;
 using OpenTrenches.Core.Scene.Combat;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scene.World;
+using OpenTrenches.Core.Scripting;
 
 namespace OpenTrenches.Core.Scene.World;
 
@@ -13,7 +15,7 @@ public partial class WorldView : Node3D
     private Node3D _characterLayer { get; }
 
     //* tiles
-    private ChunkLayer ChunkLayer { get; }
+    private ChunkViewLayer ChunkLayer { get; set; } = null!;
 
     //* UI
 
@@ -30,21 +32,18 @@ public partial class WorldView : Node3D
         };
         AddChild(_characterLayer);
 
-        ChunkLayer = new()
-        {
-            
-        };
-        AddChild(ChunkLayer);
         
 
         _characterUILayer = new();
         AddChild(_characterUILayer);
     }
 
-    public void AddChunk(ChunkRecord record)
+    public void LoadState(ClientState state)
     {
-        ChunkLayer.SetChunk(record);
+        ChunkLayer = new(state.Chunks);
+        AddChild(ChunkLayer);
     }
+
 
     public void AddCharacter(Character character)
     {

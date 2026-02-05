@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using MessagePack;
+using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Player;
@@ -14,11 +15,14 @@ public partial class KeyboardListener : Node
     public bool S { get; set; }
     public bool D { get; set; }
     public bool LMB { get; set; } //left mouse button
+    public bool E { get; set; }
     
-    public Vector2 MPos { get; set; } //mouse position
+    public Vector2 MPos { get; set; } //mouse position within world
 
     private Character? Character { get; set; }
     public void SetPlayer(Character character) => Character = character;
+
+    private List<AbstractCommandDTO> _queuedCommands { get; } = [];
 
 
     public override void _UnhandledInput(InputEvent @event)
@@ -81,18 +85,45 @@ public partial class KeyboardListener : Node
             case Key.D:
                 D = keyEvent.Pressed;
                 break;
+            case Key.E: // build
+                if (Character is not null)
+                {
+                    
+                    // set targetted cell to current location
+                    Vector2I cell = new ((int)(Character.Position.X / CommonDefines.CellSize), (int)(Character.Position.Z / CommonDefines.CellSize));
+                    // If below ground (in trench) set cell to be an adjacent cell based on direction
+                    if (Character.Position.Y < CommonDefines.TrenchThresholdY)
+                    {
+                        Vector2 dir = MPos - new Vector2(Character.Position.X, Character.Position.Z);
+
+                        Vector2I facing;
+                        if (Mathf.Abs(dir.X) > Mathf.Abs(dir.Y)) 
+                            facing = new Vector2I(Mathf.Sign(dir.X), 0);
+                        else 
+                            facing = new Vector2I(0, Mathf.Sign(dir.Y));
+                        cell += facing;
+                    }
+                    _queuedCommands.Add(new BuildCommandRequest(cell.X, cell.Y, TileType.Trench));
+                }
+                break;
             default:
                 break;
         }
     }
 
+
     public InputStatusDTO GetStatus()
     {
-        return new InputStatusDTO()
-        {
-            Keys = [.. GetKeyList()],
-            MousePos = MPos,
-        };
+        return new InputStatusDTO(
+            Keys: [.. GetKeyList()],
+            MousePos: MPos
+        );
+    }
+    public IEnumerable<AbstractCommandDTO> PollCommands()
+    {
+        var temp = _queuedCommands.ToArray();
+        _queuedCommands.Clear();
+        return temp;
     }
 
     private IEnumerable<UserKey> GetKeyList()
@@ -102,6 +133,7 @@ public partial class KeyboardListener : Node
         if (S) yield return UserKey.S;
         if (D) yield return UserKey.D;
         if (LMB) yield return UserKey.LMB;
+        if (E) yield return UserKey.Build;
     }
 }
 

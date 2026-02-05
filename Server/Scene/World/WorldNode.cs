@@ -2,18 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scene.World;
 
-public partial class WorldNode : Node3D
+public partial class WorldNode : Node3D, IWorldSimulator
 {
     //* Characters
     private Dictionary<ushort, CharacterSimulator> _characters = [];
     private Node3D CharacterLayer { get; }
 
     //* gridmap
-    private ChunkLayer ChunkLayer { get; } 
+    private ChunkLayer? ChunkLayer { get; set; } 
 
     public WorldNode()
     {
@@ -23,11 +24,6 @@ public partial class WorldNode : Node3D
         };
         AddChild(CharacterLayer);
 
-        ChunkLayer = new()
-        {
-            Name = "Chunks",
-        };
-        AddChild(ChunkLayer);
     }
 
 
@@ -40,7 +36,14 @@ public partial class WorldNode : Node3D
 
         //* loading
 
-        ChunkLayer.SetChunks(serverState.Chunks);
+
+        ChunkLayer = new(serverState.Chunks)
+        {
+            Name = "Chunks",
+        };
+        AddChild(ChunkLayer);
+
+        
         foreach (Character character in serverState.Characters.Values) AddCharacter(character); 
     }
 
@@ -48,11 +51,20 @@ public partial class WorldNode : Node3D
 
     public void AddCharacter(Character character)
     {
-        if (_characters.TryAdd(character.ID, new CharacterSimulator(character)))
+        if (_characters.TryAdd(character.ID, new CharacterSimulator(character, this)))
         {
             CharacterSimulator node = _characters[character.ID];
             CharacterLayer.AddChild(node);
         }
     }
 
+    bool IWorldSimulator.Build(Vector2I cell, TileType buildTarget, float progress) => ChunkLayer?.Build(cell, buildTarget, progress) ?? false;
+}
+
+public interface IWorldSimulator
+{
+    /// <summary>
+    /// Attempts to progress the building of <paramref name="buildTarget"/> at <paramref name="cell"/> by <paramref name="progress"/>, returning true if transaction was completed or false otherwise.
+    /// </summary>
+    bool Build(Vector2I cell, TileType buildTarget, float progress);
 }

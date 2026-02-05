@@ -9,6 +9,8 @@ namespace OpenTrenches.Common.Contracts.DTO;
 [MessagePackObject]
 [Union(0, typeof(SetPlayerCommandDTO))]
 [Union(10, typeof(ProjectileNotificationCommand))]
+[Union(11, typeof(BuildCommandRequest))]
+[Union(12, typeof(SetCellCommand))]
 public abstract record class AbstractCommandDTO {}
 
 [MessagePackObject]
@@ -17,7 +19,8 @@ public record class SetPlayerCommandDTO(
 ) : AbstractCommandDTO {}
 
 [MessagePackObject]
-public record class BuiltCommand(
-    [property: Key(1)] int X, 
-    [property: Key(2)] int Y
+public record class BuildCommandRequest(
+    [property: Key(0)] int X,
+    [property: Key(1)] int Y,
+    [property: Key(2)] TileType Tile
 ) : AbstractCommandDTO {}

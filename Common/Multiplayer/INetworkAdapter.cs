@@ -20,7 +20,7 @@ public interface INetworkConnectionAdapter
     public void Send(Datagram datagram);
 
     public void Send(AbstractUpdateDTO dTO) =>  Send(new UpdateDatagram(dTO));
-    public void Send(AbstractDTO dTO) =>  Send(new CreateDatagram(dTO));
+    public void Send(AbstractCreateDTO dTO) =>  Send(new CreateDatagram(dTO));
     public void Send(AbstractCommandDTO dTO) =>  Send(new CommandDatagram(dTO));
     public void Send(AbstractStreamDTO dTO) =>  Send(new StreamDatagram(dTO));
 }

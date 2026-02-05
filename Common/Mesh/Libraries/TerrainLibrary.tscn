@@ -1,18 +1,40 @@
-[gd_scene load_steps=3 format=3 uid="uid://c67i80u0fb2r5"]
+[gd_scene load_steps=6 format=3 uid="uid://jg3v6dudp8rc"]
 
-[ext_resource type="ArrayMesh" uid="uid://ccexgbsafwpsa" path="res://Common/Mesh/Dirt.res" id="2_b73bh"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gsanc"]
+albedo_color = Color(0.78274107, 0.79569423, 0.5286835, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_p7nll"]
+[sub_resource type="BoxMesh" id="BoxMesh_6o15e"]
+material = SubResource("StandardMaterial3D_gsanc")
+size = Vector3(2, 2, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oxlax"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c4jk4"]
+albedo_color = Color(0.5618365, 0.44645053, 0.21945089, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_h5gas"]
+material = SubResource("StandardMaterial3D_c4jk4")
 size = Vector3(2, 2, 2)
 
 [node name="TerrainLibrary" type="Node3D"]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = ExtResource("2_b73bh")
+[node name="Terrain" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_6o15e")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+[node name="StaticBody3D" type="StaticBody3D" parent="Terrain"]
 collision_layer = 0
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
-shape = SubResource("BoxShape3D_p7nll")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain/StaticBody3D"]
+shape = SubResource("BoxShape3D_oxlax")
+
+[node name="Trench" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_h5gas")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Trench"]
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Trench/StaticBody3D"]
+shape = SubResource("BoxShape3D_oxlax")

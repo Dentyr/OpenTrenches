@@ -4,7 +4,7 @@ using MessagePack;
 namespace OpenTrenches.Common.Contracts.DTO;
 
 [MessagePackObject]
-public record  class CharacterDTO(ushort ID, Vector3 Position, float Health) : AbstractDTO
+public record  class CharacterDTO(ushort ID, Vector3 Position, float Health) : AbstractCreateDTO
 {
     [Key(0)]
     public ushort ID { get; } = ID;

@@ -38,10 +38,10 @@ public class CommandDatagram(AbstractCommandDTO DTO) : Datagram
 
 
 [MessagePackObject]
-public class CreateDatagram(AbstractDTO Item) : Datagram
+public class CreateDatagram(AbstractCreateDTO Item) : Datagram
 {
     [Key(0)]
-    public AbstractDTO DTO { get; } = Item;
+    public AbstractCreateDTO DTO { get; } = Item;
 }
 
 

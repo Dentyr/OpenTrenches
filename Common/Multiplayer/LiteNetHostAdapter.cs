@@ -87,7 +87,6 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
     private void HandleNetworkReceive(NetPeer peer, NetPacketReader dataReader, byte channel, DeliveryMethod deliveryMethod)
     {
         Adapter?.HandleReceive(dataReader.GetRemainingBytes());
-        // Console.WriteLine("We got: {0}", dataReader.GetString(100 /* max length of string */));
         dataReader.Recycle();
     }
 

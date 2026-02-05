@@ -7,16 +7,19 @@ using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
 
-public class ServerState
+public class ServerState : IServerState
 {
     //* State
 
     //* chunks
     public ChunkArray2D Chunks { get; } = new();
+    IChunkArray2D IServerState.Chunks => Chunks;
     
     //* characters
     private readonly Dictionary<ushort, Character> _characters = [];
     public IReadOnlyDictionary<ushort, Character> Characters => _characters;
+
+
     public event Action<Character>? CharacterAddedEvent; 
     private void AddCharacter(Character Character)
     {
@@ -28,7 +31,7 @@ public class ServerState
     private ushort _charId = 0;
     public Character CreateCharacter()
     {
-        var character = new Character(_charId ++);
+        var character = new Character(this, _charId ++);
         character.FireEvent += HandleFire;
         AddCharacter(character);
         return character;
@@ -43,10 +46,15 @@ public class ServerState
         _commandQueue.Add(new ProjectileNotificationCommand(character.Position, target));
     }
 
-    public IEnumerable<AbstractCommandDTO> FlushEvente()
+    public IEnumerable<AbstractCommandDTO> PollEvents()
     {
         var temp = _commandQueue;
         _commandQueue = [];
-        return temp;
+        return temp.Concat(Chunks.PollCellChanges());
     }
+}
+
+public interface IServerState
+{
+    public IChunkArray2D Chunks { get; }
 }

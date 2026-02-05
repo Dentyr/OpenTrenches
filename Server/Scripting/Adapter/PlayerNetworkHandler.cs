@@ -55,6 +55,7 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         }
         if (input.Keys.Contains(UserKey.LMB)) Character.TrySwitch(CharacterState.Shooting);
         else if (Character.State == CharacterState.Shooting) Character.TrySwitch(CharacterState.Idle);
+
         movement *= 250f;
         Character.Movement = movement;
 
@@ -69,7 +70,11 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
 
     protected override void _DeserializeMessage(CommandDatagram message)
     {
-        throw new NotImplementedException();
+        AbstractCommandDTO command = message.DTO;
+        if (command is BuildCommandRequest buildCommand)
+        {
+            Character.SetBuildTarget(buildCommand.X, buildCommand.Y, buildCommand.Tile);   
+        }
     }
     #endregion
 
