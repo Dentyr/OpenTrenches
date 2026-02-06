@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
+using OpenTrenches.Server.Scripting.Teams;
 
 public class ServerState : IServerState
 {
@@ -20,12 +22,16 @@ public class ServerState : IServerState
     private readonly Dictionary<ushort, Character> _characters = [];
     public IReadOnlyDictionary<ushort, Character> Characters => _characters;
 
-
-    public event Action<Character>? CharacterAddedEvent; 
     private void AddCharacter(Character Character)
     {
         if (_characters.TryAdd(Character.ID, Character)) CharacterAddedEvent?.Invoke(Character);
     }
+
+    private readonly Dictionary<int, Team> _teams = [];
+    public IReadOnlyDictionary<int, Team> Teams => _teams;
+
+
+    public event Action<Character>? CharacterAddedEvent; 
 
     //* creation
 
@@ -43,20 +49,15 @@ public class ServerState : IServerState
 
     //* communication
 
-    private List<AbstractCommandDTO> _commandQueue = [];
+    private PolledQueue<AbstractCommandDTO> _commandQueue = new();
 
     private void HandleAbility(uint charaIdx, int abilityIdx)
-        => _commandQueue.Add(new AbilityNotificationCommand(charaIdx, abilityIdx));
+        => _commandQueue.Enqueue(new AbilityNotificationCommand(charaIdx, abilityIdx));
 
     private void HandleFire(Character character, Vector3 target) 
-        => _commandQueue.Add(new ProjectileNotificationCommand(character.Position, target));
+        => _commandQueue.Enqueue(new ProjectileNotificationCommand(character.Position, target));
 
-    public IEnumerable<AbstractCommandDTO> PollEvents()
-    {
-        var temp = _commandQueue;
-        _commandQueue = [];
-        return temp.Concat(Chunks.PollCellChanges());
-    }
+    public IEnumerable<AbstractCommandDTO> PollEvents() => _commandQueue.PollItems().Concat(Chunks.PollCellChanges());
 }
 
 public interface IServerState
