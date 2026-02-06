@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using MessagePack;
+using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
@@ -25,7 +26,7 @@ public partial class KeyboardListener : Node
     private Character? Character { get; set; }
     public void SetPlayer(Character character) => Character = character;
 
-    private List<AbstractCommandDTO> _queuedCommands { get; } = [];
+    private PolledQueue<AbstractCommandDTO> _queuedCommands { get; } = new();
 
 
     public override void _UnhandledInput(InputEvent @event)
@@ -106,7 +107,7 @@ public partial class KeyboardListener : Node
                             facing = new Vector2I(0, Mathf.Sign(dir.Y));
                         cell += facing;
                     }
-                    _queuedCommands.Add(new BuildCommandRequest(cell.X, cell.Y, TileType.Trench));
+                    _queuedCommands.Enqueue(new BuildCommandRequest(cell.X, cell.Y, TileType.Trench));
                 }
                 break;
             default:
@@ -122,12 +123,7 @@ public partial class KeyboardListener : Node
             MousePos: MPos
         );
     }
-    public IEnumerable<AbstractCommandDTO> PollCommands()
-    {
-        var temp = _queuedCommands.ToArray();
-        _queuedCommands.Clear();
-        return temp;
-    }
+    public IEnumerable<AbstractCommandDTO> PollCommands() => _queuedCommands.PollItems();
 
     private IEnumerable<UserKey> GetKeyList()
     {

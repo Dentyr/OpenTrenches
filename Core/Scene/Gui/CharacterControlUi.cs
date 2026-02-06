@@ -1,4 +1,5 @@
 using Godot;
+using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Core.Scene.GUI;
@@ -15,7 +16,7 @@ public partial class CharacterControlUi : Control
     public event Action<int>? AbilitySelected;
     
 
-    private List<AbstractCommandDTO> _queuedCommands { get; } = [];
+    private PolledQueue<AbstractCommandDTO> _queuedCommands { get; } = new();
 
     public override void _Ready()
     {
@@ -33,14 +34,9 @@ public partial class CharacterControlUi : Control
         }
     }
 
-    private void NotifyAbilityCommand(int idx) => _queuedCommands.Add(new UseAbilityCommandRequest(0));
+    private void NotifyAbilityCommand(int idx) => _queuedCommands.Enqueue(new UseAbilityCommandRequest(0));
 
-    public IEnumerable<AbstractCommandDTO> PollCommands()
-    {
-        var temp = _queuedCommands.ToArray();
-        _queuedCommands.Clear();
-        return temp;
-    }
+    public IEnumerable<AbstractCommandDTO> PollCommands() => _queuedCommands.PollItems();
 }
 
 
