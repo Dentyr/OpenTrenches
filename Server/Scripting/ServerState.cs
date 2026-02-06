@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
 
@@ -32,19 +33,23 @@ public class ServerState : IServerState
     public Character CreateCharacter()
     {
         var character = new Character(this, _charId ++);
+        
         character.FireEvent += HandleFire;
+        character.ActivatedAbilityEvent += (idx) => HandleAbility(character.ID, idx);
+
         AddCharacter(character);
         return character;
     }
+
     //* communication
 
     private List<AbstractCommandDTO> _commandQueue = [];
 
+    private void HandleAbility(uint charaIdx, int abilityIdx)
+        => _commandQueue.Add(new AbilityNotificationCommand(charaIdx, abilityIdx));
 
-    private void HandleFire(Character character, Vector3 target)
-    {
-        _commandQueue.Add(new ProjectileNotificationCommand(character.Position, target));
-    }
+    private void HandleFire(Character character, Vector3 target) 
+        => _commandQueue.Add(new ProjectileNotificationCommand(character.Position, target));
 
     public IEnumerable<AbstractCommandDTO> PollEvents()
     {

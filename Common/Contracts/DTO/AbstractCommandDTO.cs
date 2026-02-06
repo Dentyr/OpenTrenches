@@ -1,16 +1,21 @@
 
 using Godot;
 using MessagePack;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 namespace OpenTrenches.Common.Contracts.DTO;
 
 /// <summary>
 /// DTO for commands the target reliably receive
 /// </summary>
 [MessagePackObject]
-[Union(0, typeof(SetPlayerCommandDTO))]
-[Union(10, typeof(ProjectileNotificationCommand))]
-[Union(11, typeof(BuildCommandRequest))]
-[Union(12, typeof(SetCellCommand))]
+[Union(100,     typeof(ProjectileNotificationCommand))]
+[Union(101,     typeof(AbilityNotificationCommand))]
+
+[Union(500,     typeof(SetPlayerCommandDTO))]
+[Union(501,     typeof(SetCellCommand))]
+
+[Union(201,     typeof(BuildCommandRequest))]
+[Union(202,     typeof(UseAbilityCommandRequest))]
 public abstract record class AbstractCommandDTO {}
 
 [MessagePackObject]

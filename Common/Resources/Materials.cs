@@ -8,4 +8,8 @@ public static class Materials
     {
         AlbedoColor = Colors.Pink,
     };
+    public static readonly StandardMaterial3D WhiteDebug = new()
+    {
+        AlbedoColor = Colors.White,
+    };
 }

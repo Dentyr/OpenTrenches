@@ -2,19 +2,25 @@
 // namespace 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
+using OpenTrenches.Common.Ability;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Ability;
 using OpenTrenches.Server.Scripting.Adapter;
 namespace OpenTrenches.Server.Scripting.Player;
 
 public class Character(IServerState ServerState, ushort ID) : IIdObject
 {
+    //* Identification
     private IServerState ServerState { get; } = ServerState;
     public ushort ID { get; } = ID;
 
+    //* State in World
+    
     public Vector3 Position { get; set; } = new (0, 10, 0);
 
     private readonly UpdateableProperty<Vector3> _direction = new(Vector3.Zero);
@@ -33,13 +39,6 @@ public class Character(IServerState ServerState, ushort ID) : IIdObject
     /// </summary>
     public Vector3 MovementVelocity { get; set; } = Vector3.Zero;
 
-    private readonly UpdateableProperty<float> _health = new(10);
-    public float Health 
-    { 
-        get => _health;
-        private set => _health.Value = value;
-    }
-
     private UpdateableProperty<CharacterState> _state = new(CharacterState.Idle); 
     public CharacterState State
     { 
@@ -47,21 +46,42 @@ public class Character(IServerState ServerState, ushort ID) : IIdObject
         set => _state.Value = value;
     }
 
+    //* Combat status
+    private readonly UpdateableProperty<float> _health = new(10);
+    public float Health 
+    { 
+        get => _health;
+        private set => _health.Value = value;
+    }
+
+    //TODO Update stats to be more modular
+
+    private float _baseDefense { get; set; } = 0;
+    private float GetDefense()
+    {
+
+        return _baseDefense + Abilities.Sum(x => x.Active ? x.Record.DefenseMod : 0);
+    }
+
+    private CharacterAbility[] Abilities { get; } = [new(AbilityEffectRecords.Effects[AbilityRecords.StimulantAbility.ID])];
+    public event Action<int>? ActivatedAbilityEvent;
+
+
+    private readonly UpdateableProperty<float> _stateCooldown = new(0);
+    public float StateCooldown
+    { 
+        get => _stateCooldown;
+        private set => _stateCooldown.Value = value;
+    }
+    public event Action<Character, Vector3>? FireEvent;
+
 
     //* build target
+
     public TileType BuildTarget { get; private set; }
     public Vector2I BuildCell { get; private set; }
 
-    private readonly UpdateableProperty<float> _cooldown = new(0);
 
-
-    public float Cooldown
-    { 
-        get => _cooldown;
-        set => _cooldown.Value = value;
-    }
-
-    public event Action<Character, Vector3>? FireEvent;
 
     /// <summary>
     /// Called when the adapter simulates time passing
@@ -71,14 +91,15 @@ public class Character(IServerState ServerState, ushort ID) : IIdObject
     public void AdapterSimulate(float delta, ICharacterAdapter adapter)
     {
         // Ability usage
+        foreach (var abiltiy in this.Abilities) abiltiy.ProgressTimer(delta);
 
 
-        Cooldown -= delta;
+        StateCooldown -= delta;
         
 
-        if (Cooldown < 0) 
+        if (StateCooldown < 0) 
         {
-            Cooldown = 0;
+            StateCooldown = 0;
 
             //* shooting
             
@@ -91,7 +112,7 @@ public class Character(IServerState ServerState, ushort ID) : IIdObject
                     if (result is FireHitResult.Hit hit) hit.Character.ApplyDamage(4);
                     
                     FireEvent?.Invoke(this, result.Position);
-                    Cooldown = 0.1f;
+                    StateCooldown = 0.1f;
                 }
             }
         }
@@ -154,9 +175,18 @@ public class Character(IServerState ServerState, ushort ID) : IIdObject
     }
 
     //* combat
-    private void ApplyDamage(float hp)
+
+    public void TryActivate(int AbilityIdx)
     {
-        Health -= hp;
+        if (AbilityIdx >= 0 && AbilityIdx < Abilities.Length && Abilities[AbilityIdx].TryDo(this))
+        {
+            ActivatedAbilityEvent?.Invoke(AbilityIdx);
+        }
+    }
+
+    private void ApplyDamage(float dmg)
+    {
+        Health -= dmg / (Math.Max(0, GetDefense()) + 1);
     }
 
 
@@ -184,7 +214,7 @@ public class Character(IServerState ServerState, ushort ID) : IIdObject
                 payload = Serialization.Serialize(Direction);
                 break;
             case CharacterAttribute.Cooldown:
-                payload = Serialization.Serialize(Cooldown);
+                payload = Serialization.Serialize(StateCooldown);
                 break;
             case CharacterAttribute.State:
                 payload = Serialization.Serialize(State);

@@ -3,7 +3,7 @@ using Godot;
 
 namespace OpenTrenches.Core.Scene.World;
 /// <summary>
-/// <see cref="CharacterNode"/> component for a client's player character.
+/// <see cref="CharacterRenderer"/> component for a client's player character.
 /// </summary>
 public partial class FocusCamera : Camera3D
 {

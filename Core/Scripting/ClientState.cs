@@ -10,13 +10,14 @@ using Godot;
 using OpenTrenches.Core.Scene;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 
 namespace OpenTrenches.Core.Scripting;
 
 public sealed class ClientState
 {
-    private Dictionary<ushort, Character> _characters = [];
-    public IReadOnlyDictionary<ushort, Character> Characters => _characters;
+    private Dictionary<uint, Character> _characters = [];
+    public IReadOnlyDictionary<uint, Character> Characters => _characters;
 
     public event Action<Character>? CharacterAddedEvent; 
 
@@ -55,13 +56,20 @@ public sealed class ClientState
             if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character)) PlayerCharacterSetEvent?.Invoke(character);
             else throw new NotImplementedException("Request another ID not implemented");
         }
+        else if (dto is SetCellCommand setCell)
+        {
+            Chunks.Execute(setCell);
+        }
         else if (dto is ProjectileNotificationCommand projectile)
         {
             FireEvent?.Invoke(projectile.Start, projectile.End);
         }
-        else if (dto is SetCellCommand setCell)
+        else if (dto is AbilityNotificationCommand abilityNotify)
         {
-            Chunks.Execute(setCell);
+            if (_characters.TryGetValue(abilityNotify.Character, out var chara))
+            {
+                chara.ActivateAbility(abilityNotify.Idx);
+            }
         }
     }
 }

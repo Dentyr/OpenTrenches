@@ -7,6 +7,7 @@ using OpenTrenches.Common.Contracts.DTO;
 using System.Linq;
 using OpenTrenches.Common.Contracts.Defines;
 using System.Runtime.InteropServices;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 
 namespace OpenTrenches.Server.Scripting.Adapter;
 
@@ -21,6 +22,8 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         this.GameState = GameState;
         Character = GameState.CreateCharacter();
     }
+
+
 
     #region create
     protected override void _DeserializeCreate(CreateDatagram datagram)
@@ -74,6 +77,10 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         if (command is BuildCommandRequest buildCommand)
         {
             Character.SetBuildTarget(buildCommand.X, buildCommand.Y, buildCommand.Tile);   
+        }
+        else if (command is UseAbilityCommandRequest commandRequest)
+        {
+            Character.TryActivate(commandRequest.Idx);
         }
     }
     #endregion

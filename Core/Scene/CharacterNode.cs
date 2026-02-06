@@ -5,10 +5,10 @@ using OpenTrenches.Core.Scripting.Player;
 
 namespace OpenTrenches.Core.Scene.World;
 
-public partial class CharacterNode : Node3D
+public partial class CharacterRenderer : Node3D
 {
     private Character Character { get; }
-    public CharacterNode(Character Character)
+    public CharacterRenderer(Character Character)
     {
         this.Character = Character;
         Position = Character.Position;
@@ -24,17 +24,12 @@ public partial class CharacterNode : Node3D
                 Size = new(1, 2, 1),
             }
         });
-
-
-        AddChild(new Label()
-        {
-            Text = "Label Test",
-        });
     }
 
     public override void _Process(double delta)
     {        
         Position = Character.Position;
+        Character.Process((float)delta);
     }
 
 }

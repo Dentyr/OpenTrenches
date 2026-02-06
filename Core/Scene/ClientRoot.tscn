@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dcfr8xpqb0nsr"]
 
 [ext_resource type="Script" uid="uid://bho02vra6ps78" path="res://Core/Scene/ClientRoot.cs" id="1_2i6bf"]
+[ext_resource type="PackedScene" uid="uid://bggyc833cpgfn" path="res://Core/Scene/Gui/CharacterControlUI.tscn" id="2_rtlfk"]
 
 [node name="ClientRoot" type="Node" unique_id=770046232]
 script = ExtResource("1_2i6bf")
@@ -9,3 +10,6 @@ script = ExtResource("1_2i6bf")
 offset_right = 40.0
 offset_bottom = 23.0
 text = "Client"
+
+[node name="CharacterControlUi" parent="." unique_id=1186784944 instance=ExtResource("2_rtlfk")]
+mouse_filter = 2

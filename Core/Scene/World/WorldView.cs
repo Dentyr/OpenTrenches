@@ -11,7 +11,7 @@ namespace OpenTrenches.Core.Scene.World;
 public partial class WorldView : Node3D
 {
     //* Characters
-    private readonly Dictionary<ushort, (CharacterNode CharacterNode, CharacterFloat Label)> _characters = [];
+    private readonly Dictionary<ushort, (CharacterRenderer CharacterNode, CharacterFloat Label)> _characters = [];
     private Node3D _characterLayer { get; }
 
     //* tiles
@@ -54,9 +54,9 @@ public partial class WorldView : Node3D
 
     public void AddCharacter(Character character)
     {
-        if (_characters.TryAdd(character.ID, new(new CharacterNode(character), new CharacterFloat(character))))
+        if (_characters.TryAdd(character.ID, new(new CharacterRenderer(character), new CharacterFloat(character))))
         {
-            CharacterNode node = _characters[character.ID].CharacterNode;
+            CharacterRenderer node = _characters[character.ID].CharacterNode;
             _characterLayer.AddChild(node);
 
             CharacterFloat label = _characters[character.ID].Label;
