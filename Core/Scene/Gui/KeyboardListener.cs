@@ -5,8 +5,11 @@ using Godot;
 using MessagePack;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Player;
+
+namespace OpenTrenches.Core.Scene.GUI;
 
 public partial class KeyboardListener : Node
 {
@@ -69,7 +72,7 @@ public partial class KeyboardListener : Node
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
-        if (@event is not InputEventKey keyEvent) return;
+        if (@event is not InputEventKey keyEvent || !keyEvent.Pressed) return;
 
         switch(keyEvent.Keycode)
         {
@@ -133,7 +136,6 @@ public partial class KeyboardListener : Node
         if (S) yield return UserKey.S;
         if (D) yield return UserKey.D;
         if (LMB) yield return UserKey.LMB;
-        if (E) yield return UserKey.Build;
     }
 }
 
