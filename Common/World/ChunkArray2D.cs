@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
@@ -26,14 +25,14 @@ public class ChunkArray2D : IChunkArray2D
     /// <summary>
     /// Infrequent state changes, such as type of tile
     /// </summary>
-    private List<SetCellCommand> TileChanges { get; } = [];
+    private PolledQueue<SetCellCommand> TileChanges { get; } = new();
+    public IEnumerable<SetCellCommand> PollCellChanges() => TileChanges.PollItems();
+
     /// <summary>
     /// frequent state changes, such as build progress
     /// </summary>
-    private List<WorldGridAttributeUpdateDTO> Updates { get; } = [];
+    private PolledQueue<WorldGridAttributeUpdateDTO> Updates { get; } = new();
 
-
-    Chunk IChunkArray2D.this[int x, int y] => throw new NotImplementedException();
 
     public event Action<ChunkRecord>? ChunkChangedEvent;
 
@@ -41,18 +40,6 @@ public class ChunkArray2D : IChunkArray2D
     {
     }
 
-    event Action<ChunkRecord>? IChunkArray2D.ChunkChangedEvent
-    {
-        add
-        {
-            throw new NotImplementedException();
-        }
-
-        remove
-        {
-            throw new NotImplementedException();
-        }
-    }
 
     public bool Build(int x, int y, TileType buildTarget, float progress)
     {
@@ -72,7 +59,7 @@ public class ChunkArray2D : IChunkArray2D
                     status.BuildProgress += progress;
                     if (status.BuildProgress > 1) 
                         return TrySetTile(x, y, new(tile.Building.BuildTarget, 100)); //TODO temp HP value of 100
-                    else Updates.Add(WorldGridAttributeUpdateDTO.CreateBuildProgress(x, y, status.BuildProgress));
+                    else Updates.Enqueue(WorldGridAttributeUpdateDTO.CreateBuildProgress(x, y, status.BuildProgress));
                     return true;
                 }
                 else return false;
@@ -112,7 +99,7 @@ public class ChunkArray2D : IChunkArray2D
         if (Chunks.TryGet(x / CommonDefines.ChunkSize, y / CommonDefines.ChunkSize, out Chunk? chunk))
         {
             chunk[x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize] = tile;
-            TileChanges.Add(new SetCellCommand(new(tile is not null ? CommonToDTO.Convert(tile) : null, x, y)));
+            TileChanges.Enqueue(new SetCellCommand(new(tile is not null ? CommonToDTO.Convert(tile) : null, x, y)));
             return true;
         }
         return false;
@@ -128,12 +115,6 @@ public class ChunkArray2D : IChunkArray2D
         for (byte x = 0; x < SizeX; x ++) for (byte y = 0; y < SizeY; y ++) yield return new ChunkRecord(this[x, y], x, y);
     }
 
-    public IEnumerable<SetCellCommand> PollCellChanges()
-    {
-        var temp = TileChanges.ToArray();
-        TileChanges.Clear();
-        return temp;
-    }
 
     public void Execute(SetCellCommand setCell)
     {
@@ -163,7 +144,7 @@ public class ChunkArray2D : IChunkArray2D
             }
             else 
             {
-                Updates.Add(WorldGridAttributeUpdateDTO.CreateBuildProgress(x, y, status.BuildProgress));
+                Updates.Enqueue(WorldGridAttributeUpdateDTO.CreateBuildProgress(x, y, status.BuildProgress));
                 return false;
             }
         }
@@ -176,30 +157,4 @@ public class ChunkArray2D : IChunkArray2D
         TrySetTile(x, y, tile);
     }
 
-}
-
-
-public interface IChunkArray2D
-{
-    public Chunk this[int x, int y] { get; }
-
-    public int SizeX { get; }
-    public int SizeY { get; }
-
-    public event Action<ChunkRecord>? ChunkChangedEvent;
-
-    /// <summary>
-    /// Increases building progress for the cell at (<paramref name="x"/>, <paramref name="y"/>). Returns true if completed building or cannot build, and false if it is still progressing build. 
-    /// </summary>
-    public bool ProgressBuild(int x, int y, float progress);
-    public bool ProgressBuild(Vector2I buildCell, float progress) => ProgressBuild(buildCell.X, buildCell.Y, progress);
-
-    public void StartBuild(int x, int y, TileType buildTarget, float initialProgress);
-    public void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0) => StartBuild(buildCell.X, buildCell.Y, buildTarget, initialProgress);
-
-    /// <summary>
-    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>. Tile may be null (default tile).
-    /// </summary>
-    public bool TryGetTile(int x, int y, out Tile? tile);
-    public bool TryGetTile(Vector2I cell, out Tile? tile) => TryGetTile(cell.X, cell.Y, out tile);
 }
