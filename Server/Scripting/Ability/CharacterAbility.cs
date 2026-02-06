@@ -5,9 +5,9 @@ using OpenTrenches.Server.Scripting.Player;
 namespace OpenTrenches.Server.Scripting.Ability;
 
 
-public class CharacterAbility(AbilityEffectRecord Record) : ActivatedAbility(Record.Info)
+public class CharacterAbility(AbilityRecord Record) : ActivatedAbility(Record)
 {
-    private Func<Character, bool> CanUse { get; } = Record.CanUse;
+    private Func<Character, bool> CanUse { get; } = AbilityEffectRecords.Effects[Record].CanUse;
 
     public bool CanDo(Character character) => TimeLeft <= 0 && CanUse(character);
     public bool TryDo(Character character) {

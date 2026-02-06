@@ -31,7 +31,7 @@ public partial class AbilityButton : Control
 
         _button = new()
         {
-            Icon = AbilityTextureRecords.Textures[Character.GetAbility(AbilityIndex).Record.ID].Thumbnail,
+            Icon = AbilityTextureRecords.Textures[Character.GetAbility(AbilityIndex).Record].Thumbnail,
             ExpandIcon = true,
         };
         _button.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);

@@ -2,9 +2,8 @@ namespace OpenTrenches.Common.Ability;
 
 public static class AbilityRecords
 {
-    public static AbilityRecord StimulantAbility { get; } = new()
+    public static AbilityRecord StimulantAbility { get; } = new(0)
     {
-        ID = 0,
         Name = "Stims",
         Description = "gain defense",
         DefenseMod = 5,

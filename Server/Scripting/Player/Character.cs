@@ -13,11 +13,12 @@ using OpenTrenches.Server.Scripting.Ability;
 using OpenTrenches.Server.Scripting.Adapter;
 namespace OpenTrenches.Server.Scripting.Player;
 
-public class Character(IServerState ServerState, ushort ID) : IIdObject
+public class Character(IServerState ServerState, ushort ID, int Team) : IIdObject
 {
     //* Identification
     private IServerState ServerState { get; } = ServerState;
     public ushort ID { get; } = ID;
+    public int Team { get; } = Team;
 
     //* State in World
     
@@ -63,7 +64,7 @@ public class Character(IServerState ServerState, ushort ID) : IIdObject
         return _baseDefense + Abilities.Sum(x => x.Active ? x.Record.DefenseMod : 0);
     }
 
-    private CharacterAbility[] Abilities { get; } = [new(AbilityEffectRecords.Effects[AbilityRecords.StimulantAbility.ID])];
+    private CharacterAbility[] Abilities { get; } = [new(AbilityRecords.StimulantAbility)];
     public event Action<int>? ActivatedAbilityEvent;
 
 

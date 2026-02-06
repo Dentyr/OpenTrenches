@@ -10,23 +10,12 @@ namespace OpenTrenches.Server.Scripting.Ability;
 /// </summary>
 public static class AbilityEffectRecords
 {
-    static AbilityEffectRecords()
-    {
-        var tempDict = new Dictionary<int, AbilityEffectRecord>();
-        Append(tempDict, 
-            AbilityRecords.StimulantAbility, 
-            canDo: (chara) => true
-        );
-        Effects = tempDict;
-    }
-
-    private static void Append(Dictionary<int, AbilityEffectRecord> dict, AbilityRecord abilityRecord, Func<Character, bool> canDo)
-    {
-        if (!dict.TryAdd(abilityRecord.ID, new(
-            Info: abilityRecord,
-            CanUse: canDo
-        ))) throw new Exception("Failed to add ability to dictionary");
-    }
-
-    public static IReadOnlyDictionary<int, AbilityEffectRecord> Effects { get; }
+    public readonly static IReadOnlyDictionary<AbilityRecord, AbilityEffectRecord> Effects  = new Dictionary<AbilityRecord, AbilityEffectRecord>() {
+        {
+            AbilityRecords.StimulantAbility,
+            new (
+                CanUse: (chara) => true
+            )
+        }
+    };
 }

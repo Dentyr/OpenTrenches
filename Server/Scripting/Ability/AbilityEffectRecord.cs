@@ -9,6 +9,5 @@ namespace OpenTrenches.Server.Scripting.Ability;
 /// </summary>
 public record class AbilityEffectRecord
 (
-    AbilityRecord Info,
     Func<Character, bool> CanUse
 ) {}
