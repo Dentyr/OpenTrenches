@@ -36,6 +36,8 @@ public class Character : IIdObject
         }
     }
 
+    public float MaxHealth => 15;
+
     public event Action? DiedEvent;
     public event Action? RespawnEvent;
     
