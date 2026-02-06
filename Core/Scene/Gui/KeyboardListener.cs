@@ -72,7 +72,7 @@ public partial class KeyboardListener : Node
 
     public override void _UnhandledKeyInput(InputEvent @event)
     {
-        if (@event is not InputEventKey keyEvent || !keyEvent.Pressed) return;
+        if (@event is not InputEventKey keyEvent) return;
 
         switch(keyEvent.Keycode)
         {
@@ -89,7 +89,7 @@ public partial class KeyboardListener : Node
                 D = keyEvent.Pressed;
                 break;
             case Key.E: // build
-                if (Character is not null)
+                if (keyEvent.Pressed && Character is not null)
                 {
                     
                     // set targetted cell to current location
