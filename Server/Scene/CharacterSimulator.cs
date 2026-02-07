@@ -20,6 +20,9 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
         //* character
         this.Character = Character;
         Position = Character.Position;
+        
+        Character.DiedEvent += Deactivate;
+        Character.RespawnEvent += Activate;
 
         //* collision
         AddChild(new CollisionShape3D()
@@ -29,8 +32,7 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
                 Size = new(1, 2, 1),
             }
         });
-        CollisionLayer = SceneDefines.Map.CharacterLayer;
-        CollisionMask = SceneDefines.Map.TerrainLayer;
+        Activate();
     }
 
     public override void _Process(double delta)
@@ -72,5 +74,25 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
             return new FireHitResult.Hit(hits[SceneDefines.PhysicsKey.Position].AsVector3(), hitsim.Character);
         // hit something else
         return new FireHitResult.Miss(hits[SceneDefines.PhysicsKey.Position].AsVector3());
+    }
+
+    /// <summary>
+    /// Stop all physics interactions
+    /// </summary>
+    private void Deactivate()
+    {
+        CollisionLayer = 0;
+        CollisionMask = 0;
+        SetPhysicsProcess(false);
+    }
+
+    /// <summary>
+    /// Enables physics simulation
+    /// </summary>
+    private void Activate()
+    {
+        CollisionLayer = SceneDefines.Map.CharacterLayer;
+        CollisionMask = SceneDefines.Map.TerrainLayer;
+        SetPhysicsProcess(true);
     }
 }

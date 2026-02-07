@@ -10,12 +10,19 @@ namespace OpenTrenches.Common.Contracts.DTO;
 /// </summary>
 [MessagePackObject]
 [Union(100,     typeof(ProjectileNotificationCommand))]
-[Union(101,     typeof(AbilityNotificationCommand))]
+[Union(110,     typeof(AbstractCommandDTO))]
+[Union(111,     typeof(AbilityNotificationCommand))]
 [Union(199,     typeof(InitializedNotificationCommand))]
+
+[Union(140,     typeof(DeathNotificationCommand))]
+[Union(141,     typeof(RespawnNotificationCommand))]
 
 [Union(500,     typeof(SetPlayerCommandDTO))]
 [Union(501,     typeof(SetCellCommand))]
 
+
+
+[Union(200,     typeof(RespawnCommandRequest))]
 [Union(201,     typeof(BuildCommandRequest))]
 [Union(202,     typeof(UseAbilityCommandRequest))]
 public abstract record class AbstractCommandDTO {}

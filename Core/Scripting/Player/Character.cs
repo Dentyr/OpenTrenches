@@ -26,21 +26,14 @@ public class Character : IIdObject
 
     //* World
 
+    public bool Active { get; private set; } = true;
+
     public Vector3 Position { get; set; } = new (0, 10, 0);
 
-    private float _health = 10; //TODO debug value
-    public float Health 
-    { 
-        get => _health; 
-        set
-        {
-            if (_health > 0 && value <= 0) DiedEvent?.Invoke();
-            else if (_health <= 0 && value > 0) RespawnEvent?.Invoke();
-            _health = value;
-        }
-    }
 
-    public float MaxHealth => 15;
+    //* combat
+
+    public float Health { get; private set; }
 
     public event Action? DiedEvent;
     public event Action? RespawnEvent;
@@ -61,6 +54,8 @@ public class Character : IIdObject
         this.ClientState = ClientState;
         this.Position = Position;
         this.Health = Health;
+
+        Active = Health > 0;
     }
 
     //* Modifying state
@@ -117,4 +112,23 @@ public class Character : IIdObject
     }
     
     public override int GetHashCode() => ID;
+
+
+    public void Deactivate()
+    {
+        if (Active)
+        {
+            Active = false;
+            DiedEvent?.Invoke();
+        }
+    }
+
+    public void Reactivate()
+    {
+        if (!Active)
+        {
+            Active = true;
+            RespawnEvent?.Invoke();
+        }
+    }
 }

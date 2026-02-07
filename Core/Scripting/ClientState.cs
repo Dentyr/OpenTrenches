@@ -27,6 +27,12 @@ public sealed class ClientState : IClientState
         LoadedEvent?.Invoke();
     }
 
+    public event Action? PlayerDeathEvent;
+    private void PropagatePlayerDeathEvent() => PlayerDeathEvent?.Invoke();
+
+    public event Action? PlayerRespawnEvent;
+    private void PropagatePlayerPlayerRespawnEvent() => PlayerRespawnEvent?.Invoke();
+
     //* State
 
     private Character? _playerCharacter;
@@ -87,7 +93,14 @@ public sealed class ClientState : IClientState
     {
         if (dto is SetPlayerCommandDTO setPlayerCommand) 
         {
-            if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character)) PlayerCharacter = character;
+            if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character)) 
+            {
+                if (PlayerCharacter is not null) Console.Error.WriteLine("Attempted to re-set player");
+
+                PlayerCharacter = character;
+                PlayerCharacter.DiedEvent += PropagatePlayerDeathEvent;
+                PlayerCharacter.RespawnEvent += PropagatePlayerPlayerRespawnEvent;
+            }
             else throw new NotImplementedException("Set player failed; re-request not implemented");
         }
         else if (dto is SetCellCommand setCell)
@@ -103,6 +116,20 @@ public sealed class ClientState : IClientState
             if (_characters.TryGetValue(abilityNotify.Character, out var chara))
             {
                 chara.ActivateAbility(abilityNotify.Idx);
+            }
+        }
+        else if (dto is DeathNotificationCommand characterDeath)
+        {
+            if (Characters.TryGetValue(characterDeath.Character, out Character? character)) 
+            {
+                character.Deactivate();
+            }
+        }
+        else if (dto is RespawnNotificationCommand characterRespawn)
+        {
+            if (Characters.TryGetValue(characterRespawn.Character, out Character? character)) 
+            {
+                character.Reactivate();
             }
         }
         else if (dto is InitializedNotificationCommand) SetLoaded();

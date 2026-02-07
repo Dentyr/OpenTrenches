@@ -10,6 +10,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using OpenTrenches.Core.Scripting.Player;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 
 namespace OpenTrenches.Core.Scene;
 
@@ -29,7 +31,9 @@ public partial class ClientRoot : Node
     private ClientState? State { get; set; }
 
     //* GUI
-    private CharacterControlUi CharacterUI { get; set; } = null!; 
+    private CharacterControlUi _characterUI = null!; 
+
+    private DeathScreen _deathScreen = null!;
 
     public ClientRoot()
     {
@@ -40,9 +44,14 @@ public partial class ClientRoot : Node
         KeyboardListener = new();
         AddChild(KeyboardListener);
     }
+    //* Initialize godot items
     public override void _Ready()
     {
-        CharacterUI = GetNode<CharacterControlUi>("CharacterControlUi");
+        _characterUI = GetNode<CharacterControlUi>("CharacterControlUi");
+        _deathScreen = GetNode<DeathScreen>("DeathScreen");
+        _deathScreen.Hide();
+        // Send player respawn request to server when requested
+        _deathScreen.OnRespawnClicked += () => ClientNetworkHandler.Adapter.Send(new RespawnCommandRequest());;
 
         if (ClientNetworkHandler.State is not null) SetClient(ClientNetworkHandler.State);
     }
@@ -56,15 +65,22 @@ public partial class ClientRoot : Node
     private void LoadState()
     {
         ArgumentNullException.ThrowIfNull(State);
-        SetWorld(State);
 
+        //* World changes
+        SetWorld(State);
 
         State.CharacterAddedEvent += World.AddCharacter;
 
-        State.PlayerCharacterSetEvent += SetPlayer;
         if (State.PlayerCharacter is not null) SetPlayer(State.PlayerCharacter);
 
         State.FireEvent += World.RenderProjectile;
+
+        //* Gui changes
+        State.PlayerCharacterSetEvent += SetPlayer;
+
+
+        State.PlayerDeathEvent += _deathScreen.Show;
+        State.PlayerRespawnEvent += _deathScreen.Hide;
     }
     private void SetWorld(ClientState state)
     {
@@ -75,14 +91,15 @@ public partial class ClientRoot : Node
     private void SetPlayer(Character playerCharacter)
     {
         World.AddPlayerComponents(playerCharacter);
-        CharacterUI.SetPlayer(playerCharacter);
+        _characterUI.SetPlayer(playerCharacter);
         KeyboardListener.SetPlayer(playerCharacter);
     }
 
 
     private IEnumerable<AbstractCommandDTO> PollCommands()
         => KeyboardListener.PollCommands()
-        .Concat(CharacterUI.PollCommands());
+        .Concat(_characterUI.PollCommands());
+
     public override void _Process(double delta)
     {
         NetworkAdapter.Poll();

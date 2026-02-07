@@ -14,12 +14,12 @@ using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Server.Scripting.Teams;
 namespace OpenTrenches.Server.Scripting.Player;
 
-public class Character(IServerState ServerState, ushort ID, Team Team) : IIdObject
+public class Character : IIdObject
 {
     //* Identification
-    private IServerState ServerState { get; } = ServerState;
-    public ushort ID { get; } = ID;
-    public Team Team { get; } = Team;
+    private IServerState ServerState { get; }
+    public ushort ID { get; }
+    public Team Team { get; }
 
     //* State in World
     
@@ -49,12 +49,21 @@ public class Character(IServerState ServerState, ushort ID, Team Team) : IIdObje
     }
 
     //* Combat status
-    private readonly UpdateableProperty<float> _health = new(10);
+    private readonly UpdateableProperty<float> _health = new();
     public float Health 
     { 
         get => _health;
         private set => _health.Value = value;
     }
+
+    /// <summary>
+    /// Called when the character is no longer active
+    /// </summary>
+    public event Action? DiedEvent;
+    /// <summary>
+    /// Called when the character becomes active
+    /// </summary>
+    public event Action? RespawnEvent;
 
     //TODO Update stats to be more modular
 
@@ -70,6 +79,16 @@ public class Character(IServerState ServerState, ushort ID, Team Team) : IIdObje
 
 
     private readonly UpdateableProperty<float> _stateCooldown = new(0);
+
+    public Character(IServerState ServerState, ushort ID, Team Team)
+    {
+        this.ServerState = ServerState;
+        this.ID = ID;
+        this.Team = Team;
+
+        Respawn();
+    }
+
     public float StateCooldown
     { 
         get => _stateCooldown;
@@ -178,6 +197,27 @@ public class Character(IServerState ServerState, ushort ID, Team Team) : IIdObje
 
     //* combat
 
+    /// <summary>
+    /// Sets character back to full health and at team spawnpoint
+    /// </summary>
+    public void Respawn()
+    {
+        Health = CommonDefines.MaxHealth; 
+        Position = Team.SpawnPoint;
+        RespawnEvent?.Invoke();
+    }
+
+    /// <summary>
+    /// Attempt by the character to respawn.
+    /// </summary>
+    public void RequestRespawn()
+    {
+        if (Health <= 0) Respawn();
+    }
+
+    /// <summary>
+    /// Attempts to activate ability index <paramref name="AbilityIdx"/>
+    /// </summary>
     public void TryActivate(int AbilityIdx)
     {
         if (AbilityIdx >= 0 && AbilityIdx < Abilities.Length && Abilities[AbilityIdx].TryDo(this))
@@ -188,7 +228,9 @@ public class Character(IServerState ServerState, ushort ID, Team Team) : IIdObje
 
     private void ApplyDamage(float dmg)
     {
+        if (Health < 0) return;
         Health -= dmg / (Math.Max(0, GetDefense()) + 1);
+        if (Health <= 0) DiedEvent?.Invoke();
     }
 
 

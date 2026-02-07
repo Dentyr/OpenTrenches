@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bho02vra6ps78" path="res://Core/Scene/ClientRoot.cs" id="1_2i6bf"]
 [ext_resource type="PackedScene" uid="uid://bggyc833cpgfn" path="res://Core/Scene/Gui/CharacterControlUI.tscn" id="2_rtlfk"]
+[ext_resource type="PackedScene" uid="uid://8kdoof7mnddi" path="res://Core/Scene/Gui/DeathScreen.tscn" id="3_f08st"]
 
 [node name="ClientRoot" type="Node" unique_id=770046232]
 script = ExtResource("1_2i6bf")
@@ -13,3 +14,5 @@ text = "Client"
 
 [node name="CharacterControlUi" parent="." unique_id=1186784944 instance=ExtResource("2_rtlfk")]
 mouse_filter = 2
+
+[node name="DeathScreen" parent="." unique_id=659891129 instance=ExtResource("3_f08st")]

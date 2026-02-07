@@ -1,5 +1,6 @@
 using Godot;
 using OpenTrenches.Common.Collections;
+using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Core.Scene.GUI;
@@ -52,8 +53,8 @@ public partial class CharacterControlUi : Control
     {
         if (_character is not null)
         {
-            _healthLabel.Text = _character.Health + "/" + _character.MaxHealth;
-            _healthBar.Value = _character.Health / _character.MaxHealth;
+            _healthLabel.Text = _character.Health + "/" + CommonDefines.MaxHealth;
+            _healthBar.Value = _character.Health / CommonDefines.MaxHealth;
         }
     }
 

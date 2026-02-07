@@ -9,4 +9,6 @@ public static class CommonDefines
     public const float CellSize = 2f;
 
     public const float TrenchThresholdY = 1.8f;
+
+    public const float MaxHealth = 25f;
 }

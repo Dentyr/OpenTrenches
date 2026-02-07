@@ -11,7 +11,7 @@ namespace OpenTrenches.Core.Scene.World;
 public partial class WorldView : Node3D
 {
     //* Characters
-    private readonly Dictionary<ushort, (CharacterRenderer CharacterNode, CharacterFloat Label)> _characters = [];
+    private readonly Dictionary<ushort, CharacterNodesRecord> _characters = [];
     private Node3D _characterLayer { get; }
 
     //* tiles
@@ -58,7 +58,7 @@ public partial class WorldView : Node3D
 
     public void AddCharacter(Character character)
     {
-        if (_characters.TryAdd(character.ID, new(new CharacterRenderer(character), new CharacterFloat(character))))
+        if (_characters.TryAdd(character.ID, new(character)))
         {
             CharacterRenderer node = _characters[character.ID].CharacterNode;
             _characterLayer.AddChild(node);
@@ -77,9 +77,9 @@ public partial class WorldView : Node3D
 
     public void AddPlayerComponents(Character character)
     {
-        if (_characters.TryGetValue(character.ID, out var tuple)) 
+        if (_characters.TryGetValue(character.ID, out var record)) 
         {
-            tuple.CharacterNode.AddChild(new FocusCamera());
+            record.CharacterNode.AddChild(new FocusCamera());
         }
 
     }
@@ -99,5 +99,31 @@ public partial class WorldView : Node3D
     public void RenderProjectile(Vector3 start, Vector3 end)
     {
         AddChild(new BulletRay3D(start, end));
+    }
+}
+
+public class CharacterNodesRecord
+{
+    public CharacterRenderer CharacterNode { get; }
+    public CharacterFloat Label { get; }
+
+    public CharacterNodesRecord(Character character)
+    {
+        CharacterNode = new CharacterRenderer(character);
+        Label = new CharacterFloat(character);
+
+        character.DiedEvent += Deactivate;
+        character.RespawnEvent += Activate;
+    }
+
+    private void Deactivate()
+    {
+        CharacterNode.Hide();
+        Label.Hide();
+    }
+    private void Activate()
+    {
+        CharacterNode.Show();
+        Label.Show();
     }
 }

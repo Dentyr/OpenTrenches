@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://8kdoof7mnddi"]
+
+[ext_resource type="Script" uid="uid://b8s0o4wblv1ve" path="res://Core/Scene/Gui/DeathScreen.cs" id="1_02q2n"]
+
+[node name="DeathScreen" type="Control" unique_id=659891129]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_02q2n")
+
+[node name="Panel" type="Panel" parent="." unique_id=328071349]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="." unique_id=1617642695]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -134.5
+offset_top = -87.0
+offset_right = 134.5
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "You died"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Respawn" type="Button" parent="." unique_id=1706879344]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 66.0
+offset_right = 100.0
+offset_bottom = 146.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Respawn"
