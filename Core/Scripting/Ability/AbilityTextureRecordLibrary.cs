@@ -12,7 +12,7 @@ namespace OpenTrenches.Core.Scripting.Ability;
 /// <summary>
 /// A library of server-side effects
 /// </summary>
-public static class AbilityTextureRecords
+public static class AbilityTextureRecordLibrary
 {
     public static readonly IReadOnlyDictionary<AbilityRecord, AbilityTextureRecord> Textures = new Dictionary<AbilityRecord, AbilityTextureRecord>() {
         {
