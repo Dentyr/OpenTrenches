@@ -47,8 +47,6 @@ public class Character : IIdObject
 
     public Character(ushort ID, int Team, IClientState ClientState, Vector3 Position, float Health)
     {
-        DiedEvent += () => Console.WriteLine("Died");
-        RespawnEvent += () => Console.WriteLine("Respawn");
         this.ID = ID;
         this.Team = Team;
         this.ClientState = ClientState;

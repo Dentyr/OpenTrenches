@@ -56,7 +56,6 @@ public class ServerState : IServerState
         character.ActivatedAbilityEvent += (idx) => HandleAbility(character.ID, idx);
 
         character.DiedEvent += () => _commandQueue.Enqueue(new DeathNotificationCommand(character.ID));
-        character.DiedEvent += () => Console.WriteLine("Chara died");
         character.RespawnEvent += () => _commandQueue.Enqueue(new RespawnNotificationCommand(character.ID));
 
         if (!AddCharacter(character)) throw new Exception("Failed to create new character");
