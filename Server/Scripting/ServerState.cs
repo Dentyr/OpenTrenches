@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using OpenTrenches.Common.Collections;
+using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
-using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
+using OpenTrenches.Common.Factions;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Server.Scripting.Player;
 using OpenTrenches.Server.Scripting.Teams;
 
@@ -22,9 +25,16 @@ public class ServerState : IServerState
     private readonly Dictionary<ushort, Character> _characters = [];
     public IReadOnlyDictionary<ushort, Character> Characters => _characters;
 
-    private void AddCharacter(Character Character)
+    private bool AddCharacter(Character Character)
     {
-        if (_characters.TryAdd(Character.ID, Character)) CharacterAddedEvent?.Invoke(Character);
+        if (!_teams.ContainsKey(Character.Team)) return false;
+        if (_characters.TryAdd(Character.ID, Character)) 
+        {
+            _teams[Character.Team].AddCharacter(Character);
+            CharacterAddedEvent?.Invoke(Character);
+            return true;
+        }
+        return false;
     }
 
     private readonly Dictionary<int, Team> _teams = [];
@@ -38,13 +48,29 @@ public class ServerState : IServerState
     private ushort _charId = 0;
     public Character CreateCharacter()
     {
-        var character = new Character(this, _charId ++);
+        Character character = new(this, 
+            ID: _charId ++, 
+            Team: _teams.MinBy(team => team.Value.CharcaterCount).Value.ID);
         
         character.FireEvent += HandleFire;
         character.ActivatedAbilityEvent += (idx) => HandleAbility(character.ID, idx);
 
-        AddCharacter(character);
+        if (!AddCharacter(character)) throw new Exception("Failed to create new character");
         return character;
+    }
+    private ushort _teamId = 0;
+    private Team CreateTeam(FactionEnum faction, Vector3 spawnpoint)
+    {
+        Team team = new(_teamId ++, faction, spawnpoint);
+        _teams.Add(team.ID, team);
+
+        return team;
+    }
+
+    public ServerState()
+    {
+        CreateTeam(FactionEnum.StandardDebug, new(20, 10, 20));
+        CreateTeam(FactionEnum.StandardDebug, new(50, 10, 50));
     }
 
     //* communication
@@ -58,6 +84,12 @@ public class ServerState : IServerState
         => _commandQueue.Enqueue(new ProjectileNotificationCommand(character.Position, target));
 
     public IEnumerable<AbstractCommandDTO> PollEvents() => _commandQueue.PollItems().Concat(Chunks.PollCellChanges());
+
+    public IEnumerable<AbstractCreateDTO> GetInitDTOs()
+        => _characters.Values.Select(ObjectToDTO.Convert).Cast<AbstractCreateDTO>()
+            .Concat(Chunks.GetChunks().Select(CommonToDTO.Convert))
+            .Concat(Teams.Values.Select(ObjectToDTO.Convert));
+            // .Concat(Chunks.GetChunks().Select(chunk => CommonToDTO.Convert(chunk)));
 }
 
 public interface IServerState

@@ -4,17 +4,12 @@ using MessagePack;
 namespace OpenTrenches.Common.Contracts.DTO;
 
 [MessagePackObject]
-public record  class CharacterDTO(ushort ID, Vector3 Position, float Health) : AbstractCreateDTO
-{
-    [Key(0)]
-    public ushort ID { get; } = ID;
-
-    [Key(1)]
-    public Vector3 Position { get; } = Position;
-
-    [Key(2)]
-    public float Health { get; } = Health;
-}
+public record  class CharacterDTO(
+    [property: Key(0)] ushort ID,
+    [property: Key(1)] Vector3 Position,
+    [property: Key(2)] float Health,
+    [property: Key(3)] int Team
+) : AbstractCreateDTO {}
 public enum CharacterAttribute : byte
 {
     Position,

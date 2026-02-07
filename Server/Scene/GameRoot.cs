@@ -9,6 +9,7 @@ using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Common.World;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 namespace OpenTrenches.Server.Scene;
 
@@ -53,10 +54,11 @@ public partial class GameRoot : Node
         PlayerNetworkHandler player = new(connection, GameState);
         _players.Add(player);
 
-        foreach (ChunkRecord chunkRecord in GameState.Chunks.GetChunks()) player.Adapter.Send(CommonToDTO.Convert(chunkRecord));
-        foreach (var character in GameState.Characters.Values) player.Adapter.Send(ObjectToDTO.Convert(character));
+        foreach (AbstractCreateDTO createDTO in GameState.GetInitDTOs()) player.Adapter.Send(createDTO);
+
         player.Adapter.Send(new SetPlayerCommandDTO(player.Character.ID));
         
+        player.Adapter.Send(new InitializedNotificationCommand());
     }
 
 

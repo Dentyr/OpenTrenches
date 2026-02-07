@@ -2,6 +2,7 @@
 using Godot;
 using MessagePack;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
 namespace OpenTrenches.Common.Contracts.DTO;
 
 /// <summary>
@@ -10,6 +11,7 @@ namespace OpenTrenches.Common.Contracts.DTO;
 [MessagePackObject]
 [Union(100,     typeof(ProjectileNotificationCommand))]
 [Union(101,     typeof(AbilityNotificationCommand))]
+[Union(199,     typeof(InitializedNotificationCommand))]
 
 [Union(500,     typeof(SetPlayerCommandDTO))]
 [Union(501,     typeof(SetCellCommand))]

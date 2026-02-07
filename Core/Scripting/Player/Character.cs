@@ -17,8 +17,12 @@ public class Character : IIdObject
     //* Identification
 
     public ushort ID { get; }
-    public CharacterState State { get; private set; }
+    public int Team { get; }
+    public IClientState ClientState { get; }
+    public CharacterState ActionState { get; private set; }
 
+    public bool PlayerCharacter => ClientState.PlayerCharacter == this;
+    public bool OnPlayerTeam => ClientState.PlayerCharacter?.Team == Team;
 
     //* World
 
@@ -48,11 +52,13 @@ public class Character : IIdObject
     public IReadOnlyList<IActivatedAbility> GetAbilities() => [.. _abilities.Cast<IActivatedAbility>()];
     // public event Action<int> AbilityActivated;
 
-    public Character(ushort ID, Vector3 Position, float Health)
+    public Character(ushort ID, int Team, IClientState ClientState, Vector3 Position, float Health)
     {
         DiedEvent += () => Console.WriteLine("Died");
         RespawnEvent += () => Console.WriteLine("Respawn");
         this.ID = ID;
+        this.Team = Team;
+        this.ClientState = ClientState;
         this.Position = Position;
         this.Health = Health;
     }
@@ -96,8 +102,19 @@ public class Character : IIdObject
             case CharacterAttribute.Cooldown:
                 break;
             case CharacterAttribute.State:
-                State = Serialization.Deserialize<CharacterState>(update.Payload);
+                ActionState = Serialization.Deserialize<CharacterState>(update.Payload);
                 break;
         }
     }
+
+    //* equality
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || obj is not Character chara) return false;
+        // same ID within the same context
+        return chara.ID == ID && chara.ClientState == ClientState;
+    }
+    
+    public override int GetHashCode() => ID;
 }

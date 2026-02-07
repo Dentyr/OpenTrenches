@@ -15,7 +15,7 @@ public partial class CharacterRenderer : Node3D
         AddChild(new MeshInstance3D()
         {
             Mesh = Meshes.Dirt,
-            MaterialOverride = Materials.PinkDebug,
+            MaterialOverride = Character.OnPlayerTeam ? Materials.WhiteDebug : Materials.RedDebug,
         });
         AddChild(new CollisionShape3D()
         {

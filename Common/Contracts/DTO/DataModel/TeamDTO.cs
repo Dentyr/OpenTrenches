@@ -1,4 +1,5 @@
 using MessagePack;
+using OpenTrenches.Common.Factions;
 
 namespace OpenTrenches.Common.Contracts.DTO.DataModel;
 
@@ -7,5 +8,5 @@ namespace OpenTrenches.Common.Contracts.DTO.DataModel;
 [MessagePackObject]
 public record class TeamDTO(
     [property: Key(0)] int ID,
-    [property: Key(1)] int Faction
+    [property: Key(1)] FactionEnum Faction
 ) : AbstractCreateDTO {}

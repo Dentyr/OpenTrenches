@@ -8,6 +8,8 @@ using OpenTrenches.Core.Scene.GUI;
 using OpenTrenches.Core.Scene.Gui;
 using System.Linq;
 using System.Collections.Generic;
+using System;
+using OpenTrenches.Core.Scripting.Player;
 
 namespace OpenTrenches.Core.Scene;
 
@@ -42,20 +44,25 @@ public partial class ClientRoot : Node
     {
         CharacterUI = GetNode<CharacterControlUi>("CharacterControlUi");
 
-        if (ClientNetworkHandler.State is not null) LoadGame(ClientNetworkHandler.State);
+        if (ClientNetworkHandler.State is not null) SetClient(ClientNetworkHandler.State);
     }
 
-    private void LoadGame(ClientState state) //TODO load when server decides on new game
+    private void SetClient(ClientState state) //TODO load when server decides on new game
     {
         State = state;
-        SetWorld(state);
+        State.LoadedEvent += LoadState;
+        if (State.Loaded) LoadState();
+    }
+    private void LoadState()
+    {
+        ArgumentNullException.ThrowIfNull(State);
+        SetWorld(State);
+
 
         State.CharacterAddedEvent += World.AddCharacter;
 
-
-        State.PlayerCharacterSetEvent += World.AddPlayerComponents;
-        State.PlayerCharacterSetEvent += CharacterUI.SetPlayer;
-        State.PlayerCharacterSetEvent += KeyboardListener.SetPlayer;
+        State.PlayerCharacterSetEvent += SetPlayer;
+        if (State.PlayerCharacter is not null) SetPlayer(State.PlayerCharacter);
 
         State.FireEvent += World.RenderProjectile;
     }
@@ -64,6 +71,12 @@ public partial class ClientRoot : Node
         World = new(state);
         World.DisablePhysics();
         AddChild(World);
+    }
+    private void SetPlayer(Character playerCharacter)
+    {
+        World.AddPlayerComponents(playerCharacter);
+        CharacterUI.SetPlayer(playerCharacter);
+        KeyboardListener.SetPlayer(playerCharacter);
     }
 
 

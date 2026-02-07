@@ -48,6 +48,10 @@ public partial class WorldView : Node3D
 
         ChunkLayer = new(State.Chunks);
         AddChild(ChunkLayer);
+
+        //* Load from state
+        foreach(var chara in State.Characters.Values) AddCharacter(chara);
+
     }
 
 

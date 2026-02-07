@@ -10,13 +10,38 @@ using Godot;
 using OpenTrenches.Core.Scene;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
-using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using OpenTrenches.Common.Contracts.DTO.DataModel;
+using OpenTrenches.Core.Scripting.Teams;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 namespace OpenTrenches.Core.Scripting;
 
-public sealed class ClientState
+public sealed class ClientState : IClientState
 {
-    private Dictionary<uint, Character> _characters = [];
+    //* Status
+    public bool Loaded { get; private set; }
+    public event Action? LoadedEvent;
+    private void SetLoaded()
+    {
+        Loaded = true;
+        LoadedEvent?.Invoke();
+    }
+
+    //* State
+
+    private Character? _playerCharacter;
+    public Character? PlayerCharacter 
+    { 
+        get => _playerCharacter; 
+        private set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _playerCharacter = value;
+            PlayerCharacterSetEvent?.Invoke(value);
+        } 
+    }
+
+    private readonly Dictionary<uint, Character> _characters = [];
     public IReadOnlyDictionary<uint, Character> Characters => _characters;
 
     public event Action<Character>? CharacterAddedEvent; 
@@ -31,6 +56,14 @@ public sealed class ClientState
     public ChunkArray2D Chunks { get; } = new(); //TODO send required size in create message
 
 
+    private readonly Dictionary<int, ClientTeam> _teams = [];
+    public IReadOnlyDictionary<int, ClientTeam> Team => _teams;
+
+    private void AddTeam(ClientTeam team)
+    {
+        _teams.Add(team.ID, team);
+    }
+
 
     //* Events
     public event Action<Character>? PlayerCharacterSetEvent;
@@ -43,8 +76,9 @@ public sealed class ClientState
     }
     public void Create(AbstractCreateDTO dTO)
     {
-        if (dTO is CharacterDTO character) AddCharacter(FromDTO.Convert(character));
+        if (dTO is CharacterDTO character) AddCharacter(FromDTO.Convert(character, this));
         else if (dTO is WorldChunkDTO chunk) Chunks.SetChunk(CommonFromDTO.Convert(chunk));
+        else if (dTO is TeamDTO team) AddTeam(FromDTO.Convert(team));
         // else if (dTO is WorldChunkDTO chunk) {
         //     Chunks.SetChunk(CommonFromDTO.Convert(chunk));
         // }
@@ -53,8 +87,8 @@ public sealed class ClientState
     {
         if (dto is SetPlayerCommandDTO setPlayerCommand) 
         {
-            if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character)) PlayerCharacterSetEvent?.Invoke(character);
-            else throw new NotImplementedException("Request another ID not implemented");
+            if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character)) PlayerCharacter = character;
+            else throw new NotImplementedException("Set player failed; re-request not implemented");
         }
         else if (dto is SetCellCommand setCell)
         {
@@ -71,5 +105,13 @@ public sealed class ClientState
                 chara.ActivateAbility(abilityNotify.Idx);
             }
         }
+        else if (dto is InitializedNotificationCommand) SetLoaded();
     }
+}
+
+public interface IClientState
+{
+    public IReadOnlyDictionary<uint, Character> Characters { get; }
+    public IReadOnlyDictionary<int, ClientTeam> Team { get; }
+    public Character? PlayerCharacter { get; }
 }

@@ -2,7 +2,7 @@
 
 using MessagePack;
 
-namespace OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+namespace OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 /// <summary>
 /// Notifies the activation of an ability
