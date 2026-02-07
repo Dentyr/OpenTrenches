@@ -27,10 +27,9 @@ public class ServerState : IServerState
 
     private bool AddCharacter(Character Character)
     {
-        if (!_teams.ContainsKey(Character.Team)) return false;
         if (_characters.TryAdd(Character.ID, Character)) 
         {
-            _teams[Character.Team].AddCharacter(Character);
+            Character.Team.AddCharacter(Character);
             CharacterAddedEvent?.Invoke(Character);
             return true;
         }
@@ -50,8 +49,9 @@ public class ServerState : IServerState
     {
         Character character = new(this, 
             ID: _charId ++, 
-            Team: _teams.MinBy(team => team.Value.CharcaterCount).Value.ID);
+            Team: _teams.MinBy(team => team.Value.CharcaterCount).Value);
         
+        character.Position = character.Team.SpawnPoint;
         character.FireEvent += HandleFire;
         character.ActivatedAbilityEvent += (idx) => HandleAbility(character.ID, idx);
 
@@ -70,7 +70,7 @@ public class ServerState : IServerState
     public ServerState()
     {
         CreateTeam(FactionEnum.StandardDebug, new(20, 10, 20));
-        CreateTeam(FactionEnum.StandardDebug, new(50, 10, 50));
+        CreateTeam(FactionEnum.StandardDebug, new(30, 10, 30));
     }
 
     //* communication

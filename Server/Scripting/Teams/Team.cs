@@ -22,7 +22,7 @@ public class Team(int ID, FactionEnum Faction, Vector3 SpawnPoint)
 
     public void AddCharacter(Character character)
     {
-        if (character.Team == ID) _characters.Add(character);
+        if (character.Team == this) _characters.Add(character);
     }
 
     public bool RemoveCharacter(Character character) => _characters.Remove(character);

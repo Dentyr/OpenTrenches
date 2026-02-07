@@ -11,14 +11,15 @@ using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Ability;
 using OpenTrenches.Server.Scripting.Adapter;
+using OpenTrenches.Server.Scripting.Teams;
 namespace OpenTrenches.Server.Scripting.Player;
 
-public class Character(IServerState ServerState, ushort ID, int Team) : IIdObject
+public class Character(IServerState ServerState, ushort ID, Team Team) : IIdObject
 {
     //* Identification
     private IServerState ServerState { get; } = ServerState;
     public ushort ID { get; } = ID;
-    public int Team { get; } = Team;
+    public Team Team { get; } = Team;
 
     //* State in World
     
