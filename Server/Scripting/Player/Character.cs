@@ -130,7 +130,7 @@ public class Character : IIdObject
                 {
                     var target = Position + ((Direction - Position).Normalized() * 1000);
                     FireHitResult result = adapter.AdaptFire(target);
-                    if (result is FireHitResult.Hit hit) hit.Character.ApplyDamage(4);
+                    if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(4);
                     
                     FireEvent?.Invoke(this, result.Position);
                     StateCooldown = 0.1f;
