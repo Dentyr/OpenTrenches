@@ -23,45 +23,45 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
 
 
         Listener.ConnectionRequestEvent += HandleRequest;
-
         Listener.PeerConnectedEvent += HandleConnect;
-
         Listener.NetworkReceiveEvent += HandleReceive;
 
     }
 
+    /// <summary>
+    /// Directs an incoming packet to the adapter associated with <paramref name="peer"/>
+    /// </summary>
     private void HandleReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
     {
         _adapterDictionary[peer].HandleReceive(reader.GetRemainingBytes());
         reader.Recycle();
     }
 
+    /// <summary>
+    /// Handles an accepted connection request from <paramref name="peer"/>
+    /// </summary>
     private void HandleConnect(NetPeer peer)
     {
-        NetDataWriter writer = new NetDataWriter();         // Create writer class
+        NetDataWriter writer = new();
         
-        LiteNetConnectionAdapter connection = new LiteNetConnectionAdapter(peer);
+        LiteNetConnectionAdapter connection = new(peer);
         _adapterDictionary.Add(peer, connection);
         ConnectedEvent?.Invoke(connection);
     }
+
+    /// <summary>
+    /// handles in incoming <paramref name="request"/>
+    /// </summary>
     private void HandleRequest(ConnectionRequest request)
     {
-        if(Server.ConnectedPeersCount < 10 /* max connections */)
+        if(Server.ConnectedPeersCount < 30 /* max connections */)
             request.AcceptIfKey(NetworkDefines.Key);
         else
             request.Reject();
     }
 
-    public void Poll()
-    {
-        Server.PollEvents();
-    }
-
-    public void Start()
-    {
-        Server.Start(NetworkDefines.ServerPort /* port */);
-    }
-
+    public void Poll() => Server.PollEvents();
+    public void Start() => Server.Start(NetworkDefines.ServerPort);
     public void Stop() => Server.Stop();
 
 
@@ -77,6 +77,7 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
     private EventBasedNetListener Listener { get; }
     private NetManager Client { get; }
     private LiteNetConnectionAdapter? Adapter { get; set; }
+
     public LiteNetClientAdapter()
     {
         Listener = new();
@@ -84,24 +85,26 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
 
         Listener.NetworkReceiveEvent += HandleNetworkReceive;
     }
+
+    /// <summary>
+    /// Directs an incoming packet to the adapter associated with <paramref name="peer"/>
+    /// </summary>
     private void HandleNetworkReceive(NetPeer peer, NetPacketReader dataReader, byte channel, DeliveryMethod deliveryMethod)
     {
         Adapter?.HandleReceive(dataReader.GetRemainingBytes());
         dataReader.Recycle();
     }
 
+    /// <summary>
+    /// Attempts to connect to <paramref name="hostname"/>, returning a connection adapter to manage the connection.
+    /// </summary>
     public INetworkConnectionAdapter Connect(string hostname)
     {
         Adapter = new LiteNetConnectionAdapter(Client.Connect("localhost", NetworkDefines.ServerPort, NetworkDefines.Key));
         return Adapter;
     }
 
-    public void Poll()
-    {
-        Client.PollEvents();
-    }
-
+    public void Poll() => Client.PollEvents();
     public void Start() => Client.Start();
-
     public void Stop() => Client.Stop();
 }
