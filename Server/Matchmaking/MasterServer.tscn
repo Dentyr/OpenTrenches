@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dcwchd53yuih"]
+
+[ext_resource type="Script" uid="uid://bd30501njhj5h" path="res://Server/Matchmaking/MasterServer.cs" id="1_exvna"]
+
+[node name="MasterServer" type="Node" unique_id=1191957015]
+script = ExtResource("1_exvna")
+metadata/_custom_type_script = "uid://bd30501njhj5h"

@@ -10,6 +10,7 @@ using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Common.World;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
+using System.Threading;
 
 namespace OpenTrenches.Server.Scene;
 
@@ -27,8 +28,11 @@ public partial class GameRoot : Node
     {
         //* network setup
         Console.WriteLine($"PID {Process.GetCurrentProcess().ProcessName}");
+
+        // 
+
+
         NetworkAdapter = new LiteNetServerAdapter();
-        NetworkAdapter.Start();
         NetworkAdapter.ConnectedEvent += Connection;
         
         //* model and adapter
@@ -43,6 +47,25 @@ public partial class GameRoot : Node
         //* events
         GameState.CharacterAddedEvent += World.AddCharacter;
         GameState.CharacterAddedEvent += BroadcastCharacter;
+    }
+    public override void _EnterTree()
+    {
+        // get port number from command line arguments.
+        string[] args = OS.GetCmdlineArgs();
+        for(int i = 0; i < args.Length - 1; i ++)
+        {
+            if (args[i] == "--port" && int.TryParse(args[i + 1], out var portnum))
+            {
+                Console.WriteLine("Listening on port " + portnum);
+
+                NetworkAdapter.Start(portnum);
+                return;
+            }
+        }
+
+        Console.Error.WriteLine("Failed to get port argument");
+        GetTree().Quit();
+        return;
     }
 
     private void BroadcastCharacter(Character character) 

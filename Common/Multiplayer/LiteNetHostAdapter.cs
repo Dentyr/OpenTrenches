@@ -1,6 +1,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTrenches.Common.Contracts;
@@ -34,7 +37,6 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
     private void HandleReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
     {
         _adapterDictionary[peer].HandleReceive(reader.GetRemainingBytes());
-        reader.Recycle();
     }
 
     /// <summary>
@@ -61,7 +63,7 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
     }
 
     public void Poll() => Server.PollEvents();
-    public void Start() => Server.Start(NetworkDefines.ServerPort);
+    public void Start(int port) => Server.Start(port);
     public void Stop() => Server.Stop();
 
 
@@ -92,7 +94,6 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
     private void HandleNetworkReceive(NetPeer peer, NetPacketReader dataReader, byte channel, DeliveryMethod deliveryMethod)
     {
         Adapter?.HandleReceive(dataReader.GetRemainingBytes());
-        dataReader.Recycle();
     }
 
     /// <summary>
@@ -103,8 +104,23 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
         Adapter = new LiteNetConnectionAdapter(Client.Connect("localhost", NetworkDefines.ServerPort, NetworkDefines.Key));
         return Adapter;
     }
+    /// <summary>
+    /// Attempts to connect to <paramref name="endpoint"/>, returning a connection adapter to manage the connection.
+    /// </summary>
+    public INetworkConnectionAdapter Connect(IPEndPoint endpoint)
+    {
+        Adapter = new LiteNetConnectionAdapter(Client.Connect(endpoint, NetworkDefines.Key));
+        return Adapter;
+    }
+
 
     public void Poll() => Client.PollEvents();
     public void Start() => Client.Start();
     public void Stop() => Client.Stop();
+}
+
+
+public interface IDiscoveryAdapter
+{
+    
 }

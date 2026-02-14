@@ -1,5 +1,6 @@
 
 using System;
+using System.Net;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
 
@@ -16,10 +17,6 @@ public interface IHostNetworkAdapter
     /// </summary>
     public void Poll();
 
-    /// <summary>
-    /// Enables services and listening
-    /// </summary>
-    public void Start();
 
     /// <summary>
     /// Disables services;
@@ -34,12 +31,27 @@ public interface IClientNetworkAdapter : IHostNetworkAdapter
     /// </summary>
     /// <param name="hostname"></param>
     public INetworkConnectionAdapter Connect(string hostname);
+    /// <summary>
+    /// Starts an asynchronous connection attempt to endpoint
+    /// </summary>
+    /// <param name="hostname"></param>
+    public INetworkConnectionAdapter Connect(IPEndPoint endPoint);
+
+    /// <summary>
+    /// Enables services and listening
+    /// </summary>
+    public void Start();
 
 }
 
 public interface IServerNetworkAdapter : IHostNetworkAdapter
 {
     public event Action<INetworkConnectionAdapter> ConnectedEvent;
+
+    /// <summary>
+    /// Enables services and listening on the specified port
+    /// </summary>
+    public void Start(int port);
 
     public void Send(Datagram datagram);
     
