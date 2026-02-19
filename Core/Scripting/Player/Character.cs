@@ -35,12 +35,19 @@ public class Character : IIdObject
         get => _health;
         private set
         {
-            if (value > 0 && _health <= 0) ActivatedEvent?.Invoke();
-            else if (value <= 0 && _health > 0) InactivatedEvent?.Invoke();
+            bool wasAlive = IsActive;
             _health = value;
+            bool isAlive  = IsActive;
+
+            if (wasAlive != isAlive)
+            {
+                if (isAlive) ActivatedEvent?.Invoke();
+                else InactivatedEvent?.Invoke();
+            }
         }
     }
 
+    public bool IsActive => _health > 0;
     public event Action? InactivatedEvent;
     public event Action? ActivatedEvent;
     

@@ -117,6 +117,9 @@ public class CharacterNodesRecord
 
         character.InactivatedEvent += Deactivate;
         character.ActivatedEvent += Activate;
+
+        if (character.IsActive) Activate();
+        else Deactivate();
     }
 
     private void Deactivate()
