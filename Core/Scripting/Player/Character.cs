@@ -21,22 +21,28 @@ public class Character : IIdObject
     public IClientState ClientState { get; }
     public CharacterState ActionState { get; private set; }
 
-    public bool PlayerCharacter => ClientState.PlayerCharacter == this;
-    public bool OnPlayerTeam => ClientState.PlayerCharacter?.Team == Team;
 
     //* World
-
-    public bool Active { get; private set; } = true;
 
     public Vector3 Position { get; set; }
 
 
     //* combat
 
-    public float Health { get; private set; }
+    private float _health = 1;
+    public float Health 
+    { 
+        get => _health;
+        private set
+        {
+            if (value > 0 && _health <= 0) ActivatedEvent?.Invoke();
+            else if (value <= 0 && _health > 0) InactivatedEvent?.Invoke();
+            _health = value;
+        }
+    }
 
-    public event Action? DiedEvent;
-    public event Action? RespawnEvent;
+    public event Action? InactivatedEvent;
+    public event Action? ActivatedEvent;
     
 
 
@@ -52,8 +58,6 @@ public class Character : IIdObject
         this.ClientState = ClientState;
         this.Position = Position;
         this.Health = Health;
-
-        Active = Health > 0;
     }
 
     //* Modifying state
@@ -110,23 +114,4 @@ public class Character : IIdObject
     }
     
     public override int GetHashCode() => HashCode.Combine(ClientState.GetHashCode(), ID);
-
-
-    public void Deactivate()
-    {
-        if (Active)
-        {
-            Active = false;
-            DiedEvent?.Invoke();
-        }
-    }
-
-    public void Reactivate()
-    {
-        if (!Active)
-        {
-            Active = true;
-            RespawnEvent?.Invoke();
-        }
-    }
 }

@@ -10,6 +10,7 @@ namespace OpenTrenches.Core.Scene.World;
 
 public partial class WorldView : Node3D
 {
+    private readonly IClientState _clientState;
     //* Characters
     private readonly Dictionary<ushort, CharacterNodesRecord> _characters = [];
     private Node3D _characterLayer { get; }
@@ -28,6 +29,8 @@ public partial class WorldView : Node3D
 
     public WorldView(ClientState State)
     {
+        _clientState = State;
+        
         _characterLayer = new()
         {
             Name = "Characters",
@@ -58,7 +61,7 @@ public partial class WorldView : Node3D
 
     public void AddCharacter(Character character)
     {
-        if (_characters.TryAdd(character.ID, new(character)))
+        if (_characters.TryAdd(character.ID, new(_clientState, character)))
         {
             CharacterRenderer node = _characters[character.ID].CharacterNode;
             _characterLayer.AddChild(node);
@@ -107,13 +110,13 @@ public class CharacterNodesRecord
     public CharacterRenderer CharacterNode { get; }
     public CharacterFloat Label { get; }
 
-    public CharacterNodesRecord(Character character)
+    public CharacterNodesRecord(IClientState clientState, Character character)
     {
-        CharacterNode = new CharacterRenderer(character);
+        CharacterNode = new CharacterRenderer(clientState, character);
         Label = new CharacterFloat(character);
 
-        character.DiedEvent += Deactivate;
-        character.RespawnEvent += Activate;
+        character.InactivatedEvent += Deactivate;
+        character.ActivatedEvent += Activate;
     }
 
     private void Deactivate()

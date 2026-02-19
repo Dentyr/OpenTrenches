@@ -98,8 +98,8 @@ public sealed class ClientState : IClientState
                 if (PlayerCharacter is not null) Console.Error.WriteLine("Attempted to re-set player");
 
                 PlayerCharacter = character;
-                PlayerCharacter.DiedEvent += PropagatePlayerDeathEvent;
-                PlayerCharacter.RespawnEvent += PropagatePlayerPlayerRespawnEvent;
+                PlayerCharacter.InactivatedEvent += PropagatePlayerDeathEvent;
+                PlayerCharacter.ActivatedEvent += PropagatePlayerPlayerRespawnEvent;
             }
             else throw new NotImplementedException("Set player failed; re-request not implemented");
         }
@@ -122,14 +122,14 @@ public sealed class ClientState : IClientState
         {
             if (Characters.TryGetValue(characterDeath.Character, out Character? character)) 
             {
-                character.Deactivate();
+                //TODO implement log?
             }
         }
         else if (dto is RespawnNotificationCommand characterRespawn)
         {
-            if (Characters.TryGetValue(characterRespawn.Character, out Character? character)) 
+            if (Characters.TryGetValue(characterRespawn.Character, out Character? character))
             {
-                character.Reactivate();
+                //TODO implement log?
             }
         }
         else if (dto is InitializedNotificationCommand) SetLoaded();
