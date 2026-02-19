@@ -35,6 +35,7 @@ public sealed class ClientState : IClientState
 
     //* State
 
+    //* character
     private Character? _playerCharacter;
     public Character? PlayerCharacter 
     { 
@@ -57,6 +58,9 @@ public sealed class ClientState : IClientState
         if (_characters.TryAdd(Character.ID, Character)) CharacterAddedEvent?.Invoke(Character);
     }
 
+    //* player info
+    private PlayerState _playerState = new();
+    public IReadOnlyPlayerState PlayerState => _playerState;
 
     //* 
     public ChunkArray2D Chunks { get; } = new(); //TODO send required size in create message

@@ -20,6 +20,8 @@ public partial class CharacterControlUi : Control
 
     private ProgressBar _healthBar = null!;
     private Label _healthLabel = null!;
+
+    private IconDisplay _logisticsDisplay = null!;
     
 
     private PolledQueue<AbstractCommandDTO> _queuedCommands { get; } = new();
@@ -32,6 +34,8 @@ public partial class CharacterControlUi : Control
         _healthBar.MaxValue = 1;
         _healthBar.Step = 0.01;
         _healthLabel = _healthBar.GetNode<Label>("Label");
+
+        _logisticsDisplay = GetNode<IconDisplay>("LogisticsDisplay");
     }
 
     public void SetPlayer(Character character)
@@ -44,6 +48,10 @@ public partial class CharacterControlUi : Control
             abilityNode.AbilitySelected += NotifyAbilityCommand; 
             _abilityContainer.AddChild(abilityNode);
         }
+    }
+    public void SetLogistics(int value)
+    {
+        _logisticsDisplay.Text = value.ToString();
     }
 
     private void NotifyAbilityCommand(int idx) => _queuedCommands.Enqueue(new UseAbilityCommandRequest(0));

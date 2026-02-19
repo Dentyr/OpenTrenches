@@ -143,6 +143,8 @@ public partial class ClientRoot : Node
         //* Gui changes
         State.PlayerCharacterSetEvent += SetPlayer;
 
+        State.PlayerState.OnLogisticsChangedEvent += _characterUI.SetLogistics;
+
 
         State.PlayerDeathEvent += _deathScreen.Show;
         State.PlayerRespawnEvent += _deathScreen.Hide;

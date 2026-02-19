@@ -10,4 +10,10 @@ public static class TextureLibrary2D
     public static Texture2D TransparentGray { get; } = ResourceLoader.Load<Texture2D>("Common/Resources/Img/DimGray.png");
     public static Texture2D Cyan { get; } = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Cyan.png");
     public static Texture2D Border { get; } = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Border.png");
+
+
+    public static class UI
+    {
+        public static Texture2D LogisticsThumbnail = ResourceLoader.Load<Texture2D>("Common/Resources/Img/UI/Logistics.png");
+    }
 }
