@@ -28,7 +28,7 @@ public class Character : IIdObject
 
     public bool Active { get; private set; } = true;
 
-    public Vector3 Position { get; set; } = new (0, 10, 0);
+    public Vector3 Position { get; set; }
 
 
     //* combat
@@ -40,9 +40,9 @@ public class Character : IIdObject
     
 
 
-    public ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
+    private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
     public IActivatedAbility GetAbility(int index) => _abilities[index];
-    public IReadOnlyList<IActivatedAbility> GetAbilities() => [.. _abilities.Cast<IActivatedAbility>()];
+    public IReadOnlyList<ActivatedAbility> GetAbilities() => _abilities;
     // public event Action<int> AbilityActivated;
 
     public Character(ushort ID, int Team, IClientState ClientState, Vector3 Position, float Health)
@@ -60,10 +60,10 @@ public class Character : IIdObject
 
     public void ActivateAbility(int index)
     {
-        if (index >= 0 && index < _abilities.Length) 
-        {
-            _abilities[index].ActivateTimer();
-        }
+        if (index >= 0 && index < _abilities.Length) _abilities[index].ActivateTimer();
+        #if DEBUG
+        else throw new IndexOutOfRangeException($"index was {index}, abilities between 0 and {_abilities.Length - 1}");
+        #endif
     }
 
     //* Process
@@ -109,7 +109,7 @@ public class Character : IIdObject
         return chara.ID == ID && chara.ClientState == ClientState;
     }
     
-    public override int GetHashCode() => ID;
+    public override int GetHashCode() => HashCode.Combine(ClientState.GetHashCode(), ID);
 
 
     public void Deactivate()
