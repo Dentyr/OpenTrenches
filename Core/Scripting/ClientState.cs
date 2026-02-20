@@ -59,7 +59,7 @@ public sealed class ClientState : IClientState
     }
 
     //* player info
-    private PlayerState _playerState = new();
+    private PlayerState _playerState = new() { Logistics=12 }; //TODO test value
     public IReadOnlyPlayerState PlayerState => _playerState;
 
     //* 

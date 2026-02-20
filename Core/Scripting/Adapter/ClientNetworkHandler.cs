@@ -11,7 +11,7 @@ public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractN
 {
     public ushort? PlayerID;
 
-    public ClientState? State = new();
+    public ClientState State = new();
 
 
     protected override void _DeserializeCreate(CreateDatagram datagram) => State?.Create(datagram.DTO);

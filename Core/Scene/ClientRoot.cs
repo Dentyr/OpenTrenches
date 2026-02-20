@@ -45,6 +45,7 @@ public partial class ClientRoot : Node
         //* Network
 
         NetworkAdapter = new LiteNetClientAdapter();
+        NetworkAdapter.Start();
 
         ConnectionAgent = new();
         ConnectionAgent.ReceivedServersEvent += UpdateServerList;
@@ -56,17 +57,6 @@ public partial class ClientRoot : Node
     }
 
 
-    public override void _EnterTree()
-    {
-        NetworkAdapter.Start();
-        ClientNetworkHandler = new(NetworkAdapter.Connect("localhost"));
-
-        ConnectionAgent.PollRecords();
-        // recordTask.Wait();
-        // Task.Delay(100);
-        // Thread.Sleep(100);
-        
-    }
 
 
     //* Initialize godot items
@@ -78,17 +68,8 @@ public partial class ClientRoot : Node
         // Send player respawn request to server when requested
         _deathScreen.OnRespawnClicked += HandleRespawnAttempt;
 
-    }
-    private async void TryConnect()
-    {
-        for (int i = 0; i < 10; i ++)
-        {
-            if (ClientNetworkHandler?.State is not null) {
-                SetState(ClientNetworkHandler.State);
-                return;
-            }
-            await Task.Delay(200);
-        }
+        //* Try to connect to server
+        ConnectionAgent.PollRecords();
     }
 
     //* handling user input
@@ -110,10 +91,7 @@ public partial class ClientRoot : Node
         {
             ClientNetworkHandler = new(NetworkAdapter.Connect(endPoint));
         }
-        // await ClientNetworkHandler.WaitUntilConnect();
-        if (ClientNetworkHandler.State is not null)  {
-            SetState(ClientNetworkHandler.State);
-        }
+        SetState(ClientNetworkHandler.State);
     }
 
     /// <summary>
@@ -126,7 +104,9 @@ public partial class ClientRoot : Node
         if (State.Loaded) LoadState();
     }
 
-    
+    /// <summary>
+    /// Hooks rendering elements to client state
+    /// </summary>
     private void LoadState()
     {
         ArgumentNullException.ThrowIfNull(State);
@@ -134,13 +114,13 @@ public partial class ClientRoot : Node
         //* World changes
         SetWorld(State);
 
+
+
+        //* Hook rendered events
         State.CharacterAddedEvent += World.AddCharacter;
-
-        if (State.PlayerCharacter is not null) SetPlayer(State.PlayerCharacter);
-
         State.FireEvent += World.RenderProjectile;
 
-        //* Gui changes
+        //* Hook state changes
         State.PlayerCharacterSetEvent += SetPlayer;
 
         State.PlayerState.OnLogisticsChangedEvent += _characterUI.SetLogistics;
@@ -148,6 +128,11 @@ public partial class ClientRoot : Node
 
         State.PlayerDeathEvent += _deathScreen.Show;
         State.PlayerRespawnEvent += _deathScreen.Hide;
+
+        //* Initialize values
+        if (State.PlayerCharacter is not null) SetPlayer(State.PlayerCharacter);
+        _characterUI.SetLogistics(State.PlayerState.Logistics);
+        
     }
     private void SetWorld(ClientState state)
     {
