@@ -14,8 +14,10 @@ public class PlayerState : IReadOnlyPlayerState
         }
     }
 
-    // oldValue, newValue
     public event Action<int>? OnLogisticsChangedEvent;
+
+
+    
 }
 public interface IReadOnlyPlayerState
 {
