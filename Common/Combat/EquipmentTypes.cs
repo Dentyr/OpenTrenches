@@ -19,9 +19,10 @@ public static class EquipmentTypes
                 logisticsCost: 5,
                 new FirearmStats
                 {
-                    DamagePerProjectile = 30,
-                    RateOfFire = 30f,
-                    ReloadSeconds = 2f,
+                    DamagePerProjectile = 10f,
+                    SpreadMOA = 3,
+                    RateOfFire = 70f,
+                    ReloadSeconds = 3f,
                     MagazineSize = 15,
                     ProjectilesPerShot = 1
                 })
@@ -33,11 +34,12 @@ public static class EquipmentTypes
                 EquipmentCategory.Firearm,
                 logisticsCost: 25,
                 new FirearmStats
-                {
-                    DamagePerProjectile = 70,
-                    RateOfFire = 30f,
-                    ReloadSeconds = 8f,
-                    MagazineSize = 4,
+                {   //based on WWI issue trench gun
+                    DamagePerProjectile = 2.5f,
+                    SpreadMOA = 120,
+                    RateOfFire = 45f,
+                    ReloadSeconds = 5f,
+                    MagazineSize = 6,
                     ProjectilesPerShot = 8,
                 })
         },
@@ -50,10 +52,11 @@ public static class EquipmentTypes
                 new FirearmStats
                 {
                     DamagePerProjectile = 22,
-                    RateOfFire = 120f,
+                    SpreadMOA = 5,
+                    RateOfFire = 260f,
                     ReloadSeconds = 2f,
                     MagazineSize = 60,
-                    ProjectilesPerShot = 1
+                    ProjectilesPerShot = 1,
                 })
         }
     };

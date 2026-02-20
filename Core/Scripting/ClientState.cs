@@ -13,6 +13,7 @@ using OpenTrenches.Common.World;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Core.Scripting.Teams;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 namespace OpenTrenches.Core.Scripting;
 
@@ -83,6 +84,7 @@ public sealed class ClientState : IClientState
     public void Update(AbstractUpdateDTO update)
     {
         if (update is CharacterUpdateDTO characterUpdateDTO) if (Characters.TryGetValue(characterUpdateDTO.TargetId, out var character)) character.Update(characterUpdateDTO);
+        else if (update is FirearmSlotUpdateDTO updateDatagram) Console.WriteLine(updateDatagram.Attribute);
     }
     public void Create(AbstractCreateDTO dTO)
     {

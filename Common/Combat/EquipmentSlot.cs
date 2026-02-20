@@ -1,6 +1,8 @@
 using System;
 using OpenTrenches.Common.Combat;
 
+namespace OpenTrenches.Common.Combat;
+
 public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlot
     where T : class
 {
@@ -8,8 +10,8 @@ public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlo
 
 
     #region equipment property
-        private EquipmentType<T> _equipment;
-        public EquipmentType<T> Equipment
+        private EquipmentType<T>? _equipment;
+        public EquipmentType<T>? Equipment
         {
             get => _equipment;
             set
@@ -19,11 +21,11 @@ public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlo
                 if (old != _equipment) SlotValueChanged?.Invoke(_equipment);
             }
         }
-        AbstractEquipmentType IReadOnlyEquipmentSlot.Equipment => Equipment;
+        AbstractEquipmentType? IReadOnlyEquipmentSlot.Equipment => Equipment;
 
         // notification event
-        public event Action<EquipmentType<T>>? SlotValueChanged; 
-        event Action<AbstractEquipmentType>? IReadOnlyEquipmentSlot.SlotValueChanged
+        public event Action<EquipmentType<T>?>? SlotValueChanged; 
+        event Action<AbstractEquipmentType?>? IReadOnlyEquipmentSlot.SlotValueChanged
         {
             add => SlotValueChanged += value;
             remove => SlotValueChanged -= value;
@@ -31,7 +33,7 @@ public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlo
     #endregion
 
 
-    public EquipmentSlot(EquipmentCategory category, EquipmentType<T> equipment)
+    public EquipmentSlot(EquipmentCategory category, EquipmentType<T>? equipment)
     {
         Category = category;
         _equipment = equipment;
@@ -42,13 +44,13 @@ public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlo
 public interface IReadOnlyEquipmentSlot
 {
     public EquipmentCategory Category { get; }
-    public AbstractEquipmentType Equipment { get; }
-    public event Action<AbstractEquipmentType>? SlotValueChanged; 
+    public AbstractEquipmentType? Equipment { get; }
+    public event Action<AbstractEquipmentType?>? SlotValueChanged; 
 }
 public interface IReadOnlyEquipmentSlot<T> : IReadOnlyEquipmentSlot
     where T : class
 {
-    public new EquipmentType<T> Equipment { get; }
+    public new EquipmentType<T>? Equipment { get; }
 
-    public new event Action<EquipmentType<T>>? SlotValueChanged; 
+    public new event Action<EquipmentType<T>?>? SlotValueChanged; 
 }

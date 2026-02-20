@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using OpenTrenches.Common.Ability;
+using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Ability;
 using OpenTrenches.Server.Scripting.Adapter;
+using OpenTrenches.Server.Scripting.Combat;
 using OpenTrenches.Server.Scripting.Teams;
 namespace OpenTrenches.Server.Scripting.Player;
 
@@ -56,6 +59,9 @@ public class Character : IIdObject
         private set => _health.Value = value;
     }
 
+    public FirearmSlot PrimarySlot = new(EquipmentCategory.Firearm, EquipmentTypes.Rifle);
+
+
     /// <summary>
     /// Called when the character is no longer active
     /// </summary>
@@ -78,14 +84,8 @@ public class Character : IIdObject
     public event Action<int>? ActivatedAbilityEvent;
 
 
-    private readonly UpdateableProperty<float> _stateCooldown = new(0);
 
 
-    public float StateCooldown
-    { 
-        get => _stateCooldown;
-        private set => _stateCooldown.Value = value;
-    }
     public event Action<Character, Vector3>? FireEvent;
 
 
@@ -112,32 +112,12 @@ public class Character : IIdObject
     /// <param name="adapter"></param>
     public void AdapterSimulate(float delta, ICharacterAdapter adapter)
     {
-        // Ability usage
+        // Cooldowns
         foreach (var abiltiy in this.Abilities) abiltiy.ProgressTimer(delta);
-
-
-        StateCooldown -= delta;
+        PrimarySlot.Cooldown(delta);
         
+        if (State == CharacterState.Shooting) TryFire(adapter);
 
-        if (StateCooldown < 0) 
-        {
-            StateCooldown = 0;
-
-            //* shooting
-            
-            if (State == CharacterState.Shooting)
-            {
-                if (Position != Direction)
-                {
-                    var target = Position + ((Direction - Position).Normalized() * 1000);
-                    FireHitResult result = adapter.AdaptFire(target);
-                    if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(4);
-                    
-                    FireEvent?.Invoke(this, result.Position);
-                    StateCooldown = 0.1f;
-                }
-            }
-        }
 
         //* building
 
@@ -172,6 +152,29 @@ public class Character : IIdObject
             else CancelTask();
         }
     }
+    private void TryFire(ICharacterAdapter adapter)
+    {
+        if (Position != Direction 
+            && PrimarySlot.Equipment is EquipmentType<FirearmStats> firearm 
+            && PrimarySlot.TryShoot())
+        {
+            for (int i = 0; i < firearm.Stats.ProjectilesPerShot; i ++)
+            {
+                var target = Position + (
+                    (Direction - Position)
+                        .BoxSpread(firearm.Stats.SpreadMOA)
+                        .Normalized() 
+                    * firearm.Stats.ProjectileDistance
+                );
+                
+                FireHitResult result = adapter.AdaptFire(target);
+                if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(PrimarySlot.Equipment.Stats.DamagePerProjectile);
+                
+                FireEvent?.Invoke(this, result.Position);
+            }
+        }
+    }
+
     private void CancelTask()
     {
         State = CharacterState.Idle;
@@ -258,9 +261,6 @@ public class Character : IIdObject
             case CharacterAttribute.Direction:
                 payload = Serialization.Serialize(Direction);
                 break;
-            case CharacterAttribute.Cooldown:
-                payload = Serialization.Serialize(StateCooldown);
-                break;
             case CharacterAttribute.State:
                 payload = Serialization.Serialize(State);
                 break;
@@ -274,6 +274,7 @@ public class Character : IIdObject
         if (_health.PollChanged())      yield return GetUpdate(CharacterAttribute.Health);
         if (_direction.PollChanged())   yield return GetUpdate(CharacterAttribute.Direction);
         if (_state.PollChanged())       yield return GetUpdate(CharacterAttribute.State);
+        foreach( var kvp in PrimarySlot.PollUpdates() ) yield return new FirearmSlotUpdateDTO(kvp.Key, kvp.Value, ID);
     }
 
     public void SetBuildTarget(int x, int y, TileType tile)
