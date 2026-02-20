@@ -80,14 +80,6 @@ public class Character : IIdObject
 
     private readonly UpdateableProperty<float> _stateCooldown = new(0);
 
-    public Character(IServerState ServerState, ushort ID, Team Team)
-    {
-        this.ServerState = ServerState;
-        this.ID = ID;
-        this.Team = Team;
-
-        Respawn();
-    }
 
     public float StateCooldown
     { 
@@ -102,6 +94,15 @@ public class Character : IIdObject
     public TileType BuildTarget { get; private set; }
     public Vector2I BuildCell { get; private set; }
 
+
+    public Character(IServerState ServerState, ushort ID, Team Team)
+    {
+        this.ServerState = ServerState;
+        this.ID = ID;
+        this.Team = Team;
+
+        Respawn();
+    }
 
 
     /// <summary>
