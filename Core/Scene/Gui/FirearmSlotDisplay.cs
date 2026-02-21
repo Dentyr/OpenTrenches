@@ -11,7 +11,7 @@ public partial class FirearmSlotDisplay : Control
 {
     private FirearmSlot? _slot;
 
-    private readonly Label _hpLabel;
+    private readonly Label _loadedLabel;
     private readonly TextureRect _texture;
     private readonly TextureProgressBar _cooldownBar;
     private readonly TextureProgressBar _reloadBar;
@@ -32,13 +32,13 @@ public partial class FirearmSlotDisplay : Control
         _reloadBar = InitRadialProgressBar();
         _reloadBar.TextureProgress = TextureLibrary2D.Cyan;
 
-        _hpLabel = new Label()
+        _loadedLabel = new Label()
         {
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom,
         };
-        _hpLabel.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-        AddChild(_hpLabel);
+        _loadedLabel.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        AddChild(_loadedLabel);
     }
 
     private TextureProgressBar InitRadialProgressBar()
@@ -89,12 +89,11 @@ public partial class FirearmSlotDisplay : Control
 
 
         var stats = _slot.Equipment.Stats;
-        var maxFireCooldown = stats.RateOfFire > 0 ? 60f / stats.RateOfFire : 0f;
-        var maxReloadCooldown = stats.ReloadSeconds;
-        _hpLabel.Text = _slot.AmmoLoaded.ToString();
+        
+        _loadedLabel.Text = _slot.AmmoLoaded.ToString();
 
-        _cooldownBar.Value = Mathf.Clamp(_slot.FireCooldown / maxFireCooldown, 0f, 1f);
-        _reloadBar.Value = Mathf.Clamp(_slot.ReloadCooldown / maxReloadCooldown, 0f, 1f);
+        _cooldownBar.Value = Mathf.Clamp(_slot.FireCooldown / stats.FirePerSecond, 0f, 1f);
+        _reloadBar.Value = Mathf.Clamp(_slot.ReloadCooldown / stats.ReloadSeconds, 0f, 1f);
 
         SetTimerVisibility(_cooldownBar);
         SetTimerVisibility(_reloadBar);
