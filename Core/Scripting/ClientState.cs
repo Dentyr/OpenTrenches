@@ -83,8 +83,14 @@ public sealed class ClientState : IClientState
     
     public void Update(AbstractUpdateDTO update)
     {
-        if (update is CharacterUpdateDTO characterUpdateDTO) if (Characters.TryGetValue(characterUpdateDTO.TargetId, out var character)) character.Update(characterUpdateDTO);
-        else if (update is FirearmSlotUpdateDTO updateDatagram) Console.WriteLine(updateDatagram.Attribute);
+        if (update is CharacterUpdateDTO characterUpdateDTO) 
+        {
+            if (Characters.TryGetValue(characterUpdateDTO.TargetId, out var character)) character.Update(characterUpdateDTO);
+        }
+        else if (update is FirearmSlotUpdateDTO updateDTO)
+        {
+            if (Characters.TryGetValue(updateDTO.TargetId, out var character)) character.Update(updateDTO);
+        }
     }
     public void Create(AbstractCreateDTO dTO)
     {

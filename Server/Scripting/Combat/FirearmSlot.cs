@@ -9,7 +9,7 @@ using OpenTrenches.Server.Scripting.Adapter;
 
 namespace OpenTrenches.Server.Scripting.Combat;
 
-public class FirearmSlot : EquipmentSlot<FirearmStats>
+public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
 {
     private readonly UpdateableProperty<float> _reload = new();
     public float ReloadCooldown 
@@ -29,15 +29,15 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>
 
     public bool CooledDown => FireCooldown <= 0;
 
-    private readonly UpdateableProperty<float> _ammoLoaded = new();
-    public float AmmoLoaded 
+    private readonly UpdateableProperty<int> _ammoLoaded = new();
+    public int AmmoLoaded 
     {
         get => _ammoLoaded.Value;
         set => _ammoLoaded.Value = value;
     }
 
-    private readonly UpdateableProperty<float> _ammoStored = new();
-    public float AmmoStored 
+    private readonly UpdateableProperty<int> _ammoStored = new();
+    public int AmmoStored 
     {
         get => _ammoStored.Value;
         set => _ammoStored.Value = value;
@@ -93,7 +93,7 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>
     }
 
 
-    public FirearmSlot(EquipmentCategory category, EquipmentType<FirearmStats> equipment) : base(category, equipment)
+    public FirearmSlot(EquipmentType<FirearmStats> equipment) : base(EquipmentCategory.Firearm, equipment)
     {
     }
 

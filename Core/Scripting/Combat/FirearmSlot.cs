@@ -8,18 +8,18 @@ using OpenTrenches.Server.Scripting.Adapter;
 
 namespace OpenTrenches.Core.Scripting.Combat;
 
-public class FirearmSlot : EquipmentSlot<FirearmStats>
+public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
 {
-    public float Reload { get; set; }
+    public float ReloadCooldown { get; set; }
 
-    public float Cooldown { get; set; }
+    public float FireCooldown { get; set; }
 
-    public float AmmoLoaded { get; set; }
+    public int AmmoLoaded { get; set; }
 
-    public float AmmoStored { get; set; }
+    public int AmmoStored { get; set; }
 
 
-    public FirearmSlot(EquipmentCategory category, EquipmentType<FirearmStats> equipment) : base(category, equipment)
+    public FirearmSlot(EquipmentType<FirearmStats>? equipment) : base(EquipmentCategory.Firearm, equipment)
     {
     }
 
@@ -30,16 +30,16 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>
         switch (update.Attribute)
         {
             case FirearmSlotAttribute.Reload:
-                Reload = Serialization.Deserialize<float>(update.Payload);
+                ReloadCooldown = Serialization.Deserialize<float>(update.Payload);
                 break;
             case FirearmSlotAttribute.Cooldown:
-                Cooldown = Serialization.Deserialize<float>(update.Payload);
+                FireCooldown = Serialization.Deserialize<float>(update.Payload);
                 break;
             case FirearmSlotAttribute.AmmoLoaded:
-                AmmoLoaded = Serialization.Deserialize<float>(update.Payload);
+                AmmoLoaded = Serialization.Deserialize<int>(update.Payload);
                 break;
             case FirearmSlotAttribute.AmmoStored:
-                AmmoStored = Serialization.Deserialize<float>(update.Payload);
+                AmmoStored = Serialization.Deserialize<int>(update.Payload);
                 break;
         }
     }

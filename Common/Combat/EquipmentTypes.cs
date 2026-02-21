@@ -53,7 +53,7 @@ public static class EquipmentTypes
                 {
                     DamagePerProjectile = 22,
                     SpreadMOA = 5,
-                    RateOfFire = 260f,
+                    RateOfFire = 500f,
                     ReloadSeconds = 2f,
                     MagazineSize = 60,
                     ProjectilesPerShot = 1,

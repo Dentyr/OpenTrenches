@@ -1,11 +1,13 @@
 using System;
 using MessagePack;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 namespace OpenTrenches.Common.Contracts.DTO;
 
 [MessagePackObject]
 [Union(0, typeof(CharacterUpdateDTO))]
+[Union(1, typeof(FirearmSlotUpdateDTO))]
 [Union(10, typeof(WorldGridAttributeUpdateDTO))]
 public abstract record class AbstractUpdateDTO
 {

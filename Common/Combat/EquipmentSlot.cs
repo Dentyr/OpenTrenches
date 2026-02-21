@@ -54,3 +54,11 @@ public interface IReadOnlyEquipmentSlot<T> : IReadOnlyEquipmentSlot
 
     public new event Action<EquipmentType<T>?>? SlotValueChanged; 
 }
+
+public interface IReadOnlyFirearmSlot
+{
+    public float ReloadCooldown { get; }
+    public float FireCooldown { get; }
+    public int AmmoLoaded { get; }
+    public int AmmoStored { get; }
+}

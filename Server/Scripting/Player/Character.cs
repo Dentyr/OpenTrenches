@@ -59,7 +59,7 @@ public class Character : IIdObject
         private set => _health.Value = value;
     }
 
-    public FirearmSlot PrimarySlot = new(EquipmentCategory.Firearm, EquipmentTypes.Rifle);
+    public FirearmSlot PrimarySlot = new(EquipmentTypes.Rifle);
 
 
     /// <summary>
