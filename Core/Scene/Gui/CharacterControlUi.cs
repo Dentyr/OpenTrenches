@@ -22,7 +22,13 @@ public partial class CharacterControlUi : Control
     private Label _healthLabel = null!;
 
     private IconDisplay _logisticsDisplay = null!;
+
+    //* equipment & upgrades
+
+    private FirearmSlotDisplay _primarySlotDisplay = null!;
     
+
+    //* user commands
 
     private PolledQueue<AbstractCommandDTO> _queuedCommands { get; } = new();
 
@@ -34,6 +40,12 @@ public partial class CharacterControlUi : Control
         _healthBar.MaxValue = 1;
         _healthBar.Step = 0.01;
         _healthLabel = _healthBar.GetNode<Label>("Label");
+
+        //*
+
+        _primarySlotDisplay = GetNode<FirearmSlotDisplay>("PrimarySlot");
+
+        //*
 
         _logisticsDisplay = GetNode<IconDisplay>("LogisticsDisplay");
     }
@@ -48,6 +60,8 @@ public partial class CharacterControlUi : Control
             abilityNode.AbilitySelected += NotifyAbilityCommand; 
             _abilityContainer.AddChild(abilityNode);
         }
+
+        _primarySlotDisplay.SetSlot(character.PrimarySlot);
     }
     public void SetLogistics(int value)
     {

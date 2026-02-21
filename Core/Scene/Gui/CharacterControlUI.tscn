@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://dtfyw8hhhkj5p" path="res://Core/Scene/Gui/IconDisplay.cs" id="3_g61sg"]
 [ext_resource type="Texture2D" uid="uid://bdpmqm4pv8po5" path="res://Common/Resources/Img/UI/Logistics.png" id="4_cbcig"]
 [ext_resource type="Script" uid="uid://ijpvxjbh7usp" path="res://Core/Scene/Gui/EquipmentUpgradePanel.cs" id="5_cbcig"]
+[ext_resource type="Script" uid="uid://c170dcuuyswof" path="res://Core/Scene/Gui/FirearmSlotDisplay.cs" id="6_dkbvg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m2ewg"]
 bg_color = Color(0.07450981, 0.07450981, 0.07450981, 0.61960787)
@@ -126,3 +127,12 @@ grow_vertical = 0
 script = ExtResource("5_cbcig")
 Open = true
 metadata/_custom_type_script = "uid://ijpvxjbh7usp"
+
+[node name="PrimarySlot" type="Control" parent="." unique_id=1012168235]
+anchors_preset = 0
+offset_left = 988.0
+offset_top = 578.0
+offset_right = 1049.0
+offset_bottom = 643.0
+script = ExtResource("6_dkbvg")
+metadata/_custom_type_script = "uid://c170dcuuyswof"

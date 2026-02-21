@@ -16,4 +16,11 @@ public static class TextureLibrary2D
     {
         public static Texture2D LogisticsThumbnail = ResourceLoader.Load<Texture2D>("Common/Resources/Img/UI/Logistics.png");
     }
+
+    public static class Equipment
+    {
+        public static Texture2D RifleTexture = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Equipment/Rifle.png");
+        public static Texture2D MachineGunTexture = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Equipment/MachineGun.png");
+        public static Texture2D ShotGunTexture = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Equipment/Shotgun.png");
+    }
 }

@@ -89,7 +89,9 @@ public sealed class ClientState : IClientState
         }
         else if (update is FirearmSlotUpdateDTO updateDTO)
         {
-            if (Characters.TryGetValue(updateDTO.TargetId, out var character)) character.Update(updateDTO);
+            if (Characters.TryGetValue(updateDTO.TargetId, out var character)) {
+                character.Update(updateDTO);
+            }
         }
     }
     public void Create(AbstractCreateDTO dTO)

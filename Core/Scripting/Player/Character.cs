@@ -6,9 +6,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Godot;
 using OpenTrenches.Common.Ability;
+using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
+using OpenTrenches.Core.Scripting.Combat;
 
 namespace OpenTrenches.Core.Scripting.Player;
 
@@ -52,6 +55,7 @@ public class Character : IIdObject
     public event Action? ActivatedEvent;
     
 
+    public FirearmSlot PrimarySlot = new(EquipmentTypes.Rifle);
 
     private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
     public IActivatedAbility GetAbility(int index) => _abilities[index];
@@ -109,6 +113,10 @@ public class Character : IIdObject
                 ActionState = Serialization.Deserialize<CharacterState>(update.Payload);
                 break;
         }
+    }
+    public void Update(FirearmSlotUpdateDTO update)
+    {
+        PrimarySlot.Update(update);
     }
 
     //* equality
