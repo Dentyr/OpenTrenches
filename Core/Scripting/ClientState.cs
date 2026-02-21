@@ -28,11 +28,14 @@ public sealed class ClientState : IClientState
         LoadedEvent?.Invoke();
     }
 
+    //* Player events ( for rendering )
+
     public event Action? PlayerDeathEvent;
-    private void PropagatePlayerDeathEvent() => PlayerDeathEvent?.Invoke();
 
     public event Action? PlayerRespawnEvent;
-    private void PropagatePlayerPlayerRespawnEvent() => PlayerRespawnEvent?.Invoke();
+
+    public event Action? PlayerReloadEvent;
+    public event Action? PlayerFireEvent;
 
     //* State
 
@@ -81,6 +84,7 @@ public sealed class ClientState : IClientState
 
     public event Action<Vector3, Vector3>? FireEvent;
     
+    //TODO switch to dictionary approach
     public void Update(AbstractUpdateDTO update)
     {
         if (update is CharacterUpdateDTO characterUpdateDTO) 
@@ -112,8 +116,8 @@ public sealed class ClientState : IClientState
                 if (PlayerCharacter is not null) Console.Error.WriteLine("Attempted to re-set player");
 
                 PlayerCharacter = character;
-                PlayerCharacter.InactivatedEvent += PropagatePlayerDeathEvent;
-                PlayerCharacter.ActivatedEvent += PropagatePlayerPlayerRespawnEvent;
+                PlayerCharacter.InactivatedEvent += () => PlayerDeathEvent?.Invoke();
+                PlayerCharacter.ActivatedEvent += () => PlayerRespawnEvent?.Invoke();
             }
             else throw new NotImplementedException("Set player failed; re-request not implemented");
         }
@@ -123,6 +127,7 @@ public sealed class ClientState : IClientState
         }
         else if (dto is ProjectileNotificationCommand projectile)
         {
+            if (projectile.Character == PlayerCharacter?.ID) PlayerFireEvent?.Invoke();
             FireEvent?.Invoke(projectile.Start, projectile.End);
         }
         else if (dto is AbilityNotificationCommand abilityNotify)
@@ -147,6 +152,10 @@ public sealed class ClientState : IClientState
             }
         }
         else if (dto is InitializedNotificationCommand) SetLoaded();
+        else if (dto is ReloadNotificationCommand) 
+        {
+            PlayerReloadEvent?.Invoke();
+        }
     }
 }
 

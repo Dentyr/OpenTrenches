@@ -74,6 +74,11 @@ public class Character : IIdObject
     /// </summary>
     public event Action? RespawnEvent;
 
+
+    public event Action<Character, Vector3>? FireEvent;
+    public event Action<Character>? ReloadEvent;
+
+    
     //TODO Update stats to be more modular
 
     private float _baseDefense { get; set; } = 0;
@@ -89,7 +94,6 @@ public class Character : IIdObject
 
 
 
-    public event Action<Character, Vector3>? FireEvent;
 
 
     //* build target
@@ -295,6 +299,6 @@ public class Character : IIdObject
 
     public void TryReload()
     {
-        PrimarySlot.TryReload();
+        if (PrimarySlot.TryReload()) ReloadEvent?.Invoke(this);
     }
 }

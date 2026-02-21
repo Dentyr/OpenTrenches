@@ -85,7 +85,7 @@ public class ServerState : IServerState
         => _commandQueue.Enqueue(new AbilityNotificationCommand(charaIdx, abilityIdx));
 
     private void HandleFire(Character character, Vector3 target) 
-        => _commandQueue.Enqueue(new ProjectileNotificationCommand(character.Position, target));
+        => _commandQueue.Enqueue(new ProjectileNotificationCommand(character.Position, target, character.ID));
 
     public IEnumerable<AbstractCommandDTO> PollEvents() => _commandQueue.PollItems().Concat(Chunks.PollCellChanges());
 

@@ -13,8 +13,15 @@ public partial class FirearmSlotDisplay : Control
 
     private readonly Label _loadedLabel;
     private readonly TextureRect _texture;
+
+
+
     private readonly TextureProgressBar _cooldownBar;
+    private float _cooldown;
+
+
     private readonly TextureProgressBar _reloadBar;
+    private float _reload;
 
     public FirearmSlotDisplay()
     {
@@ -74,6 +81,7 @@ public partial class FirearmSlotDisplay : Control
 
     public override void _Process(double delta)
     {
+        // Ensure this slot has a firearm
         if (_slot is null)
         {
             _texture.Texture = null;
@@ -88,20 +96,42 @@ public partial class FirearmSlotDisplay : Control
         }
 
 
-        var stats = _slot.Equipment.Stats;
-        
         _loadedLabel.Text = _slot.AmmoLoaded.ToString();
 
-        _cooldownBar.Value = Mathf.Clamp(_slot.FireCooldown / stats.FirePerSecond, 0f, 1f);
-        _reloadBar.Value = Mathf.Clamp(_slot.ReloadCooldown / stats.ReloadSeconds, 0f, 1f);
 
-        SetTimerVisibility(_cooldownBar);
-        SetTimerVisibility(_reloadBar);
+        if (_reload > 0)
+        {
+            _reload -= Math.Max((float)delta, 0f);
+            _reloadBar.Value = _reload / _slot.Equipment.Stats.ReloadSeconds;
+            SetTimerVisibility(_reloadBar);
+        }
+        if (_cooldown > 0)
+        {
+            _cooldown -= Math.Max((float)delta, 0f);
+            _cooldownBar.Value = _cooldown / _slot.Equipment.Stats.FirePerSecond;
+            SetTimerVisibility(_cooldownBar);
+        }
     }
 
     private void SetTimerVisibility(TextureProgressBar progressBar)
     {
         if (progressBar.Value > 0 && !progressBar.Visible) progressBar.Visible = true;
         else if (progressBar.Value <= 0 && progressBar.Visible) progressBar.Visible = false;
+    }
+
+    /// <summary>
+    /// begins approximating the countdown until reload is finished
+    /// </summary>
+    public void StartReloadTimer()
+    {
+        if (_slot?.Equipment is EquipmentType<FirearmStats> firearm) _reload = firearm.Stats.ReloadSeconds;
+    }
+
+    /// <summary>
+    /// begins approximating the countdown until the gun can shoot again
+    /// </summary>
+    public void StartFireTimer()
+    {
+        if (_slot?.Equipment is EquipmentType<FirearmStats> firearm) _cooldown = firearm.Stats.FirePerSecond;
     }
 }

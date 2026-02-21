@@ -124,6 +124,9 @@ public partial class ClientRoot : Node
         State.PlayerCharacterSetEvent += SetPlayer;
 
         State.PlayerState.OnLogisticsChangedEvent += _characterUI.SetLogistics;
+        State.PlayerReloadEvent += _characterUI.NotifyPlayerReload;
+        State.PlayerFireEvent += _characterUI.NotifyPlayerFire;
+
 
 
         State.PlayerDeathEvent += _deathScreen.Show;

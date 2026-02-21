@@ -8,6 +8,7 @@ using System.Linq;
 using OpenTrenches.Common.Contracts.Defines;
 using System.Runtime.InteropServices;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 namespace OpenTrenches.Server.Scripting.Adapter;
 
@@ -21,6 +22,12 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
     {
         this.GameState = GameState;
         Character = GameState.CreateCharacter();
+        Character.ReloadEvent += HandleReload;
+    }
+
+    private void HandleReload(Character character)
+    {
+        Adapter.Send(new ReloadNotificationCommand(character.ID));
     }
 
 

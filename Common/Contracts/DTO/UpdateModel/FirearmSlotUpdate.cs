@@ -4,8 +4,6 @@ namespace OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 public enum FirearmSlotAttribute : byte
 {
-    Reload,
-    Cooldown,
     AmmoLoaded,
     AmmoStored,
 }

@@ -11,6 +11,7 @@ namespace OpenTrenches.Common.Contracts.DTO;
 /// </summary>
 [MessagePackObject]
 [Union(100,     typeof(ProjectileNotificationCommand))]
+[Union(101,     typeof(ReloadNotificationCommand))]
 [Union(110,     typeof(AbstractCommandDTO))]
 [Union(111,     typeof(AbilityNotificationCommand))]
 [Union(199,     typeof(InitializedNotificationCommand))]

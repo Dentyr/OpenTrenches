@@ -105,12 +105,6 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
         byte[]? payload = null;
         switch (type)
         {
-            case FirearmSlotAttribute.Reload:
-                payload = Serialization.Serialize(ReloadCooldown);
-                break;
-            case FirearmSlotAttribute.Cooldown:
-                payload = Serialization.Serialize(FireCooldown);
-                break;
             case FirearmSlotAttribute.AmmoLoaded:
                 payload = Serialization.Serialize(AmmoLoaded);
                 break;
@@ -124,8 +118,6 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
 
     public IEnumerable<KeyValuePair<FirearmSlotAttribute, byte[]>> PollUpdates()
     {
-        if (_reload.PollChanged()) yield return new KeyValuePair<FirearmSlotAttribute, byte[]>(FirearmSlotAttribute.Reload, GetUpdate(FirearmSlotAttribute.Reload));
-        if (_cooldown.PollChanged()) yield return new KeyValuePair<FirearmSlotAttribute, byte[]>(FirearmSlotAttribute.Cooldown, GetUpdate(FirearmSlotAttribute.Cooldown));
         if (_ammoLoaded.PollChanged()) yield return new KeyValuePair<FirearmSlotAttribute, byte[]>(FirearmSlotAttribute.AmmoLoaded, GetUpdate(FirearmSlotAttribute.AmmoLoaded));
         if (_ammoStored.PollChanged()) yield return new KeyValuePair<FirearmSlotAttribute, byte[]>(FirearmSlotAttribute.AmmoStored, GetUpdate(FirearmSlotAttribute.AmmoStored));
     }

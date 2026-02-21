@@ -68,6 +68,16 @@ public partial class CharacterControlUi : Control
         _logisticsDisplay.Text = value.ToString();
     }
 
+    public void NotifyPlayerFire()
+    {
+        _primarySlotDisplay.StartFireTimer();
+    }
+
+    public void NotifyPlayerReload()
+    {
+        _primarySlotDisplay.StartReloadTimer();
+    }
+
     private void NotifyAbilityCommand(int idx) => _queuedCommands.Enqueue(new UseAbilityCommandRequest(0));
 
 
@@ -81,6 +91,8 @@ public partial class CharacterControlUi : Control
     }
 
     public IEnumerable<AbstractCommandDTO> PollCommands() => _queuedCommands.PollItems();
+
+
 }
 
 

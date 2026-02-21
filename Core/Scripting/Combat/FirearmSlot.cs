@@ -29,12 +29,6 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
     {
         switch (update.Attribute)
         {
-            case FirearmSlotAttribute.Reload:
-                ReloadCooldown = Serialization.Deserialize<float>(update.Payload);
-                break;
-            case FirearmSlotAttribute.Cooldown:
-                FireCooldown = Serialization.Deserialize<float>(update.Payload);
-                break;
             case FirearmSlotAttribute.AmmoLoaded:
                 AmmoLoaded = Serialization.Deserialize<int>(update.Payload);
                 break;
