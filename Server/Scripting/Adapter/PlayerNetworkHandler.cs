@@ -86,6 +86,11 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         {
             Character.RequestRespawn();
         }
+        else if (command is ReloadCommandRequest)
+        {
+
+            Character.TryReload();
+        }
     }
     #endregion
 

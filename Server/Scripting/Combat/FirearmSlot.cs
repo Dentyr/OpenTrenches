@@ -66,7 +66,7 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
             if (ammoToLoad > 0)
             {
                 ReloadCooldown = Equipment.Stats.ReloadSeconds;
-                FireCooldown = 60 / Equipment.Stats.RateOfFire;
+                FireCooldown = 0;
 
                 AmmoLoaded += ammoToLoad;
                 AmmoStored -= ammoToLoad;
@@ -83,7 +83,7 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
     /// <returns>True if set to fire cooldown</returns>
     public bool TryShoot()
     {
-        if (Equipment is not null && Reloaded && CooledDown)
+        if (Equipment is not null && Reloaded && CooledDown && AmmoLoaded > 0)
         {
             FireCooldown = 60 / Equipment.Stats.RateOfFire;
             AmmoLoaded -= 1;

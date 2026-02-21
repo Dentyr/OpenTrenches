@@ -59,7 +59,11 @@ public class Character : IIdObject
         private set => _health.Value = value;
     }
 
-    public FirearmSlot PrimarySlot = new(EquipmentTypes.Rifle);
+    public FirearmSlot PrimarySlot = new(EquipmentTypes.Rifle)
+    {
+        AmmoLoaded = 1,
+        AmmoStored = 500,
+    };
 
 
     /// <summary>
@@ -288,5 +292,10 @@ public class Character : IIdObject
     internal Vector2I GetCell()
     {
         return new((int)(Position.X / CommonDefines.CellSize), (int)(Position.Z / CommonDefines.CellSize));
+    }
+
+    public void TryReload()
+    {
+        PrimarySlot.TryReload();
     }
 }

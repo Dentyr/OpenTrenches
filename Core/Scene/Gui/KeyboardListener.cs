@@ -19,7 +19,6 @@ public partial class KeyboardListener : Node
     public bool S { get; set; }
     public bool D { get; set; }
     public bool LMB { get; set; } //left mouse button
-    public bool E { get; set; }
     
     public Vector2 MPos { get; set; } //mouse position within world
 
@@ -109,6 +108,9 @@ public partial class KeyboardListener : Node
                     }
                     _queuedCommands.Enqueue(new BuildCommandRequest(cell.X, cell.Y, TileType.Trench));
                 }
+                break;
+            case Key.R:
+                if (keyEvent.Pressed) _queuedCommands.Enqueue(new ReloadCommandRequest());
                 break;
             default:
                 break;
