@@ -1,4 +1,3 @@
-using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Common.Factions;
 using OpenTrenches.Core.Scripting.Player;

@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Scene.World;
 using OpenTrenches.Common.World;
 

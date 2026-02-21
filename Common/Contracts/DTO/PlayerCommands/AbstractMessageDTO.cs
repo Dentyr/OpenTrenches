@@ -1,7 +1,7 @@
 
 using Godot;
 using MessagePack;
-namespace OpenTrenches.Common.Contracts.DTO;
+namespace OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 
 [MessagePackObject]
 [Union(0, typeof(InputStatusDTO))]

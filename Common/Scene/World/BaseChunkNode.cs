@@ -2,7 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Common.World;
 

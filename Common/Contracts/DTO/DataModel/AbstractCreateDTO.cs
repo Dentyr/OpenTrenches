@@ -1,7 +1,6 @@
 using MessagePack;
-using OpenTrenches.Common.Contracts.DTO.DataModel;
 
-namespace OpenTrenches.Common.Contracts.DTO;
+namespace OpenTrenches.Common.Contracts.DTO.DataModel;
 
 
 [MessagePackObject]

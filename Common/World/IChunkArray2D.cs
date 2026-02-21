@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 namespace OpenTrenches.Common.World;
 

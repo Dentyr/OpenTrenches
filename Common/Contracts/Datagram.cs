@@ -1,5 +1,8 @@
 using MessagePack;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.DataModel;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 namespace OpenTrenches.Common.Contracts;
 

@@ -11,6 +11,8 @@ using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Common.World;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
 using System.Threading;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
+using OpenTrenches.Common.Contracts.DTO.DataModel;
 
 namespace OpenTrenches.Server.Scene;
 

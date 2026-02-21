@@ -3,6 +3,7 @@ using Godot;
 using MessagePack;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 namespace OpenTrenches.Common.Contracts.DTO;
 
 /// <summary>

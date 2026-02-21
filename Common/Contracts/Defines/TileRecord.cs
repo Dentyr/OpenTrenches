@@ -1,6 +1,7 @@
 using MessagePack;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
-namespace OpenTrenches.Common.Contracts.DTO;
+namespace OpenTrenches.Common.Contracts.Defines;
 
 
 [MessagePackObject]

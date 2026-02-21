@@ -6,6 +6,7 @@ using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
 using OpenTrenches.Common.Factions;
 using OpenTrenches.Common.World;

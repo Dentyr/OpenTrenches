@@ -5,7 +5,7 @@ using System.Linq;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Server.Scripting.Adapter;
 
 namespace OpenTrenches.Common.World;

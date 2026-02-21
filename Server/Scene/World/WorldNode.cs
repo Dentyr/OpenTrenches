@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scene.World;

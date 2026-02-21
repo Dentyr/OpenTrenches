@@ -1,7 +1,7 @@
 using Godot;
 using MessagePack;
 
-namespace OpenTrenches.Common.Contracts.DTO;
+namespace OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 [MessagePackObject]
 public record class ProjectileNotificationCommand(Vector3 Start, Vector3 End) : AbstractCommandDTO

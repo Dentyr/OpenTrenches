@@ -8,7 +8,6 @@ using OpenTrenches.Common.Ability;
 using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Ability;

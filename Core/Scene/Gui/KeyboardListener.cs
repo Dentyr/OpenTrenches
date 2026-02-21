@@ -7,6 +7,7 @@ using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Player;
 

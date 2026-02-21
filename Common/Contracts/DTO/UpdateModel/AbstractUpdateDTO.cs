@@ -1,9 +1,7 @@
 using System;
 using MessagePack;
-using OpenTrenches.Common.Contracts.DTO;
-using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
-namespace OpenTrenches.Common.Contracts.DTO;
+namespace OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 [MessagePackObject]
 [Union(0, typeof(CharacterUpdateDTO))]

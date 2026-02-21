@@ -1,7 +1,8 @@
 using Godot;
 using MessagePack;
+using OpenTrenches.Common.Contracts.Defines;
 
-namespace OpenTrenches.Common.Contracts.DTO;
+namespace OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 [MessagePackObject]
 public record class SetCellCommand(
