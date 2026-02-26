@@ -12,7 +12,7 @@ public class UpdateableProperty<T>
         get => _value;
         set
         {
-            if(EqualityComparer<T>.Default.Equals(_value, value)) _changed = true;
+            if(!EqualityComparer<T>.Default.Equals(_value, value)) _changed = true;
             _value = value;
         }
     }
