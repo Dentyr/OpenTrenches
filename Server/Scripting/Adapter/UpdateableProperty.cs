@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
 
 namespace OpenTrenches.Server.Scripting.Adapter;
 
-public class UpdateableProperty<T> where T : notnull
+public class UpdateableProperty<T>
 {
     private T _value;
     public T Value 
@@ -11,7 +12,7 @@ public class UpdateableProperty<T> where T : notnull
         get => _value;
         set
         {
-            _changed = !_value.Equals(value);
+            if(EqualityComparer<T>.Default.Equals(_value, value)) _changed = true;
             _value = value;
         }
     }

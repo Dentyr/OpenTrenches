@@ -54,7 +54,7 @@ public class Character : IIdObject
     public event Action? ActivatedEvent;
     
 
-    public FirearmSlot PrimarySlot = new(EquipmentTypes.Rifle);
+    public FirearmSlot PrimarySlot = new(EquipmentEnum.Rifle);
 
     private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
     public IActivatedAbility GetAbility(int index) => _abilities[index];

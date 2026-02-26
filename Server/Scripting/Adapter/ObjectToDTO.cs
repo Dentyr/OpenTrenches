@@ -7,7 +7,7 @@ namespace OpenTrenches.Server.Scripting.Adapter;
 public static class ObjectToDTO
 {
     public static CharacterDTO Convert(Character character)
-        => new (character.ID, character.MovementVelocity, character.Health, character.Team.ID);
+        => new (character.ID, character.MovementVelocity, character.Health, character.Team.ID, character.PrimarySlot.EquipmentEnum);
 
     public static TeamDTO Convert(Team team)
         => new (team.ID, team.Faction);

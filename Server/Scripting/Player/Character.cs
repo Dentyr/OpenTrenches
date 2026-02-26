@@ -58,12 +58,16 @@ public class Character : IIdObject
         private set => _health.Value = value;
     }
 
-    public FirearmSlot PrimarySlot = new(EquipmentTypes.Rifle)
+    private FirearmSlot _primarySlot = new(EquipmentTypes.Rifle)
     {
         AmmoLoaded = 1,
         AmmoStored = 500,
     };
-
+    public IReadOnlyFirearmSlot PrimarySlot => _primarySlot;
+    public void SwitchPrimary(EquipmentType<FirearmStats> firearm)
+    {
+        _primarySlot.Equipment = firearm;
+    }
 
     /// <summary>
     /// Called when the character is no longer active
@@ -121,7 +125,7 @@ public class Character : IIdObject
     {
         // Cooldowns
         foreach (var abiltiy in this.Abilities) abiltiy.ProgressTimer(delta);
-        PrimarySlot.Cooldown(delta);
+        _primarySlot.Cooldown(delta);
         
         if (State == CharacterState.Shooting) TryFire(adapter);
 
@@ -162,8 +166,8 @@ public class Character : IIdObject
     private void TryFire(ICharacterAdapter adapter)
     {
         if (Position != Direction 
-            && PrimarySlot.Equipment is EquipmentType<FirearmStats> firearm 
-            && PrimarySlot.TryShoot())
+            && _primarySlot.Equipment is EquipmentType<FirearmStats> firearm 
+            && _primarySlot.TryShoot())
         {
             for (int i = 0; i < firearm.Stats.ProjectilesPerShot; i ++)
             {
@@ -175,7 +179,7 @@ public class Character : IIdObject
                 );
                 
                 FireHitResult result = adapter.AdaptFire(target);
-                if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(PrimarySlot.Equipment.Stats.DamagePerProjectile);
+                if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
                 FireEvent?.Invoke(this, result.Position);
             }
@@ -245,13 +249,6 @@ public class Character : IIdObject
     }
 
 
-    //* build
-    private void StartBuild()
-    {
-        ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
-    }
-
-
     //* Updates
 
     public AbstractUpdateDTO GetUpdate(CharacterAttribute type)
@@ -271,6 +268,9 @@ public class Character : IIdObject
             case CharacterAttribute.State:
                 payload = Serialization.Serialize(State);
                 break;
+            case CharacterAttribute.PrimarySlot:
+                payload = Serialization.Serialize(_primarySlot.EquipmentEnum);
+                break;
         }
         if (payload is null) throw new Exception();
         return new CharacterUpdateDTO(type, payload, ID);
@@ -281,7 +281,9 @@ public class Character : IIdObject
         if (_health.PollChanged())      yield return GetUpdate(CharacterAttribute.Health);
         if (_direction.PollChanged())   yield return GetUpdate(CharacterAttribute.Direction);
         if (_state.PollChanged())       yield return GetUpdate(CharacterAttribute.State);
-        foreach( var kvp in PrimarySlot.PollUpdates() ) yield return new FirearmSlotUpdateDTO(kvp.Key, kvp.Value, ID);
+
+        if (_primarySlot.PollEquipmentUpdate()) yield return GetUpdate(CharacterAttribute.PrimarySlot);
+        foreach( var kvp in _primarySlot.PollUpdates() ) yield return new FirearmSlotUpdateDTO(kvp.Key, kvp.Value, ID);
     }
 
     public void SetBuildTarget(int x, int y, TileType tile)
@@ -299,6 +301,6 @@ public class Character : IIdObject
 
     public void TryReload()
     {
-        if (PrimarySlot.TryReload()) ReloadEvent?.Invoke(this);
+        if (_primarySlot.TryReload()) ReloadEvent?.Invoke(this);
     }
 }

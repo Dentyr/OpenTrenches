@@ -18,5 +18,7 @@ public enum CharacterAttribute : byte
     Direction,
     Health,
     Cooldown,
-    State
+    State,
+
+    PrimarySlot,
 }

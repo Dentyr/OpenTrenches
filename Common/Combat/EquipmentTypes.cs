@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace OpenTrenches.Common.Combat;
@@ -63,6 +64,16 @@ public static class EquipmentTypes
 
     public static IReadOnlyDictionary<EquipmentEnum, AbstractEquipmentType> All { get; } = new ReadOnlyDictionary<EquipmentEnum, AbstractEquipmentType>(_all);
 
+
+    public static bool TryGet<TStats>(EquipmentEnum? type, [NotNullWhen(true)] out EquipmentType<TStats>? equipment) where TStats : class
+    {
+        if (type is not EquipmentEnum notnull || Get(notnull) is not EquipmentType<TStats> equipmentType) {
+            equipment = null;
+            return false;
+        }
+        equipment = equipmentType;
+        return true;
+    }
     public static AbstractEquipmentType Get(EquipmentEnum type) =>
         _all.TryGetValue(type, out var equipment) ? equipment : throw new ArgumentException($"unregistered equipment: {type}");
 

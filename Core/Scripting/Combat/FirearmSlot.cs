@@ -19,7 +19,7 @@ public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
     public int AmmoStored { get; set; }
 
 
-    public FirearmSlot(EquipmentType<FirearmStats>? equipment) : base(EquipmentCategory.Firearm, equipment)
+    public FirearmSlot(EquipmentEnum equipment) : base(EquipmentCategory.Firearm, equipment)
     {
     }
 
