@@ -92,12 +92,15 @@ public partial class GameRoot : Node
     public override void _Process(double delta)
     {
         NetworkAdapter.Poll();
-        // outgoing streaming
-        foreach(var player in GameState.Characters.Values)
+        // outgoing updates
+        foreach(Character character in GameState.Characters.Values)
         {
-            NetworkAdapter.Send(player.GetUpdate(CharacterAttribute.Position));
-            foreach(AbstractUpdateDTO update in player.PollUpdates()) NetworkAdapter.Send(update);
-            
+            NetworkAdapter.Send(character.GetUpdate(CharacterAttribute.Position));
+            foreach(AbstractUpdateDTO update in character.PollUpdates()) NetworkAdapter.Send(update);
+        }
+        foreach(PlayerNetworkHandler player in _players)
+        {
+            foreach(AbstractUpdateDTO update in player.Character.PollPlayerUpdates()) player.Adapter.Send(update);
         }
 
         // outgoing messages

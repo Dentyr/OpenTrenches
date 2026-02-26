@@ -91,10 +91,18 @@ public sealed class ClientState : IClientState
         {
             if (Characters.TryGetValue(characterUpdateDTO.TargetId, out var character)) character.Update(characterUpdateDTO);
         }
-        else if (update is FirearmSlotUpdateDTO updateDTO)
+        else if (update is FirearmSlotUpdateDTO firearmUpdateDTO)
         {
-            if (Characters.TryGetValue(updateDTO.TargetId, out var character)) {
-                character.Update(updateDTO);
+            if (PlayerCharacter is Character player)
+            {
+                player.Update(firearmUpdateDTO);
+            }
+        }
+        else if (update is PlayerUpdateDTO playerUpdateDTO)
+        {
+            if (PlayerCharacter is Character player)
+            {
+                player.Update(playerUpdateDTO);
             }
         }
     }

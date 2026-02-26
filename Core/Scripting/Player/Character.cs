@@ -106,10 +106,16 @@ public class Character : IIdObject
                 break;
             case CharacterAttribute.Direction:
                 break;
-            case CharacterAttribute.Cooldown:
-                break;
             case CharacterAttribute.State:
                 ActionState = Serialization.Deserialize<CharacterState>(update.Payload);
+                break;
+        }
+    }
+    public void Update(PlayerUpdateDTO update)
+    {
+        switch (update.Attribute)
+        {
+            case PlayerAttribute.Logistics:
                 break;
         }
     }

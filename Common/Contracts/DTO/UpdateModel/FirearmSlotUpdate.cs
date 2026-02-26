@@ -11,10 +11,4 @@ public enum FirearmSlotAttribute : byte
 
 
 [MessagePackObject]
-public record class FirearmSlotUpdateDTO(FirearmSlotAttribute Attribute, byte[] Payload, ushort TargetId) : AbstractUpdateDTO<FirearmSlotAttribute>(Attribute, Payload)
-{
-    [Key(2)]
-    public ushort TargetId { get; } = TargetId;
-
-    public override bool Streamed => false;
-}
+public record class FirearmSlotUpdateDTO(FirearmSlotAttribute Attribute, byte[] Payload) : AbstractUpdateDTO<FirearmSlotAttribute>(Attribute, Payload) {}

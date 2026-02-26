@@ -58,6 +58,14 @@ public class Character : IIdObject
         private set => _health.Value = value;
     }
 
+
+    private readonly UpdateableProperty<int> _logistics = new();
+    public int Logistics
+    {
+        get => _logistics.Value;
+        set => _logistics.Value = value;
+    }
+
     private FirearmSlot _primarySlot = new(EquipmentTypes.Rifle)
     {
         AmmoLoaded = 1,
@@ -251,7 +259,7 @@ public class Character : IIdObject
 
     //* Updates
 
-    public AbstractUpdateDTO GetUpdate(CharacterAttribute type)
+    public CharacterUpdateDTO GetUpdate(CharacterAttribute type)
     {
         byte[]? payload = null;
         switch (type)
@@ -275,7 +283,22 @@ public class Character : IIdObject
         if (payload is null) throw new Exception();
         return new CharacterUpdateDTO(type, payload, ID);
     }
+    public PlayerUpdateDTO GetUpdate(PlayerAttribute type)
+    {
+        byte[]? payload = null;
+        switch (type)
+        {
+            case PlayerAttribute.Logistics:
+                payload = Serialization.Serialize(_logistics);
+                break;
+        }
+        if (payload is null) throw new Exception();
+        return new PlayerUpdateDTO(type, payload);
+    }
 
+    /// <summary>
+    /// Polls updates that should be shown to all players
+    /// </summary>
     public IEnumerable<AbstractUpdateDTO> PollUpdates()
     {
         if (_health.PollChanged())      yield return GetUpdate(CharacterAttribute.Health);
@@ -283,7 +306,14 @@ public class Character : IIdObject
         if (_state.PollChanged())       yield return GetUpdate(CharacterAttribute.State);
 
         if (_primarySlot.PollEquipmentUpdate()) yield return GetUpdate(CharacterAttribute.PrimarySlot);
-        foreach( var kvp in _primarySlot.PollUpdates() ) yield return new FirearmSlotUpdateDTO(kvp.Key, kvp.Value, ID);
+    }
+    /// <summary>
+    /// Updates that should only be seen by the player associated with this character
+    /// </summary>
+    public IEnumerable<AbstractUpdateDTO> PollPlayerUpdates()
+    {
+        if (_logistics.PollChanged()) yield return GetUpdate(PlayerAttribute.Logistics);
+        foreach( var kvp in _primarySlot.PollUpdates() ) yield return new FirearmSlotUpdateDTO(kvp.Key, kvp.Value);
     }
 
     public void SetBuildTarget(int x, int y, TileType tile)
