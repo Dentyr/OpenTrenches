@@ -10,5 +10,5 @@ public record  class CharacterDTO(
     [property: Key(1)] Vector3 Position,
     [property: Key(2)] float Health,
     [property: Key(3)] int Team,
-    [property: Key(4)] EquipmentEnum? Primary
+    [property: Key(4)] FirearmEnum? Primary
 ) : AbstractCreateDTO {}

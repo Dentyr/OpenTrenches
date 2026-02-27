@@ -11,7 +11,7 @@ using OpenTrenches.Core.Scripting.Player;
 public partial class FirearmSlotDisplay : Control
 {
     private IReadOnlyFirearmState? _state;
-    private EquipmentType<FirearmStats>? _equipment;
+    private FirearmType? _equipment;
 
     private readonly Label _loadedLabel;
     private readonly TextureRect _texture;
@@ -67,9 +67,9 @@ public partial class FirearmSlotDisplay : Control
 
     //* updating
 
-    public void SetEquipment(EquipmentEnum equipment)
+    public void SetEquipment(FirearmEnum equipment)
     {
-        if (EquipmentTypes.TryGet<FirearmStats>(equipment, out var firearm)) _equipment = firearm;
+        if (EquipmentTypes.TryGet(equipment, out var firearm)) _equipment = firearm;
         UpdateTexture();
     }
     public void SetState(IReadOnlyFirearmState? slot)
@@ -78,8 +78,8 @@ public partial class FirearmSlotDisplay : Control
     }
     private void UpdateTexture()
     {
-        if (_equipment is AbstractEquipmentType equipmentType 
-            && EquipmentTextureLibrary.Textures.TryGetValue(equipmentType.Id, out var texture)) 
+        if (_equipment is not null
+            && EquipmentTextureLibrary.Textures.TryGetValue(_equipment.Id, out var texture)) 
         {
             _texture.Texture = texture;
         }
@@ -127,7 +127,7 @@ public partial class FirearmSlotDisplay : Control
     /// </summary>
     public void StartReloadTimer()
     {
-        if (_equipment is EquipmentType<FirearmStats> firearm) _reload = firearm.Stats.ReloadSeconds;
+        if (_equipment is not null) _reload = _equipment.Stats.ReloadSeconds;
     }
 
     /// <summary>
@@ -135,6 +135,6 @@ public partial class FirearmSlotDisplay : Control
     /// </summary>
     public void StartFireTimer()
     {
-        if (_equipment is EquipmentType<FirearmStats> firearm) _cooldown = firearm.Stats.FirePerSecond;
+        if (_equipment is not null) _cooldown = _equipment.Stats.FirePerSecond;
     }
 }

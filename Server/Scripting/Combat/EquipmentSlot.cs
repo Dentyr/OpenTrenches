@@ -1,40 +1,38 @@
 using System;
-using System.Collections;
 using OpenTrenches.Common.Combat;
 using OpenTrenches.Server.Scripting.Adapter;
 
 namespace OpenTrenches.Server.Scripting.Combat;
 
-public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlot
-    where T : class
+public class EquipmentSlot : IReadOnlyEquipmentSlot
 {
     public EquipmentCategory Category { get; }
 
 
     #region equipment property
-    private UpdateableProperty<EquipmentEnum?> _equipment = new();
+    private UpdateableProperty<FirearmEnum?> _equipment = new();
     public bool PollEquipmentUpdate() => _equipment.PollChanged();
-    public EquipmentEnum? EquipmentEnum
+    public FirearmEnum? EquipmentEnum
     {
         get => _equipment.Value;
     }
-    public EquipmentType<T>? Equipment
+    public FirearmType? Equipment
     {
-        get => EquipmentTypes.TryGet<T>(EquipmentEnum, out var equipment) ? equipment : null;
+        get => EquipmentTypes.TryGet(EquipmentEnum, out var equipment) ? equipment : null;
         set => _equipment.Value = value?.Id;
     }
     AbstractEquipmentType? IReadOnlyEquipmentSlot.Equipment => Equipment;
 
 
     // notification event
-    public event Action<EquipmentType<T>?>? SlotValueChangedEvent; 
+    public event Action<FirearmType?>? SlotValueChangedEvent; 
     #endregion
 
 
-    public EquipmentSlot(EquipmentCategory Category, EquipmentType<T>? Equipment)
+    public EquipmentSlot(EquipmentCategory category, FirearmType? equipment)
     {
-        this.Category = Category;
-        this.Equipment = Equipment;
+        Category = category;
+        Equipment = equipment;
     }
 
 }

@@ -3,15 +3,14 @@ using OpenTrenches.Common.Combat;
 
 namespace OpenTrenches.Core.Scripting.Combat;
 
-public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlot
-    where T : class
+public class EquipmentSlot : IReadOnlyEquipmentSlot
 {
     public EquipmentCategory Category { get; }
 
 
     #region equipment property
-    private EquipmentEnum? _equipmentEnum;
-    public EquipmentEnum? EquipmentEnum 
+    private FirearmEnum? _equipmentEnum;
+    public FirearmEnum? EquipmentEnum 
     { 
         get => _equipmentEnum; 
         set 
@@ -21,19 +20,19 @@ public class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T>, IReadOnlyEquipmentSlo
             _equipmentEnum = value; 
         }
     }
-    public EquipmentType<T>? Equipment
+    public FirearmType? Equipment
     {
-        get => EquipmentTypes.TryGet<T>(EquipmentEnum, out var equipment) ? equipment : null;
+        get => EquipmentTypes.TryGet(EquipmentEnum, out var equipment) ? equipment : null;
     }
     AbstractEquipmentType? IReadOnlyEquipmentSlot.Equipment => Equipment;
 
 
     // notification event
-    public event Action<EquipmentEnum?>? SlotValueChangedEvent; 
+    public event Action<FirearmEnum?>? SlotValueChangedEvent; 
     #endregion
 
 
-    public EquipmentSlot(EquipmentCategory category, EquipmentEnum equipment)
+    public EquipmentSlot(EquipmentCategory category, FirearmEnum equipment)
     {
         Category = category;
         _equipmentEnum = equipment;

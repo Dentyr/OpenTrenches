@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-
 namespace OpenTrenches.Common.Combat;
 
-/// <typeparam name="T">Stat type</typeparam>
-public class EquipmentType<T> : AbstractEquipmentType where T : class
+public class FirearmType : AbstractEquipmentType
 {
-    public T Stats { get; }
+    public FirearmStats Stats { get; }
 
-    public EquipmentType(EquipmentEnum id, EquipmentCategory category, int logisticsCost, T stats) : base(id, category, logisticsCost)
+    public FirearmType(FirearmEnum id, int logisticsCost, FirearmStats stats)
+        : base(id, EquipmentCategory.Firearm, logisticsCost)
     {
         Stats = stats;
     }

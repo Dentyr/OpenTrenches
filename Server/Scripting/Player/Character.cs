@@ -73,7 +73,7 @@ public class Character : IIdObject
         AmmoStored = 500,
     };
     public IReadOnlyFirearmSlot PrimarySlot => _primarySlot;
-    public void SwitchPrimary(EquipmentType<FirearmStats> firearm)
+    public void SwitchPrimary(FirearmType firearm)
     {
         _primarySlot.Equipment = firearm;
     }
@@ -175,7 +175,7 @@ public class Character : IIdObject
     private void TryFire(ICharacterAdapter adapter)
     {
         if (Position != Direction 
-            && _primarySlot.Equipment is EquipmentType<FirearmStats> firearm 
+            && _primarySlot.Equipment is FirearmType firearm 
             && _primarySlot.TryShoot())
         {
             for (int i = 0; i < firearm.Stats.ProjectilesPerShot; i ++)
@@ -339,16 +339,16 @@ public class Character : IIdObject
     /// Attempts to buy <paramref name="purchaseRequest"/>, if enough logistics
     /// </summary>
     /// <param name="purchaseRequest"></param>
-    public void TryPurchase(EquipmentEnum equipmentEnum)
+    public void TryPurchase(FirearmEnum equipmentEnum)
     {
         if (equipmentEnum != PrimarySlot.EquipmentEnum)
         {
-            var equipment = EquipmentTypes.Get(equipmentEnum);
+            FirearmType equipment = EquipmentTypes.Get(equipmentEnum);
             
             if (Logistics < equipment.LogisticsCost) return;
             Logistics -= equipment.LogisticsCost;
 
-            if (equipment is EquipmentType<FirearmStats> firearm) _primarySlot.Equipment = firearm;
+            _primarySlot.Equipment = equipment;
 
         }
     }

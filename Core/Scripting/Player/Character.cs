@@ -54,8 +54,8 @@ public class Character : IIdObject
     public event Action? ActivatedEvent;
     
 
-    private EquipmentEnum _primary;
-    public EquipmentEnum Primary 
+    private FirearmEnum _primary;
+    public FirearmEnum Primary 
     { 
         get => _primary; 
         private set
@@ -64,7 +64,7 @@ public class Character : IIdObject
             _primary = value; 
         }
     }
-    public Action<EquipmentEnum>? OnPrimaryChangedEvent;
+    public Action<FirearmEnum>? OnPrimaryChangedEvent;
 
     private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
     public IActivatedAbility GetAbility(int index) => _abilities[index];
@@ -120,7 +120,7 @@ public class Character : IIdObject
                 ActionState = Serialization.Deserialize<CharacterState>(update.Payload);
                 break;
             case CharacterAttribute.PrimarySlot:
-                Primary = Serialization.Deserialize<EquipmentEnum>(update.Payload);
+                Primary = Serialization.Deserialize<FirearmEnum>(update.Payload);
                 break;
         }
     }

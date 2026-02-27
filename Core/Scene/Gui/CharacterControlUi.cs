@@ -93,7 +93,7 @@ public partial class CharacterControlUi : Control
     }
 
     private void NotifyAbilityCommand(int idx) => _queuedCommands.Enqueue(new UseAbilityCommandRequest(0));
-    private void RequestUpgrade(EquipmentEnum equipment) => _queuedCommands.Enqueue(new PurchaseCommandRequest(equipment));
+    private void RequestUpgrade(FirearmEnum equipment) => _queuedCommands.Enqueue(new PurchaseCommandRequest(equipment));
 
 
     public override void _Process(double delta)

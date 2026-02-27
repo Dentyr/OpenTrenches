@@ -1,5 +1,5 @@
 namespace OpenTrenches.Common.Combat;
-public enum EquipmentEnum
+public enum FirearmEnum
 {
     Rifle = 0,
     Shotgun = 1,

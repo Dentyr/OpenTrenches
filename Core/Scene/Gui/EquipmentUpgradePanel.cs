@@ -11,7 +11,7 @@ using OpenTrenches.Common.Combat;
 [Tool]
 public partial class EquipmentUpgradePanel : Control 
 {
-    public event Action<EquipmentEnum>? EquipmentSelectedEvent;
+    public event Action<FirearmEnum>? EquipmentSelectedEvent;
 
     private Button _toggle;
     private VBoxContainer _menu;
@@ -51,7 +51,7 @@ public partial class EquipmentUpgradePanel : Control
     public override void _Ready()
     {
         //TODO debug set
-        SetUpgrades(Enum.GetValues<EquipmentEnum>());
+        SetUpgrades(Enum.GetValues<FirearmEnum>());
 
     }
 
@@ -75,11 +75,11 @@ public partial class EquipmentUpgradePanel : Control
         _menu.Size = new Vector2(_toggle.Size.X, Mathf.Min(_menu.Size.Y, maxHeight));
     }
 
-    public void SetUpgrades(IEnumerable<EquipmentEnum> upgrades)
+    public void SetUpgrades(IEnumerable<FirearmEnum> upgrades)
     {
         _menu.QueueFreeChildren();
 
-        foreach(EquipmentEnum upgrade in upgrades)
+        foreach(FirearmEnum upgrade in upgrades)
         {
             Button button = new()
             {

@@ -7,16 +7,11 @@ public interface IReadOnlyEquipmentSlot
 {
     public EquipmentCategory Category { get; }
     public AbstractEquipmentType? Equipment { get; }
-    public EquipmentEnum? EquipmentEnum { get; }
+    public FirearmEnum? EquipmentEnum { get; }
 }
-public interface IReadOnlyEquipmentSlot<T> : IReadOnlyEquipmentSlot
-    where T : class
+public interface IReadOnlyFirearmSlot : IReadOnlyEquipmentSlot
 {
-    public new EquipmentType<T>? Equipment { get; }
-}
-
-public interface IReadOnlyFirearmSlot : IReadOnlyEquipmentSlot<FirearmStats>
-{
+    public new FirearmType? Equipment { get; }
     public float ReloadCooldown { get; }
     public float FireCooldown { get; }
     public int AmmoLoaded { get; }

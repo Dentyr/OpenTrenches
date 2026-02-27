@@ -7,17 +7,17 @@ namespace OpenTrenches.Core.Scripting.Graphics;
 
 public static class EquipmentTextureLibrary
 {
-    public static readonly IReadOnlyDictionary<EquipmentEnum, Texture2D> Textures = new Dictionary<EquipmentEnum, Texture2D>() {
+    public static readonly IReadOnlyDictionary<FirearmEnum, Texture2D> Textures = new Dictionary<FirearmEnum, Texture2D>() {
         {
-            EquipmentEnum.Rifle, 
+            FirearmEnum.Rifle, 
             TextureLibrary2D.Equipment.RifleTexture
         },
         {
-            EquipmentEnum.Shotgun, 
+            FirearmEnum.Shotgun, 
             TextureLibrary2D.Equipment.ShotGunTexture
         },
         {
-            EquipmentEnum.MachineGun, 
+            FirearmEnum.MachineGun, 
             TextureLibrary2D.Equipment.MachineGunTexture
         },
     };
