@@ -8,20 +8,19 @@ using OpenTrenches.Server.Scripting.Adapter;
 
 namespace OpenTrenches.Core.Scripting.Combat;
 
-public class FirearmSlot : EquipmentSlot<FirearmStats>, IReadOnlyFirearmSlot
+public interface IReadOnlyFirearmState
 {
-    public float ReloadCooldown { get; set; }
+    int AmmoLoaded { get;  }
+    int AmmoStored { get;  }
+}
 
-    public float FireCooldown { get; set; }
-
+public class FirearmState : IReadOnlyFirearmState
+{
     public int AmmoLoaded { get; set; }
 
     public int AmmoStored { get; set; }
 
 
-    public FirearmSlot(EquipmentEnum equipment) : base(EquipmentCategory.Firearm, equipment)
-    {
-    }
 
     //* Updates
 

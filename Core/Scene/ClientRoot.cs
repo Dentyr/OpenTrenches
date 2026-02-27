@@ -15,6 +15,7 @@ using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using System.Threading.Tasks;
 using System.Net;
 using System.Threading;
+using OpenTrenches.Server.Scene;
 
 namespace OpenTrenches.Core.Scene;
 
@@ -87,6 +88,7 @@ public partial class ClientRoot : Node
     /// </summary>
     private async void TryJoin(IPEndPoint endPoint)
     {
+        //TODO clarify order of network and load events
         lock (this)
         {
             ClientNetworkHandler = new(NetworkAdapter.Connect(endPoint));
@@ -133,7 +135,8 @@ public partial class ClientRoot : Node
         State.PlayerRespawnEvent += _deathScreen.Hide;
 
         //* Initialize values
-        if (State.PlayerCharacter is not null) SetPlayer(State.PlayerCharacter);
+        if (State.PlayerCharacterId is uint notnull && State.TryGetCharacter(notnull, out var player)) SetPlayer(player);
+        SetPlayerState(State.PlayerState);
         _characterUI.SetLogistics(State.PlayerState.Logistics);
         
     }
@@ -146,8 +149,12 @@ public partial class ClientRoot : Node
     private void SetPlayer(Character playerCharacter)
     {
         World.AddPlayerComponents(playerCharacter);
-        _characterUI.SetPlayer(playerCharacter);
+        _characterUI.SetPlayerCharacter(playerCharacter);
         KeyboardListener.SetPlayer(playerCharacter);
+    }
+    private void SetPlayerState(IReadOnlyPlayerState playerState)
+    {
+        _characterUI.SetState(playerState);
     }
 
 

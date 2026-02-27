@@ -54,7 +54,7 @@ public class Character : IIdObject
     public event Action? ActivatedEvent;
     
 
-    public FirearmSlot PrimarySlot = new(EquipmentEnum.Rifle);
+    public EquipmentEnum Primary;
 
     private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
     public IActivatedAbility GetAbility(int index) => _abilities[index];
@@ -118,10 +118,6 @@ public class Character : IIdObject
             case PlayerAttribute.Logistics:
                 break;
         }
-    }
-    public void Update(FirearmSlotUpdateDTO update)
-    {
-        PrimarySlot.Update(update);
     }
 
     //* equality

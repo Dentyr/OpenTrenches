@@ -14,6 +14,7 @@ using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Core.Scripting.Teams;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OpenTrenches.Core.Scripting;
 
@@ -40,22 +41,11 @@ public sealed class ClientState : IClientState
     //* State
 
     //* character
-    private Character? _playerCharacter;
-    public Character? PlayerCharacter 
-    { 
-        get => _playerCharacter; 
-        private set
-        {
-            ArgumentNullException.ThrowIfNull(value);
-            _playerCharacter = value;
-            PlayerCharacterSetEvent?.Invoke(value);
-        } 
-    }
-
     private readonly Dictionary<uint, Character> _characters = [];
     public IReadOnlyDictionary<uint, Character> Characters => _characters;
+    public bool TryGetCharacter(uint id, [NotNullWhen(true)] out Character? character) => Characters.TryGetValue(id, out character);
 
-    public event Action<Character>? CharacterAddedEvent; 
+    public event Action<Character>? CharacterAddedEvent;
 
     private void AddCharacter(Character Character)
     {
@@ -63,8 +53,24 @@ public sealed class ClientState : IClientState
     }
 
     //* player info
-    private PlayerState _playerState = new() { Logistics=12 }; //TODO test value
+    private PlayerState _playerState = new() { Logistics = 12 }; //TODO test value
     public IReadOnlyPlayerState PlayerState => _playerState;
+
+
+    public uint? PlayerCharacterId { get; private set; }
+    public Character? PlayerCharacter {
+        get {
+            if (PlayerCharacterId is uint notnull && TryGetCharacter(notnull, out var character)) return character;
+            return null;
+        }
+    }
+    private void SetPlayer(Character character, PlayerState state)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        PlayerCharacterId = character.ID;
+        _playerState = state;
+        PlayerCharacterSetEvent?.Invoke(character);
+    }
 
     //* 
     public ChunkArray2D Chunks { get; } = new(); //TODO send required size in create message
@@ -83,27 +89,21 @@ public sealed class ClientState : IClientState
     public event Action<Character>? PlayerCharacterSetEvent;
 
     public event Action<Vector3, Vector3>? FireEvent;
-    
+
     //TODO switch to dictionary approach
     public void Update(AbstractUpdateDTO update)
     {
-        if (update is CharacterUpdateDTO characterUpdateDTO) 
+        if (update is CharacterUpdateDTO characterUpdateDTO)
         {
             if (Characters.TryGetValue(characterUpdateDTO.TargetId, out var character)) character.Update(characterUpdateDTO);
         }
         else if (update is FirearmSlotUpdateDTO firearmUpdateDTO)
         {
-            if (PlayerCharacter is Character player)
-            {
-                player.Update(firearmUpdateDTO);
-            }
+            _playerState.Update(firearmUpdateDTO);
         }
         else if (update is PlayerUpdateDTO playerUpdateDTO)
         {
-            if (PlayerCharacter is Character player)
-            {
-                player.Update(playerUpdateDTO);
-            }
+            _playerState.Update(playerUpdateDTO);
         }
     }
     public void Create(AbstractCreateDTO dTO)
@@ -117,15 +117,15 @@ public sealed class ClientState : IClientState
     }
     public void Receive(AbstractCommandDTO dto)
     {
-        if (dto is SetPlayerCommandDTO setPlayerCommand) 
+        if (dto is SetPlayerCommandDTO setPlayerCommand)
         {
-            if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character)) 
+            if (Characters.TryGetValue(setPlayerCommand.PlayerID, out var character))
             {
-                if (PlayerCharacter is not null) Console.Error.WriteLine("Attempted to re-set player");
+                if (PlayerCharacterId is not null) Console.Error.WriteLine("Attempted to re-set player");
 
-                PlayerCharacter = character;
-                PlayerCharacter.InactivatedEvent += () => PlayerDeathEvent?.Invoke();
-                PlayerCharacter.ActivatedEvent += () => PlayerRespawnEvent?.Invoke();
+                PlayerCharacterId = setPlayerCommand.PlayerID;
+                character.InactivatedEvent += () => PlayerDeathEvent?.Invoke();
+                character.ActivatedEvent += () => PlayerRespawnEvent?.Invoke();
             }
             else throw new NotImplementedException("Set player failed; re-request not implemented");
         }
@@ -135,7 +135,7 @@ public sealed class ClientState : IClientState
         }
         else if (dto is ProjectileNotificationCommand projectile)
         {
-            if (projectile.Character == PlayerCharacter?.ID) PlayerFireEvent?.Invoke();
+            if (projectile.Character == PlayerCharacterId) PlayerFireEvent?.Invoke();
             FireEvent?.Invoke(projectile.Start, projectile.End);
         }
         else if (dto is AbilityNotificationCommand abilityNotify)
@@ -147,7 +147,7 @@ public sealed class ClientState : IClientState
         }
         else if (dto is DeathNotificationCommand characterDeath)
         {
-            if (Characters.TryGetValue(characterDeath.Character, out Character? character)) 
+            if (Characters.TryGetValue(characterDeath.Character, out Character? character))
             {
                 //TODO implement log?
             }
@@ -160,7 +160,7 @@ public sealed class ClientState : IClientState
             }
         }
         else if (dto is InitializedNotificationCommand) SetLoaded();
-        else if (dto is ReloadNotificationCommand) 
+        else if (dto is ReloadNotificationCommand)
         {
             PlayerReloadEvent?.Invoke();
         }
@@ -172,4 +172,5 @@ public interface IClientState
     public IReadOnlyDictionary<uint, Character> Characters { get; }
     public IReadOnlyDictionary<int, ClientTeam> Team { get; }
     public Character? PlayerCharacter { get; }
+    public IReadOnlyPlayerState PlayerState { get; }
 }

@@ -50,7 +50,12 @@ public partial class CharacterControlUi : Control
         _logisticsDisplay = GetNode<IconDisplay>("LogisticsDisplay");
     }
 
-    public void SetPlayer(Character character)
+    public void SetState(IReadOnlyPlayerState state)
+    {
+        _primarySlotDisplay.SetState(state.PrimarySlotState);
+        
+    }
+    public void SetPlayerCharacter(Character character)
     {
         _character = character;
         foreach(Node? child in _abilityContainer.GetChildren()) child?.QueueFree();
@@ -61,7 +66,7 @@ public partial class CharacterControlUi : Control
             _abilityContainer.AddChild(abilityNode);
         }
 
-        _primarySlotDisplay.SetSlot(character.PrimarySlot);
+        _primarySlotDisplay.SetEquipment(character.Primary);
     }
     public void SetLogistics(int value)
     {

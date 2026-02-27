@@ -9,7 +9,8 @@ using OpenTrenches.Core.Scripting.Graphics;
 [Tool]
 public partial class FirearmSlotDisplay : Control
 {
-    private FirearmSlot? _slot;
+    private FirearmState? _state;
+    private EquipmentType<FirearmStats>? _equipment;
 
     private readonly Label _loadedLabel;
     private readonly TextureRect _texture;
@@ -65,14 +66,18 @@ public partial class FirearmSlotDisplay : Control
 
     //* updating
 
-    public void SetSlot(FirearmSlot? slot)
+    public void SetEquipment(EquipmentEnum equipment)
     {
-        _slot = slot;
+        if (EquipmentTypes.TryGet<FirearmStats>(equipment, out var firearm)) _equipment = firearm;
         UpdateTexture();
+    }
+    public void SetState(FirearmState? slot)
+    {
+        _state = slot;
     }
     private void UpdateTexture()
     {
-        if (_slot?.Equipment is AbstractEquipmentType equipmentType 
+        if (_equipment is AbstractEquipmentType equipmentType 
             && EquipmentTextureLibrary.Textures.TryGetValue(equipmentType.Id, out var texture)) 
         {
             _texture.Texture = texture;
@@ -82,12 +87,9 @@ public partial class FirearmSlotDisplay : Control
     public override void _Process(double delta)
     {
         // Ensure this slot has a firearm
-        if (_slot is null)
+        if (_state is null || _equipment is null) 
         {
             _texture.Texture = null;
-        }
-        if (_slot is null || _slot.Equipment is null)
-        {
             _cooldownBar.Value = 0;
             _reloadBar.Value = 0;
             _cooldownBar.Visible = false;
@@ -96,19 +98,19 @@ public partial class FirearmSlotDisplay : Control
         }
 
 
-        _loadedLabel.Text = _slot.AmmoLoaded.ToString();
+        _loadedLabel.Text = _state.AmmoLoaded.ToString();
 
 
         if (_reload > 0)
         {
             _reload -= Math.Max((float)delta, 0f);
-            _reloadBar.Value = _reload / _slot.Equipment.Stats.ReloadSeconds;
+            _reloadBar.Value = _reload / _equipment.Stats.ReloadSeconds;
             SetTimerVisibility(_reloadBar);
         }
         if (_cooldown > 0)
         {
             _cooldown -= Math.Max((float)delta, 0f);
-            _cooldownBar.Value = _cooldown / _slot.Equipment.Stats.FirePerSecond;
+            _cooldownBar.Value = _cooldown / _equipment.Stats.FirePerSecond;
             SetTimerVisibility(_cooldownBar);
         }
     }
@@ -124,7 +126,7 @@ public partial class FirearmSlotDisplay : Control
     /// </summary>
     public void StartReloadTimer()
     {
-        if (_slot?.Equipment is EquipmentType<FirearmStats> firearm) _reload = firearm.Stats.ReloadSeconds;
+        if (_equipment is EquipmentType<FirearmStats> firearm) _reload = firearm.Stats.ReloadSeconds;
     }
 
     /// <summary>
@@ -132,6 +134,6 @@ public partial class FirearmSlotDisplay : Control
     /// </summary>
     public void StartFireTimer()
     {
-        if (_slot?.Equipment is EquipmentType<FirearmStats> firearm) _cooldown = firearm.Stats.FirePerSecond;
+        if (_equipment is EquipmentType<FirearmStats> firearm) _cooldown = firearm.Stats.FirePerSecond;
     }
 }
