@@ -6,7 +6,7 @@ namespace OpenTrenches.Common.Combat;
 public interface IReadOnlyEquipmentSlot
 {
     public EquipmentCategory Category { get; }
-    public AbstractEquipmentType? Equipment { get; }
+    public AbstractEquipmentType<FirearmEnum>? Equipment { get; }
     public FirearmEnum? EquipmentEnum { get; }
 }
 public interface IReadOnlyFirearmSlot : IReadOnlyEquipmentSlot

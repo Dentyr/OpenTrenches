@@ -29,8 +29,8 @@ public partial class CharacterControlUi : Control
 
     private FirearmSlotDisplay _primarySlotDisplay = null!;
 
-    private EquipmentUpgradePanel _equipmentUpgradePanel = null!;
-    
+    private FirearmUpgradePanel _equipmentUpgradePanel = null!;
+
 
     //* user commands
 
@@ -38,6 +38,7 @@ public partial class CharacterControlUi : Control
 
     public override void _Ready()
     {
+        //* get from scene
         _abilityContainer = GetNode<Container>("Abilities");
 
         _healthBar = GetNode<ProgressBar>("HpBar");
@@ -48,7 +49,7 @@ public partial class CharacterControlUi : Control
         //*
 
         _primarySlotDisplay = GetNode<FirearmSlotDisplay>("PrimarySlot");
-        _equipmentUpgradePanel = GetNode<EquipmentUpgradePanel>("EquipmentUpgradePanel");
+        _equipmentUpgradePanel = GetNode<FirearmUpgradePanel>("EquipmentUpgradePanel");
 
         //*
 
@@ -109,5 +110,4 @@ public partial class CharacterControlUi : Control
 
 
 }
-
 

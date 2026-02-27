@@ -1,6 +1,6 @@
 namespace OpenTrenches.Common.Combat;
 
-public class FirearmType : AbstractEquipmentType
+public class FirearmType : AbstractEquipmentType<FirearmEnum>
 {
     public FirearmStats Stats { get; }
 

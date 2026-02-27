@@ -2,14 +2,14 @@ using System;
 
 namespace OpenTrenches.Common.Combat;
 
-public abstract class AbstractEquipmentType
+public abstract class AbstractEquipmentType<T> where T : Enum
 {
-    public FirearmEnum Id { get; }
+    public T Id { get; }
     public EquipmentCategory Category { get; }
     public int LogisticsCost { get; }
 
 
-    protected AbstractEquipmentType(FirearmEnum id, EquipmentCategory category, int logisticsCost)
+    protected AbstractEquipmentType(T id, EquipmentCategory category, int logisticsCost)
     {
         if (logisticsCost < 0) throw new ArgumentOutOfRangeException(nameof(logisticsCost));
         Id = id;

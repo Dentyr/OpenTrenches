@@ -1,20 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Godot;
-using OpenTrenches.Common.Combat;
 
 /// <summary>
-/// An upgrade panel for a <see cref="IReadOnlyEquipmentSlot"/>
+/// A UI-only panel that renders upgrade options and emits the selected option id.
 /// </summary>
-[GlobalClass]
-[Tool]
-public partial class EquipmentUpgradePanel : Control 
+public partial class EquipmentUpgradePanel<T> : Control where T : struct, Enum
 {
-    public event Action<FirearmEnum>? EquipmentSelectedEvent;
+    public event Action<T>? EquipmentSelectedEvent;
 
-    private Button _toggle;
-    private VBoxContainer _menu;
+    private readonly Button _toggle;
+    private readonly VBoxContainer _menu;
 
     [Export]
     public bool Open
@@ -48,17 +44,7 @@ public partial class EquipmentUpgradePanel : Control
         AddChild(_toggle);
         AddChild(_menu);
     }
-    public override void _Ready()
-    {
-        //TODO debug set
-        SetUpgrades(Enum.GetValues<FirearmEnum>());
-
-    }
-
-    private void ToggleOpen()
-    {
-        Open = !Open;
-    }
+    private void ToggleOpen() => Open = !Open;
 
     public override void _Process(double delta)
     {
@@ -75,11 +61,11 @@ public partial class EquipmentUpgradePanel : Control
         _menu.Size = new Vector2(_toggle.Size.X, Mathf.Min(_menu.Size.Y, maxHeight));
     }
 
-    public void SetUpgrades(IEnumerable<FirearmEnum> upgrades)
+    public void SetUpgrades(IEnumerable<T> upgrades)
     {
         _menu.QueueFreeChildren();
 
-        foreach(FirearmEnum upgrade in upgrades)
+        foreach (T upgrade in upgrades)
         {
             Button button = new()
             {

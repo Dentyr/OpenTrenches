@@ -21,7 +21,7 @@ public class EquipmentSlot : IReadOnlyEquipmentSlot
         get => EquipmentTypes.TryGet(EquipmentEnum, out var equipment) ? equipment : null;
         set => _equipment.Value = value?.Id;
     }
-    AbstractEquipmentType? IReadOnlyEquipmentSlot.Equipment => Equipment;
+    AbstractEquipmentType<FirearmEnum>? IReadOnlyEquipmentSlot.Equipment => Equipment;
 
 
     // notification event
