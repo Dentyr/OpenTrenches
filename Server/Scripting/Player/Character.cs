@@ -182,6 +182,9 @@ public class Character : IIdObject
 
             else CancelTask();
         }
+
+        //* Position
+        if (Position.Y < -10) Health = 0;
     }
     private void TryFire(ICharacterAdapter adapter)
     {
