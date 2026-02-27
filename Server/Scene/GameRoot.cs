@@ -13,6 +13,7 @@ using OpenTrenches.Common.Contracts.DTO.ServerComands;
 using System.Threading;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
+using OpenTrenches.Server.Scripting.Player.Agent;
 
 namespace OpenTrenches.Server.Scene;
 
@@ -23,6 +24,7 @@ public partial class GameRoot : Node
     private WorldNode World { get; }
 
     private readonly List<PlayerNetworkHandler> _players = [];
+    private readonly List<AiCharacterController> _npcs = [];
 
     private ServerState GameState { get; } = new();
 
@@ -49,6 +51,12 @@ public partial class GameRoot : Node
         //* events
         GameState.CharacterAddedEvent += World.AddCharacter;
         GameState.CharacterAddedEvent += BroadcastCharacter;
+
+        //* Initialization
+        for (int i = 0; i < 100; i ++)
+        {
+            _npcs.Add(new AiCharacterController(GameState));
+        }
     }
     public override void _EnterTree()
     {
@@ -94,6 +102,8 @@ public partial class GameRoot : Node
     public override void _Process(double delta)
     {
         NetworkAdapter.Poll();
+
+        //* player updates
         // outgoing updates
         foreach(Character character in GameState.Characters.Values)
         {
@@ -107,5 +117,11 @@ public partial class GameRoot : Node
 
         // outgoing messages
         foreach (AbstractCommandDTO command in GameState.PollEvents()) NetworkAdapter.Send(command);
+
+        //* Npc updates
+        foreach (var npc in _npcs)
+        {
+            npc.Think();
+        }
     }
 }

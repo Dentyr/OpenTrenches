@@ -1,18 +1,32 @@
-using OpenTrenches.Common.Contracts.DTO;
-using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using Godot;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
-public interface AiCharacterController
+public class AiCharacterController
 {
-    Character Character { get; }
+    private Character Character { get; }
+
+    private ServerState ServerState { get; }
+
+    public AiCharacterController(ServerState ServerState)
+    {
+        this.ServerState = ServerState;
+        Character = ServerState.CreateCharacter();
+    }
 
     /// <summary>
     /// Called on each tick, thinks about what the character should do next
     /// </summary>
     public void Think()
     {
-        
+        var movement = Character.Team.ID switch
+        {
+            0 => Vector3.Right,
+            1 => Vector3.Left,
+            _ => Vector3.Zero,
+        };
+
+        Character.MoveIn(movement);
     }
 }

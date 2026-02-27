@@ -52,7 +52,11 @@ public class ServerState : IServerState
             ID: _charId ++, 
             Team: _teams.MinBy(team => team.Value.CharcaterCount).Value);
         
-        character.Position = character.Team.SpawnPoint;
+        var spawnPoint = character.Team.SpawnPoint;
+        character.Position = new(
+            spawnPoint.X + (Random.Shared.NextSingle() * 10f - 5f),
+            spawnPoint.Y,
+            spawnPoint.Z + (Random.Shared.NextSingle() * 10f - 5f));
         character.FireEvent += HandleFire;
         character.ActivatedAbilityEvent += (idx) => HandleAbility(character.ID, idx);
 
@@ -73,8 +77,8 @@ public class ServerState : IServerState
 
     public ServerState()
     {
-        CreateTeam(FactionEnum.StandardDebug, new(20, 10, 20));
-        CreateTeam(FactionEnum.StandardDebug, new(30, 10, 30));
+        CreateTeam(FactionEnum.StandardDebug, new(50, 10, 50));
+        CreateTeam(FactionEnum.StandardDebug, new(150, 10, 50));
     }
 
     //* communication
