@@ -22,7 +22,8 @@ public static class EquipmentTypes
                     RateOfFire = 70f,
                     ReloadSeconds = 3f,
                     MagazineSize = 15,
-                    ProjectilesPerShot = 1
+                    Recoil = 75,
+                    ProjectilesPerShot = 1,
                 })
         },
         {
@@ -37,6 +38,7 @@ public static class EquipmentTypes
                     RateOfFire = 45f,
                     ReloadSeconds = 5f,
                     MagazineSize = 6,
+                    Recoil = 200,
                     ProjectilesPerShot = 8,
                 })
         },
@@ -52,6 +54,7 @@ public static class EquipmentTypes
                     RateOfFire = 500f,
                     ReloadSeconds = 2f,
                     MagazineSize = 60,
+                    Recoil = 30,
                     ProjectilesPerShot = 1,
                 })
         }

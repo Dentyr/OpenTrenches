@@ -68,11 +68,7 @@ public class Character : IIdObject
     }
     private float _logisticsProgress = 0;
 
-    private FirearmSlot _primarySlot = new(EquipmentTypes.Rifle)
-    {
-        AmmoLoaded = 1,
-        AmmoStored = 500,
-    };
+    private FirearmSlot _primarySlot = new(EquipmentTypes.Rifle);
     public IReadOnlyFirearmSlot PrimarySlot => _primarySlot;
     public void SwitchPrimary(FirearmType firearm)
     {
@@ -183,23 +179,37 @@ public class Character : IIdObject
     private void TryFire(ICharacterAdapter adapter)
     {
         if (Position != Direction 
-            && _primarySlot.Equipment is FirearmType firearm 
-            && _primarySlot.TryShoot())
-        {
+            && _primarySlot.Equipment is FirearmType firearm
+            && _primarySlot.CanFire()
+        ) {
+            // human recoil spread
+            var aimTarget = Position + (
+                (Direction - Position)
+                    .HSpread(_primarySlot.Recoil)
+                    .Normalized() 
+                * firearm.Stats.ProjectileDistance
+            );
             for (int i = 0; i < firearm.Stats.ProjectilesPerShot; i ++)
             {
-                var target = Position + (
-                    (Direction - Position)
-                        .BoxSpread(firearm.Stats.SpreadMOA)
-                        .Normalized() 
-                    * firearm.Stats.ProjectileDistance
-                );
                 
-                FireHitResult result = adapter.AdaptFire(target);
+                // machien spread
+                var kineticTarget = aimTarget;
+                // var kineticTarget = aimTarget.BoxSpread(firearm.Stats.SpreadMOA);
+                // var kineticTarget = Position + (
+                //     (Direction - Position)
+                //         .BoxSpread(firearm.Stats.SpreadMOA)
+                //         .Normalized() 
+                //     * firearm.Stats.ProjectileDistance
+                // );
+                
+                FireHitResult result = adapter.AdaptFire(kineticTarget);
                 if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
                 FireEvent?.Invoke(this, result.Position);
             }
+            // Apply recoil
+            _primarySlot.UseBullet();
+            _primarySlot.ApplyCooldownAndRecoil();
         }
     }
 

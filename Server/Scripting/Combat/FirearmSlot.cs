@@ -20,10 +20,14 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
             if (EquipmentEnum != value?.Id)
             {
                 EquipmentEnum = value?.Id;
-                AmmoLoaded = Equipment is not null ? Equipment.Stats.MagazineSize : 0;
-                AmmoStored = AmmoLoaded * 5;
+                if (Equipment is FirearmType firearmType) SetAmmoToDefault(firearmType);
             }
         }
+    }
+    private void SetAmmoToDefault(FirearmType firearmType)
+    {
+        AmmoLoaded = firearmType.Stats.MagazineSize;
+        AmmoStored = AmmoLoaded * 5;
     }
 
 
@@ -57,6 +61,16 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
     {
         get => _ammoStored.Value;
         set => _ammoStored.Value = value;
+    }
+
+    /// <summary>
+    /// Recoil as MoA range 
+    /// </summary>
+    private readonly UpdateableProperty<float> _recoil = new();
+    public float Recoil
+    {
+        get => _recoil.Value;
+        set => _recoil.Value = value;
     }
 
 
@@ -93,24 +107,34 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
         return false;
     }
 
+
+    public bool CanFire()
+    {
+        return EquipmentEnum is not null && Reloaded && CooledDown && AmmoLoaded > 0;
+    }
     /// <summary>
     /// Sets fire cooldown, if able
     /// </summary>
     /// <returns>True if set to fire cooldown</returns>
-    public bool TryShoot()
+    public void UseBullet()
     {
-        if (Equipment is not null && Reloaded && CooledDown && AmmoLoaded > 0)
+        if (AmmoLoaded > 0) AmmoLoaded -= 1;
+    }
+    public void ApplyCooldownAndRecoil()
+    {
+        if (Equipment is not null)
         {
             FireCooldown = 60 / Equipment.Stats.RateOfFire;
-            AmmoLoaded -= 1;
-            return true;
+            Recoil *= 0.9f;
+            Recoil += Equipment.Stats.Recoil;
         }
-        return false;
+
     }
 
 
     public FirearmSlot(FirearmType equipment) : base(EquipmentCategory.Firearm, equipment.Id)
     {
+        SetAmmoToDefault(equipment);
     }
 
 
@@ -126,6 +150,9 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
                 break;
             case FirearmSlotAttribute.AmmoStored:
                 payload = Serialization.Serialize(AmmoStored);
+                break;
+            case FirearmSlotAttribute.Recoil:
+                payload = Serialization.Serialize(Recoil);
                 break;
         }
         if (payload is null) throw new Exception();

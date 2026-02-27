@@ -19,6 +19,8 @@ public class FirearmState : IReadOnlyFirearmState
     public int AmmoLoaded { get; set; }
 
     public int AmmoStored { get; set; }
+    
+    public float Recoil { get; set; }
 
 
 
@@ -33,6 +35,9 @@ public class FirearmState : IReadOnlyFirearmState
                 break;
             case FirearmSlotAttribute.AmmoStored:
                 AmmoStored = Serialization.Deserialize<int>(update.Payload);
+                break;
+            case FirearmSlotAttribute.Recoil:
+                Recoil = Serialization.Deserialize<float>(update.Payload);
                 break;
         }
     }
