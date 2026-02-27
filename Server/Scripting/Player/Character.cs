@@ -66,6 +66,7 @@ public class Character : IIdObject
         get => _logistics.Value;
         set => _logistics.Value = value;
     }
+    private float _logisticsProgress = 0;
 
     private FirearmSlot _primarySlot = new(EquipmentTypes.Rifle)
     {
@@ -97,7 +98,6 @@ public class Character : IIdObject
     private float _baseDefense { get; set; } = 0;
     private float GetDefense()
     {
-
         return _baseDefense + Abilities.Sum(x => x.Active ? x.Record.DefenseMod : 0);
     }
 
@@ -132,6 +132,14 @@ public class Character : IIdObject
     /// <param name="adapter"></param>
     public void AdapterSimulate(float delta, ICharacterAdapter adapter)
     {
+        //* logistics
+        _logisticsProgress += delta / 3;
+        if (_logisticsProgress >= 1)
+        {
+            _logisticsProgress --;
+            Logistics ++;
+        }
+
         // Cooldowns
         foreach (var abiltiy in this.Abilities) abiltiy.ProgressTimer(delta);
         _primarySlot.Cooldown(delta);
