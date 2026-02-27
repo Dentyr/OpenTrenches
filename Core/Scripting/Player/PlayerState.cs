@@ -8,6 +8,7 @@ namespace OpenTrenches.Core.Scripting.Player;
 public class PlayerState : IReadOnlyPlayerState
 {
     public FirearmState PrimarySlotState { get; } = new();
+    IReadOnlyFirearmState? IReadOnlyPlayerState.PrimarySlotState => PrimarySlotState;
 
     private int _logistics;
 
@@ -20,6 +21,7 @@ public class PlayerState : IReadOnlyPlayerState
             _logistics = value;
         }
     }
+
 
     public event Action<int>? OnLogisticsChangedEvent;
 
@@ -42,7 +44,7 @@ public class PlayerState : IReadOnlyPlayerState
 public interface IReadOnlyPlayerState
 {
     int Logistics { get; }
-    FirearmState? PrimarySlotState { get; }
+    IReadOnlyFirearmState? PrimarySlotState { get; }
 
     event Action<int>? OnLogisticsChangedEvent;
 

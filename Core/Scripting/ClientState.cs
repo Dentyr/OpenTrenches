@@ -64,13 +64,6 @@ public sealed class ClientState : IClientState
             return null;
         }
     }
-    private void SetPlayer(Character character, PlayerState state)
-    {
-        ArgumentNullException.ThrowIfNull(character);
-        PlayerCharacterId = character.ID;
-        _playerState = state;
-        PlayerCharacterSetEvent?.Invoke(character);
-    }
 
     //* 
     public ChunkArray2D Chunks { get; } = new(); //TODO send required size in create message
@@ -86,7 +79,7 @@ public sealed class ClientState : IClientState
 
 
     //* Events
-    public event Action<Character>? PlayerCharacterSetEvent;
+    public event Action<LocalPlayerView>? PlayerCharacterSetEvent;
 
     public event Action<Vector3, Vector3>? FireEvent;
 
@@ -126,6 +119,13 @@ public sealed class ClientState : IClientState
                 PlayerCharacterId = setPlayerCommand.PlayerID;
                 character.InactivatedEvent += () => PlayerDeathEvent?.Invoke();
                 character.ActivatedEvent += () => PlayerRespawnEvent?.Invoke();
+
+                //* state
+                _playerState = new();
+                _playerState.PrimarySlotState.AmmoLoaded = setPlayerCommand.AmmoLoaded;
+                _playerState.PrimarySlotState.AmmoStored = setPlayerCommand.AmmoStored;
+
+                PlayerCharacterSetEvent?.Invoke(new LocalPlayerView(character, _playerState));
             }
             else throw new NotImplementedException("Set player failed; re-request not implemented");
         }
@@ -164,6 +164,18 @@ public sealed class ClientState : IClientState
         {
             PlayerReloadEvent?.Invoke();
         }
+    }
+}
+
+public record class LocalPlayerView
+{
+    public Character Character { get; }
+    public IReadOnlyPlayerState PlayerState { get; }
+
+    public LocalPlayerView(Character Character, IReadOnlyPlayerState PlayerState)
+    {
+        this.Character = Character;
+        this.PlayerState = PlayerState;
     }
 }
 

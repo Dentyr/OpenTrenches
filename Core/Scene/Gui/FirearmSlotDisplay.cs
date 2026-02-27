@@ -9,7 +9,7 @@ using OpenTrenches.Core.Scripting.Graphics;
 [Tool]
 public partial class FirearmSlotDisplay : Control
 {
-    private FirearmState? _state;
+    private IReadOnlyFirearmState? _state;
     private EquipmentType<FirearmStats>? _equipment;
 
     private readonly Label _loadedLabel;
@@ -71,7 +71,7 @@ public partial class FirearmSlotDisplay : Control
         if (EquipmentTypes.TryGet<FirearmStats>(equipment, out var firearm)) _equipment = firearm;
         UpdateTexture();
     }
-    public void SetState(FirearmState? slot)
+    public void SetState(IReadOnlyFirearmState? slot)
     {
         _state = slot;
     }

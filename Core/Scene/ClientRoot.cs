@@ -135,8 +135,7 @@ public partial class ClientRoot : Node
         State.PlayerRespawnEvent += _deathScreen.Hide;
 
         //* Initialize values
-        if (State.PlayerCharacterId is uint notnull && State.TryGetCharacter(notnull, out var player)) SetPlayer(player);
-        SetPlayerState(State.PlayerState);
+        if (State.PlayerCharacterId is uint notnull && State.TryGetCharacter(notnull, out var player)) SetPlayer(new LocalPlayerView(player, State.PlayerState));
         _characterUI.SetLogistics(State.PlayerState.Logistics);
         
     }
@@ -146,15 +145,11 @@ public partial class ClientRoot : Node
         World.DisablePhysics();
         AddChild(World);
     }
-    private void SetPlayer(Character playerCharacter)
+    private void SetPlayer(LocalPlayerView player)
     {
-        World.AddPlayerComponents(playerCharacter);
-        _characterUI.SetPlayerCharacter(playerCharacter);
-        KeyboardListener.SetPlayer(playerCharacter);
-    }
-    private void SetPlayerState(IReadOnlyPlayerState playerState)
-    {
-        _characterUI.SetState(playerState);
+        World.AddPlayerComponents(player.Character);
+        _characterUI.SetPlayer(player);
+        KeyboardListener.SetPlayer(player.Character);
     }
 
 

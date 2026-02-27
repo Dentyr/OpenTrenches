@@ -81,7 +81,7 @@ public partial class GameRoot : Node
 
         foreach (AbstractCreateDTO createDTO in GameState.GetInitDTOs()) player.Adapter.Send(createDTO);
 
-        player.Adapter.Send(new SetPlayerCommandDTO(player.Character.ID));
+        player.Adapter.Send(new SetPlayerCommandDTO(player.Character.ID, player.Character.PrimarySlot.AmmoLoaded, player.Character.PrimarySlot.AmmoStored));
         
         player.Adapter.Send(new InitializedNotificationCommand());
     }

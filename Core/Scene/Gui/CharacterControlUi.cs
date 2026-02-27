@@ -4,6 +4,7 @@ using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Core.Scene.GUI;
+using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Player;
 using System;
 using System.Collections.Generic;
@@ -50,23 +51,22 @@ public partial class CharacterControlUi : Control
         _logisticsDisplay = GetNode<IconDisplay>("LogisticsDisplay");
     }
 
-    public void SetState(IReadOnlyPlayerState state)
+    public void SetPlayer(LocalPlayerView player)
     {
-        _primarySlotDisplay.SetState(state.PrimarySlotState);
+        _primarySlotDisplay.SetState(player.PlayerState.PrimarySlotState);
         
-    }
-    public void SetPlayerCharacter(Character character)
-    {
-        _character = character;
+        _character = player.Character;
+
+
         foreach(Node? child in _abilityContainer.GetChildren()) child?.QueueFree();
-        for(int abilityIdx = 0; abilityIdx < character.GetAbilities().Count; abilityIdx ++)
+        for(int abilityIdx = 0; abilityIdx < _character.GetAbilities().Count; abilityIdx ++)
         {
-            var abilityNode = new AbilityButton(character, abilityIdx);
+            var abilityNode = new AbilityButton(_character, abilityIdx);
             abilityNode.AbilitySelected += NotifyAbilityCommand; 
             _abilityContainer.AddChild(abilityNode);
         }
 
-        _primarySlotDisplay.SetEquipment(character.Primary);
+        _primarySlotDisplay.SetEquipment(_character.Primary);
     }
     public void SetLogistics(int value)
     {
