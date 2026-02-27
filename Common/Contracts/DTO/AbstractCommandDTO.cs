@@ -1,5 +1,3 @@
-
-using Godot;
 using MessagePack;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
@@ -29,15 +27,3 @@ namespace OpenTrenches.Common.Contracts.DTO;
 [Union(202,     typeof(UseAbilityCommandRequest))]
 [Union(203,     typeof(ReloadCommandRequest))]
 public abstract record class AbstractCommandDTO {}
-
-[MessagePackObject]
-public record class SetPlayerCommandDTO(
-    [property: Key(0)] ushort PlayerID
-) : AbstractCommandDTO {}
-
-[MessagePackObject]
-public record class BuildCommandRequest(
-    [property: Key(0)] int X,
-    [property: Key(1)] int Y,
-    [property: Key(2)] TileType Tile
-) : AbstractCommandDTO {}
