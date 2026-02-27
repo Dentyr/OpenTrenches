@@ -7,5 +7,6 @@ namespace OpenTrenches.Common.Contracts.DTO;
 public record class SetPlayerCommandDTO(
     [property: Key(0)] ushort PlayerID,
     [property: Key(1)] int AmmoLoaded,
-    [property: Key(2)] int AmmoStored
+    [property: Key(2)] int AmmoStored,
+    [property: Key(3)] int Logistics
 ) : AbstractCommandDTO {}

@@ -1,5 +1,6 @@
 using Godot;
 using OpenTrenches.Common.Collections;
+using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
@@ -27,6 +28,8 @@ public partial class CharacterControlUi : Control
     //* equipment & upgrades
 
     private FirearmSlotDisplay _primarySlotDisplay = null!;
+
+    private EquipmentUpgradePanel _equipmentUpgradePanel = null!;
     
 
     //* user commands
@@ -45,16 +48,21 @@ public partial class CharacterControlUi : Control
         //*
 
         _primarySlotDisplay = GetNode<FirearmSlotDisplay>("PrimarySlot");
+        _equipmentUpgradePanel = GetNode<EquipmentUpgradePanel>("EquipmentUpgradePanel");
 
         //*
 
         _logisticsDisplay = GetNode<IconDisplay>("LogisticsDisplay");
+
+
+        //* events
+        _equipmentUpgradePanel.EquipmentSelectedEvent += RequestUpgrade;
     }
 
     public void SetPlayer(LocalPlayerView player)
     {
         _primarySlotDisplay.SetState(player.PlayerState.PrimarySlotState);
-        
+
         _character = player.Character;
 
 
@@ -84,6 +92,7 @@ public partial class CharacterControlUi : Control
     }
 
     private void NotifyAbilityCommand(int idx) => _queuedCommands.Enqueue(new UseAbilityCommandRequest(0));
+    private void RequestUpgrade(EquipmentEnum equipment) => _queuedCommands.Enqueue(new PurchaseCommandRequest(equipment));
 
 
     public override void _Process(double delta)

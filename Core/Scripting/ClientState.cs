@@ -15,6 +15,7 @@ using OpenTrenches.Core.Scripting.Teams;
 using OpenTrenches.Common.Contracts.DTO.ServerComands;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using System.Diagnostics.CodeAnalysis;
+using OpenTrenches.Common.Combat;
 
 namespace OpenTrenches.Core.Scripting;
 
@@ -124,6 +125,7 @@ public sealed class ClientState : IClientState
                 _playerState = new();
                 _playerState.PrimarySlotState.AmmoLoaded = setPlayerCommand.AmmoLoaded;
                 _playerState.PrimarySlotState.AmmoStored = setPlayerCommand.AmmoStored;
+                _playerState.Logistics = setPlayerCommand.Logistics;
 
                 PlayerCharacterSetEvent?.Invoke(new LocalPlayerView(character, _playerState));
             }

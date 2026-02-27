@@ -8,6 +8,7 @@ using OpenTrenches.Common.Ability;
 using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
+using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Ability;
@@ -59,7 +60,7 @@ public class Character : IIdObject
     }
 
 
-    private readonly UpdateableProperty<int> _logistics = new();
+    private readonly UpdateableProperty<int> _logistics = new(100); //TODO debug logi
     public int Logistics
     {
         get => _logistics.Value;
@@ -289,7 +290,7 @@ public class Character : IIdObject
         switch (type)
         {
             case PlayerAttribute.Logistics:
-                payload = Serialization.Serialize(_logistics);
+                payload = Serialization.Serialize(Logistics);
                 break;
         }
         if (payload is null) throw new Exception();
@@ -332,5 +333,23 @@ public class Character : IIdObject
     public void TryReload()
     {
         if (_primarySlot.TryReload()) ReloadEvent?.Invoke(this);
+    }
+
+    /// <summary>
+    /// Attempts to buy <paramref name="purchaseRequest"/>, if enough logistics
+    /// </summary>
+    /// <param name="purchaseRequest"></param>
+    public void TryPurchase(EquipmentEnum equipmentEnum)
+    {
+        if (equipmentEnum != PrimarySlot.EquipmentEnum)
+        {
+            var equipment = EquipmentTypes.Get(equipmentEnum);
+            
+            if (Logistics < equipment.LogisticsCost) return;
+            Logistics -= equipment.LogisticsCost;
+
+            if (equipment is EquipmentType<FirearmStats> firearm) _primarySlot.Equipment = firearm;
+
+        }
     }
 }

@@ -54,7 +54,8 @@ public class Character : IIdObject
     public event Action? ActivatedEvent;
     
 
-    public EquipmentEnum Primary;
+    public EquipmentEnum Primary { get; private set; }
+    public event Action<EquipmentEnum>? PrimaryChangedEvent;
 
     private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
     public IActivatedAbility GetAbility(int index) => _abilities[index];
@@ -109,13 +110,8 @@ public class Character : IIdObject
             case CharacterAttribute.State:
                 ActionState = Serialization.Deserialize<CharacterState>(update.Payload);
                 break;
-        }
-    }
-    public void Update(PlayerUpdateDTO update)
-    {
-        switch (update.Attribute)
-        {
-            case PlayerAttribute.Logistics:
+            case CharacterAttribute.PrimarySlot:
+                Primary = Serialization.Deserialize<EquipmentEnum>(update.Payload);
                 break;
         }
     }

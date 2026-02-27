@@ -95,8 +95,11 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         }
         else if (command is ReloadCommandRequest)
         {
-
             Character.TryReload();
+        }
+        else if (command is PurchaseCommandRequest purchaseRequest)
+        {
+            Character.TryPurchase(purchaseRequest.Equipment);
         }
     }
     #endregion

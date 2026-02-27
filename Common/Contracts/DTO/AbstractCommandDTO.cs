@@ -26,4 +26,5 @@ namespace OpenTrenches.Common.Contracts.DTO;
 [Union(201,     typeof(BuildCommandRequest))]
 [Union(202,     typeof(UseAbilityCommandRequest))]
 [Union(203,     typeof(ReloadCommandRequest))]
+[Union(204,     typeof(PurchaseCommandRequest))]
 public abstract record class AbstractCommandDTO {}

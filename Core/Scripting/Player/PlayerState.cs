@@ -17,7 +17,7 @@ public class PlayerState : IReadOnlyPlayerState
         get => _logistics;
         set
         {
-            if (_logistics != value) OnLogisticsChangedEvent?.Invoke(_logistics);
+            if (_logistics != value) OnLogisticsChangedEvent?.Invoke(value);
             _logistics = value;
         }
     }

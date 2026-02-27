@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Godot;
@@ -10,6 +11,8 @@ using OpenTrenches.Common.Combat;
 [Tool]
 public partial class EquipmentUpgradePanel : Control 
 {
+    public event Action<EquipmentEnum>? EquipmentSelectedEvent;
+
     private Button _toggle;
     private VBoxContainer _menu;
 
@@ -48,7 +51,7 @@ public partial class EquipmentUpgradePanel : Control
     public override void _Ready()
     {
         //TODO debug set
-        SetUpgrades(EquipmentTypes.GetAllInCategory(EquipmentCategory.Firearm));
+        SetUpgrades(Enum.GetValues<EquipmentEnum>());
 
     }
 
@@ -72,17 +75,18 @@ public partial class EquipmentUpgradePanel : Control
         _menu.Size = new Vector2(_toggle.Size.X, Mathf.Min(_menu.Size.Y, maxHeight));
     }
 
-    public void SetUpgrades(IEnumerable<AbstractEquipmentType> upgrades)
+    public void SetUpgrades(IEnumerable<EquipmentEnum> upgrades)
     {
         _menu.QueueFreeChildren();
 
-        foreach(AbstractEquipmentType upgrade in upgrades)
+        foreach(EquipmentEnum upgrade in upgrades)
         {
             Button button = new()
             {
-                Text = upgrade.Id.ToString(),
+                Text = upgrade.ToString(),
                 ClipText = true,
             };
+            button.Pressed += () => EquipmentSelectedEvent?.Invoke(upgrade);
             _menu.AddChild(button);
         }
     }
