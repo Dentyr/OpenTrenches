@@ -14,7 +14,16 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
     public FirearmType? Equipment
     {
         get => EquipmentTypes.TryGet(EquipmentEnum, out var equipment) ? equipment : null;
-        set => EquipmentEnum = value?.Id;
+        set 
+        {
+            
+            if (EquipmentEnum != value?.Id)
+            {
+                EquipmentEnum = value?.Id;
+                AmmoLoaded = Equipment is not null ? Equipment.Stats.MagazineSize : 0;
+                AmmoStored = AmmoLoaded * 5;
+            }
+        }
     }
 
 
