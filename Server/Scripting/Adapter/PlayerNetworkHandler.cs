@@ -63,13 +63,14 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
                     break;
             }
         }
+        Character.MoveIn(movement);
+        Character.Direction = new(input.MousePos.X, Character.Position.Y, input.MousePos.Y);
+
+
         if (input.Keys.Contains(UserKey.LMB)) Character.TrySwitch(CharacterState.Shooting);
         else if (Character.State == CharacterState.Shooting) Character.TrySwitch(CharacterState.Idle);
 
-        movement *= 5f;
-        Character.MovementVelocity = movement;
 
-        Character.Direction = new(input.MousePos.X, Character.Position.Y, input.MousePos.Y);
     }
     #endregion
     #region update

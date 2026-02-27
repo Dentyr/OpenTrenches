@@ -42,7 +42,14 @@ public class Character : IIdObject
     /// <summary>
     /// Cardinal velocity
     /// </summary>
-    public Vector3 MovementVelocity { get; set; } = Vector3.Zero;
+    public Vector3 MovementVelocity { get; private set; } = Vector3.Zero;
+    /// <summary>
+    /// Sets movement velocity in <paramref name="direction"/>
+    /// </summary>
+    public void MoveIn(Vector3 direction)
+    {
+        MovementVelocity = direction.Normalized() * 7f;
+    }
 
     private UpdateableProperty<CharacterState> _state = new(CharacterState.Idle); 
     public CharacterState State
@@ -370,4 +377,5 @@ public class Character : IIdObject
 
         }
     }
+
 }
