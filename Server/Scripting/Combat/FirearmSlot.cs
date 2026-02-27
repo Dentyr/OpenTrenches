@@ -9,8 +9,15 @@ using OpenTrenches.Server.Scripting.Adapter;
 
 namespace OpenTrenches.Server.Scripting.Combat;
 
-public class FirearmSlot : EquipmentSlot, IReadOnlyFirearmSlot
+public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
 {
+    public FirearmType? Equipment
+    {
+        get => EquipmentTypes.TryGet(EquipmentEnum, out var equipment) ? equipment : null;
+        set => EquipmentEnum = value?.Id;
+    }
+
+
     private readonly UpdateableProperty<float> _reload = new();
     public float ReloadCooldown 
     {
@@ -93,7 +100,7 @@ public class FirearmSlot : EquipmentSlot, IReadOnlyFirearmSlot
     }
 
 
-    public FirearmSlot(FirearmType equipment) : base(EquipmentCategory.Firearm, equipment)
+    public FirearmSlot(FirearmType equipment) : base(EquipmentCategory.Firearm, equipment.Id)
     {
     }
 

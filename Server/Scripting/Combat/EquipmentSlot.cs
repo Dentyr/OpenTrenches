@@ -4,24 +4,19 @@ using OpenTrenches.Server.Scripting.Adapter;
 
 namespace OpenTrenches.Server.Scripting.Combat;
 
-public class EquipmentSlot : IReadOnlyEquipmentSlot
+public abstract class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T> where T : struct, Enum
 {
     public EquipmentCategory Category { get; }
 
 
     #region equipment property
-    private UpdateableProperty<FirearmEnum?> _equipment = new();
+    private UpdateableProperty<T?> _equipment = new();
     public bool PollEquipmentUpdate() => _equipment.PollChanged();
-    public FirearmEnum? EquipmentEnum
+    public T? EquipmentEnum
     {
         get => _equipment.Value;
+        protected set => _equipment.Value = value;
     }
-    public FirearmType? Equipment
-    {
-        get => EquipmentTypes.TryGet(EquipmentEnum, out var equipment) ? equipment : null;
-        set => _equipment.Value = value?.Id;
-    }
-    AbstractEquipmentType<FirearmEnum>? IReadOnlyEquipmentSlot.Equipment => Equipment;
 
 
     // notification event
@@ -29,10 +24,10 @@ public class EquipmentSlot : IReadOnlyEquipmentSlot
     #endregion
 
 
-    public EquipmentSlot(EquipmentCategory category, FirearmType? equipment)
+    protected EquipmentSlot(EquipmentCategory category, T equipment)
     {
         Category = category;
-        Equipment = equipment;
+        EquipmentEnum = equipment;
     }
 
 }

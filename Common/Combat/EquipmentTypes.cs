@@ -60,6 +60,13 @@ public static class EquipmentTypes
     public static IReadOnlyDictionary<FirearmEnum, FirearmType> All { get; } = new ReadOnlyDictionary<FirearmEnum, FirearmType>(_all);
 
 
+    public static bool TryGet<T>(T? type, out FirearmType? equipment) where T : struct, Enum
+    {
+        equipment = null;
+        if (type is null) return false;
+        if (type is FirearmEnum firearmEnum) return TryGet(firearmEnum, out equipment);
+        return false;
+    }
     public static bool TryGet(FirearmEnum? type, out FirearmType? equipment)
     {
         if (type is not FirearmEnum notnull)

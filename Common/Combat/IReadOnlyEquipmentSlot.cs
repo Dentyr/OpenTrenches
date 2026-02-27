@@ -3,15 +3,14 @@ using OpenTrenches.Common.Combat;
 
 namespace OpenTrenches.Common.Combat;
 
-public interface IReadOnlyEquipmentSlot
+public interface IReadOnlyEquipmentSlot<T> where T : struct, Enum
 {
     public EquipmentCategory Category { get; }
-    public AbstractEquipmentType<FirearmEnum>? Equipment { get; }
-    public FirearmEnum? EquipmentEnum { get; }
+    public T? EquipmentEnum { get; }
 }
-public interface IReadOnlyFirearmSlot : IReadOnlyEquipmentSlot
+public interface IReadOnlyFirearmSlot : IReadOnlyEquipmentSlot<FirearmEnum>
 {
-    public new FirearmType? Equipment { get; }
+    public FirearmType? Equipment { get; }
     public float ReloadCooldown { get; }
     public float FireCooldown { get; }
     public int AmmoLoaded { get; }
