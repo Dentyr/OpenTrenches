@@ -6,7 +6,6 @@ public enum FirearmSlotAttribute : byte
 {
     AmmoLoaded,
     AmmoStored,
-    FirearmChanged,
 }
 
 
