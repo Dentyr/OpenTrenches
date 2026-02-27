@@ -4,6 +4,7 @@ using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Core.Scripting.Combat;
 using OpenTrenches.Core.Scripting.Graphics;
+using OpenTrenches.Core.Scripting.Player;
 
 [GlobalClass]
 [Tool]

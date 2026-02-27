@@ -14,11 +14,11 @@ public static class EquipmentTextureLibrary
         },
         {
             EquipmentEnum.Shotgun, 
-            TextureLibrary2D.Equipment.RifleTexture
+            TextureLibrary2D.Equipment.ShotGunTexture
         },
         {
             EquipmentEnum.MachineGun, 
-            TextureLibrary2D.Equipment.RifleTexture
+            TextureLibrary2D.Equipment.MachineGunTexture
         },
     };
 }

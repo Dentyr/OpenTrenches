@@ -54,8 +54,17 @@ public class Character : IIdObject
     public event Action? ActivatedEvent;
     
 
-    public EquipmentEnum Primary { get; private set; }
-    public event Action<EquipmentEnum>? PrimaryChangedEvent;
+    private EquipmentEnum _primary;
+    public EquipmentEnum Primary 
+    { 
+        get => _primary; 
+        private set
+        {
+            if (_primary != value) OnPrimaryChangedEvent?.Invoke(value);
+            _primary = value; 
+        }
+    }
+    public Action<EquipmentEnum>? OnPrimaryChangedEvent;
 
     private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
     public IActivatedAbility GetAbility(int index) => _abilities[index];

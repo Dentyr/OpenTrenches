@@ -74,6 +74,7 @@ public partial class CharacterControlUi : Control
             _abilityContainer.AddChild(abilityNode);
         }
 
+        _character.OnPrimaryChangedEvent += _primarySlotDisplay.SetEquipment;
         _primarySlotDisplay.SetEquipment(_character.Primary);
     }
     public void SetLogistics(int value)
