@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b5lnf6y37g43i" path="res://Core/Scene/Gui/CharacterControlUi.cs" id="1_m2ewg"]
 [ext_resource type="Script" uid="uid://dtfyw8hhhkj5p" path="res://Core/Scene/Gui/IconDisplay.cs" id="3_g61sg"]
 [ext_resource type="Texture2D" uid="uid://bdpmqm4pv8po5" path="res://Common/Resources/Img/UI/Logistics.png" id="4_cbcig"]
-[ext_resource type="Script" path="res://Core/Scene/Gui/FirearmUpgradePanel.cs" id="5_cbcig"]
+[ext_resource type="Script" uid="uid://bi7qwx1iay5x4" path="res://Core/Scene/Gui/FirearmUpgradePanel.cs" id="5_cbcig"]
 [ext_resource type="Script" uid="uid://c170dcuuyswof" path="res://Core/Scene/Gui/FirearmSlotDisplay.cs" id="6_dkbvg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m2ewg"]
