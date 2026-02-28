@@ -99,7 +99,7 @@ public partial class FirearmSlotDisplay : Control
         }
 
 
-        _loadedLabel.Text = _state.AmmoLoaded.ToString();
+        _loadedLabel.Text = $"{_state.AmmoLoaded} / {_equipment.Stats.MagazineSize}";
 
 
         if (_reload > 0)
