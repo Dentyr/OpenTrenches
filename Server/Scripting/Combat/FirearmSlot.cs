@@ -74,10 +74,15 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
     }
 
 
+    /// <summary>
+    /// Reduces fire cooldown, reload cooldown, and recoil
+    /// </summary>
+    /// <param name="delta"></param>
     public void Cooldown(float delta)
     {
         if (ReloadCooldown > 0) ReloadCooldown -= delta;
         else if (FireCooldown > 0) FireCooldown -= delta;
+        if (Recoil > 0) Recoil = Recoil - 50f * delta;
     }
 
     /// <summary>
