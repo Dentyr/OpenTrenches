@@ -7,11 +7,6 @@
 [node name="ClientRoot" type="Node" unique_id=770046232]
 script = ExtResource("1_2i6bf")
 
-[node name="Label" type="Label" parent="." unique_id=721021980]
-offset_right = 40.0
-offset_bottom = 23.0
-text = "Client"
-
 [node name="CharacterControlUi" parent="." unique_id=1186784944 instance=ExtResource("2_rtlfk")]
 mouse_filter = 2
 
