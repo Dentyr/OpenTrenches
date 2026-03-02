@@ -24,13 +24,16 @@ script = ExtResource("1_m2ewg")
 
 [node name="Abilities" type="HBoxContainer" parent="." unique_id=1026710330]
 layout_mode = 1
-anchors_preset = 2
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 847.0
+offset_left = -305.0
 offset_top = -88.0
-offset_right = 1072.0
+offset_right = -80.0
 offset_bottom = -38.0
+grow_horizontal = 0
 grow_vertical = 0
 alignment = 2
 
@@ -104,14 +107,16 @@ vertical_alignment = 1
 
 [node name="LogisticsDisplay" type="Control" parent="." unique_id=1621390208]
 layout_mode = 1
-anchors_preset = 1
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -155.0
-offset_top = 510.0
+offset_top = -138.0
 offset_right = -115.0
-offset_bottom = 550.0
+offset_bottom = -98.0
 grow_horizontal = 0
+grow_vertical = 2
 script = ExtResource("3_g61sg")
 Text = "1"
 Texture = ExtResource("4_cbcig")
@@ -134,10 +139,17 @@ script = ExtResource("5_cbcig")
 Open = true
 
 [node name="PrimarySlot" type="Control" parent="." unique_id=1012168235]
-anchors_preset = 0
-offset_left = 1076.0
-offset_top = 551.0
-offset_right = 1137.0
-offset_bottom = 616.0
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -76.0
+offset_top = -97.0
+offset_right = -15.0
+offset_bottom = -32.0
+grow_horizontal = 0
+grow_vertical = 0
 script = ExtResource("6_dkbvg")
 metadata/_custom_type_script = "uid://c170dcuuyswof"
