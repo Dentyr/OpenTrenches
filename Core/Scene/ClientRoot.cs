@@ -22,24 +22,30 @@ namespace OpenTrenches.Core.Scene;
 [GlobalClass]
 public partial class ClientRoot : Node
 {
+    // TODO? combine network classes into root class
     //* Networking
     private IClientNetworkAdapter NetworkAdapter { get; }
     private ClientNetworkHandler? ClientNetworkHandler;
 
     private readonly ConnectionAgent ConnectionAgent;
 
-    //* GD
-    private WorldView World { get; set; } = default!;
+    // TODO?combine godot elements into single renderer class
+    #region
+        //* GD
+        private WorldView World { get; set; } = default!;
 
-    private KeyboardListener KeyboardListener { get; }
+        private KeyboardListener KeyboardListener { get; }
+
+        //* GUI
+        private CharacterControlUi _characterUI = null!; 
+
+        private DeathScreen _deathScreen = null!;
+    #endregion
+
 
     //* State
     private ClientState? State { get; set; }
 
-    //* GUI
-    private CharacterControlUi _characterUI = null!; 
-
-    private DeathScreen _deathScreen = null!;
 
     public ClientRoot()
     {
@@ -88,6 +94,7 @@ public partial class ClientRoot : Node
     /// </summary>
     private async void TryJoin(IPEndPoint endPoint)
     {
+        //TODO consider failure to game instance
         //TODO clarify order of network and load events
         lock (this)
         {

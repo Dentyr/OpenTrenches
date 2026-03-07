@@ -110,6 +110,7 @@ public partial class GameRoot : Node
             NetworkAdapter.Send(character.GetUpdate(CharacterAttribute.Position));
             foreach(AbstractUpdateDTO update in character.PollUpdates()) NetworkAdapter.Send(update);
         }
+        // player specific message; shown to respective player only
         foreach(PlayerNetworkHandler player in _players)
         {
             foreach(AbstractUpdateDTO update in player.Character.PollPlayerUpdates()) player.Adapter.Send(update);

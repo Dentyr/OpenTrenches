@@ -14,6 +14,7 @@ using OpenTrenches.Core.Scene;
 
 namespace OpenTrenches.Matchmaking;
 
+//TODO consider failure to connect to master server
 [GlobalClass]
 /// <summary>
 /// A node that maintains records of currently active server processes.
@@ -89,6 +90,7 @@ public partial class MasterServer : Node
     }
     public override void _Ready()
     {
+        //TODO fix magic number document somewhere
         NewServer(3030);
 
         Console.CancelKeyPress += (_, e) => Shutdown();

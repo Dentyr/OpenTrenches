@@ -22,6 +22,7 @@ public class ServerState : IServerState
     public ChunkArray2D Chunks { get; } = new();
     IChunkArray2D IServerState.Chunks => Chunks;
     
+    //TODO change ushort to be consistent with other dictionaries
     //* characters
     private readonly Dictionary<ushort, Character> _characters = [];
     public IReadOnlyDictionary<ushort, Character> Characters => _characters;
@@ -44,7 +45,6 @@ public class ServerState : IServerState
     public event Action<Character>? CharacterAddedEvent; 
 
     //* creation
-
     private ushort _charId = 0;
     public Character CreateCharacter()
     {
