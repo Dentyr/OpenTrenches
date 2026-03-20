@@ -29,10 +29,12 @@ public partial class AbilityButton : Control
 
         //* Button
 
+        var ability = Character.GetAbility(AbilityIndex).Record;
         _button = new()
         {
-            Icon = AbilityTextureRecordLibrary.Textures[Character.GetAbility(AbilityIndex).Record].Thumbnail,
+            Icon = AbilityTextureRecordLibrary.Textures[ability].Thumbnail,
             ExpandIcon = true,
+            TooltipText = $"{ability.Name}: {ability.Description}",
         };
         _button.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         AddChild(_button);

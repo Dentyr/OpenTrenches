@@ -70,18 +70,22 @@ public partial class FirearmSlotDisplay : Control
     public void SetEquipment(FirearmEnum equipment)
     {
         if (EquipmentTypes.TryGet(equipment, out var firearm)) _equipment = firearm;
-        UpdateTexture();
+        UpdateRenders();
     }
     public void SetState(IReadOnlyFirearmState? slot)
     {
         _state = slot;
     }
-    private void UpdateTexture()
+    private void UpdateRenders()
     {
-        if (_equipment is not null
-            && EquipmentTextureLibrary.Textures.TryGetValue(_equipment.Id, out var texture)) 
+        if (_equipment is not null)
         {
-            _texture.Texture = texture;
+            if (EquipmentTextureLibrary.Textures.TryGetValue(_equipment.Id, out var texture)) _texture.Texture = texture;
+            TooltipText = $"{_equipment.Name}: {_equipment.Description}";
+        }
+        else
+        {
+            TooltipText = "Empty Slot";
         }
     }
 

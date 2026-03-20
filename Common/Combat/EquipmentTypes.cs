@@ -24,7 +24,12 @@ public static class EquipmentTypes
                     MagazineSize = 15,
                     Recoil = 75,
                     ProjectilesPerShot = 1,
-                })
+                }
+            )
+            {
+                Name = nameof(FirearmEnum.Rifle),
+                Description = "Single Shot Rifle",
+            }
         },
         {
             FirearmEnum.Shotgun,
@@ -40,7 +45,12 @@ public static class EquipmentTypes
                     MagazineSize = 6,
                     Recoil = 200,
                     ProjectilesPerShot = 8,
-                })
+                }
+            )
+            {
+                Name = nameof(FirearmEnum.Shotgun),
+                Description = "Multi Shot Firearm",
+            }
         },
         {
             FirearmEnum.MachineGun,
@@ -56,7 +66,12 @@ public static class EquipmentTypes
                     MagazineSize = 60,
                     Recoil = 30,
                     ProjectilesPerShot = 1,
-                })
+                }
+            )
+            {
+                Name = nameof(FirearmEnum.MachineGun),
+                Description = "Rapid fire firearm",
+            }
         }
     };
 
