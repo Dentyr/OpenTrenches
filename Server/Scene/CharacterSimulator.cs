@@ -19,6 +19,7 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
 
         //* character
         this.Character = Character;
+        // convert local position to cell location
         Position = Character.Position;
         
         Character.DiedEvent += Deactivate;

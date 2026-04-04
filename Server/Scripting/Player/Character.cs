@@ -154,7 +154,7 @@ public class Character : IIdObject
 
         if (State == CharacterState.Building)
         {
-            if (GetCell().DistanceTo(BuildCell) > CommonDefines.CellSize) 
+            if (GetCell().DistanceTo(BuildCell) > 1f) 
             {
                 CancelTask();
                 return;
@@ -355,7 +355,7 @@ public class Character : IIdObject
 
     internal Vector2I GetCell()
     {
-        return new((int)(Position.X / CommonDefines.CellSize), (int)(Position.Z / CommonDefines.CellSize));
+        return new((int)(Position.X), (int)(Position.Z));
     }
 
     public void TryReload()

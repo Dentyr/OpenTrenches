@@ -77,8 +77,8 @@ public class ServerState : IServerState
 
     public ServerState()
     {
-        CreateTeam(FactionEnum.StandardDebug, new(50, 10, 50));
-        CreateTeam(FactionEnum.StandardDebug, new(150, 10, 50));
+        CreateTeam(FactionEnum.StandardDebug, new(16, 100, 50));
+        CreateTeam(FactionEnum.StandardDebug, new(112, 100, 50));
     }
 
     //* communication

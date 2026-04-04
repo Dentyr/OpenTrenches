@@ -39,7 +39,7 @@ public partial class BaseChunkNode : GridMap
     {
         //* initializing properties
         MeshLibrary = Meshes.Terrain.Library;
-        CellSize = new(CommonDefines.CellSize, 2, CommonDefines.CellSize);
+        CellSize = new(1, 2, 1);
 
 
 

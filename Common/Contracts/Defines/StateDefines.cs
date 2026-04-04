@@ -3,10 +3,16 @@ using Godot;
 namespace OpenTrenches.Common.Contracts.Defines;
 public static class CommonDefines
 {
+    /// <summary>
+    /// Cells a chunk spans
+    /// </summary>
     public const byte ChunkSize = 32; 
     public const byte WorldSize = 4;
 
-    public const float CellSize = 2f;
+    /// <summary>
+    /// Pixels a cell spans
+    /// </summary>
+    public const float CellSize = 32f;
 
     public const float TrenchThresholdY = 1.8f;
 
