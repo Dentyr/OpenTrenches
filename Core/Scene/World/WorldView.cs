@@ -8,12 +8,12 @@ using OpenTrenches.Core.Scripting;
 
 namespace OpenTrenches.Core.Scene.World;
 
-public partial class WorldView : Node3D
+public partial class WorldView : Node2D
 {
     private readonly IClientState _clientState;
     //* Characters
     private readonly Dictionary<ushort, CharacterNodesRecord> _characters = [];
-    private Node3D _characterLayer { get; }
+    private Node2D _characterLayer { get; }
 
     //* tiles
     private RenderChunkLayer ChunkLayer { get; set; } = null!;
@@ -30,6 +30,10 @@ public partial class WorldView : Node3D
     public WorldView(ClientState State)
     {
         _clientState = State;
+        
+        ChunkLayer = new(State.Chunks);
+        AddChild(ChunkLayer);
+
         
         _characterLayer = new()
         {
@@ -49,12 +53,9 @@ public partial class WorldView : Node3D
         AddChild(WorldEnvironment);
 
 
-        ChunkLayer = new(State.Chunks);
-        AddChild(ChunkLayer);
 
         //* Load from state
         foreach(var chara in State.Characters.Values) AddCharacter(chara);
-
     }
 
 
@@ -66,8 +67,6 @@ public partial class WorldView : Node3D
             CharacterRenderer node = _characters[character.ID].CharacterNode;
             _characterLayer.AddChild(node);
 
-            CharacterFloat label = _characters[character.ID].Label;
-            CharacterUILayer.AddChild(label);
             
             node.SetPhysicsProcess(ChildPhysicsEnabled);
         }
@@ -94,7 +93,7 @@ public partial class WorldView : Node3D
 
         foreach(var tuple in _characters.Values) 
         {
-            tuple.Label.Position = new (tuple.CharacterNode.Position.X, tuple.CharacterNode.Position.Z);
+            tuple.Label.Position = new (tuple.CharacterNode.Position.X, tuple.CharacterNode.Position.Y);
             // tuple.Label.Position -= ne
         }
     }

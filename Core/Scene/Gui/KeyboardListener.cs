@@ -45,17 +45,21 @@ public partial class KeyboardListener : Node
     }
     public override void _Process(double delta)
     {
-        Camera3D camera = GetViewport().GetCamera3D();
-        if (camera is null) return;
         Vector2 mousePos = GetViewport().GetMousePosition();
 
-        // Project point in screen to world origin and direction
-        Vector3 origin = camera.ProjectRayOrigin(mousePos);
-        Vector3 direction = camera.ProjectRayNormal(mousePos);
+        // 3D logic:
+        // // Project point in screen to world origin and direction
+        // Vector3 origin = camera.ProjectRayOrigin(mousePos);
+        // Vector3 direction = camera.ProjectRayNormal(mousePos);
 
-        // From the ray projection, find the position level to the character.
-        Vector3 intersect = FindIntersect(origin, direction, Character?.Position.Y ?? 0);
-        this.MPos = new(intersect.X, intersect.Z);
+        // // From the ray projection, find the position level to the character.
+        // Vector3 intersect = FindIntersect(origin, direction, Character?.Position.Y ?? 0);
+        // this.MPos = new(intersect.X, intersect.Z);
+
+        if (Character is not null) 
+            MPos = new Vector2(Character.Position.X, Character.Position.Z) + mousePos - (GetViewport().GetVisibleRect().Size / 2f);
+
+        
     }
     /// <summary>
     /// Returns where the line from <paramref name="origin"/> to <paramref name="direction"/> intersects y=<paramref name="targetY"/>, or origin if close to a parallel line.
@@ -137,4 +141,3 @@ public partial class KeyboardListener : Node
         if (LMB) yield return UserKey.LMB;
     }
 }
-

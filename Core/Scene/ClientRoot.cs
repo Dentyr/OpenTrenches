@@ -69,8 +69,8 @@ public partial class ClientRoot : Node
     //* Initialize godot items
     public override void _Ready()
     {
-        _characterUI = GetNode<CharacterControlUi>("CharacterControlUi");
-        _deathScreen = GetNode<DeathScreen>("DeathScreen");
+        _characterUI = GetNode<CharacterControlUi>("UICanvas/CharacterControlUi");
+        _deathScreen = GetNode<DeathScreen>("UICanvas/DeathScreen");
         _deathScreen.Hide();
         // Send player respawn request to server when requested
         _deathScreen.OnRespawnClicked += HandleRespawnAttempt;
