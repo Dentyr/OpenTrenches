@@ -23,4 +23,9 @@ public static class TextureLibrary2D
         public static Texture2D MachineGunTexture = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Equipment/MachineGun.png");
         public static Texture2D ShotGunTexture = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Equipment/Shotgun.png");
     }
+
+    public static class Character
+    {
+        public static Texture2D DefaultCharacter = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Default.png");
+    }
 }
