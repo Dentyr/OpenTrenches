@@ -5,6 +5,7 @@ using OpenTrenches.Core.Scene.Combat;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scene.World;
 using OpenTrenches.Core.Scripting;
+using OpenTrenches.Common.Scene.World;
 
 namespace OpenTrenches.Core.Scene.World;
 
@@ -16,7 +17,7 @@ public partial class WorldView : Node2D
     private Node2D _characterLayer { get; }
 
     //* tiles
-    private RenderChunkLayer ChunkLayer { get; set; } = null!;
+    private ChunkLayer ChunkLayer { get; set; } = null!;
 
     //* UI floats
     private Node CharacterUILayer { get; }
@@ -31,7 +32,7 @@ public partial class WorldView : Node2D
     {
         _clientState = State;
         
-        ChunkLayer = new(State.Chunks);
+        ChunkLayer = new(State.Chunks, TileSetLibrary.GrassTileSet);
         AddChild(ChunkLayer);
 
         
@@ -98,9 +99,9 @@ public partial class WorldView : Node2D
         }
     }
 
-    public void RenderProjectile(Vector3 start, Vector3 end)
+    public void RenderProjectile(Vector2 start, Vector2 end)
     {
-        AddChild(new BulletRay3D(start, end));
+        AddChild(new BulletRay2D(start, end));
     }
 }
 

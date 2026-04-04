@@ -13,5 +13,5 @@ public interface ICharacterAdapter
     /// Simulates this character shooting at <paramref name="target"/>
     /// </summary>
     /// <returns>Character, if it hits one</returns>
-    public FireHitResult AdaptFire(Vector3 target);
+    public FireHitResult AdaptFire(Vector2 target);
 }

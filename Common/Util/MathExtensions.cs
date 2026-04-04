@@ -13,4 +13,14 @@ public static class MathExtensions
         // Horizontal-only spread: rotate around the world up axis (XZ plane).
         return dir.Rotated(Vector3.Up, yaw).Normalized();
     }
+
+    public static Vector2 Spread(this Vector2 dir, float minuteOfAngle)
+    {
+        dir = dir.Normalized();
+
+        float maxAngleRad = (float)(minuteOfAngle / 60 * Math.PI / 180);
+        float angle = (GD.Randf() - 0.5f) * 2 * maxAngleRad;
+
+        return dir.Rotated(angle);
+    }
 }

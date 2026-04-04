@@ -82,7 +82,7 @@ public sealed class ClientState : IClientState
     //* Events
     public event Action<LocalPlayerView>? PlayerCharacterSetEvent;
 
-    public event Action<Vector3, Vector3>? FireEvent;
+    public event Action<Vector2, Vector2>? FireEvent;
 
     //TODO switch to dictionary approach
     public void Update(AbstractUpdateDTO update)

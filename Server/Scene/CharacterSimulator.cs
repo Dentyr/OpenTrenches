@@ -5,7 +5,7 @@ using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scene.World;
 
-public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
+public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
 {
     public Character Character { get; }
     
@@ -54,15 +54,14 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
     {
         
         Position = Character.Position;
-        Velocity = new(Character.MovementVelocity.X, Velocity.Y, Character.MovementVelocity.Z);
-        Velocity += SceneDefines.Physics.g * delta;
+        Velocity = Character.MovementVelocity;
         MoveAndSlide();
         Character.Position = Position;
     }
 
-    FireHitResult ICharacterAdapter.AdaptFire(Vector3 target)
+    FireHitResult ICharacterAdapter.AdaptFire(Vector2 target)
     {
-        var hits = GetViewport().World3D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters3D()
+        var hits = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
         {
             From = Character.Position,
             To = target,
@@ -72,9 +71,9 @@ public partial class CharacterSimulator : CharacterBody3D, ICharacterAdapter
         if (hits.Count == 0) return new FireHitResult.Miss(target);
         // hit character
         else if (hits[SceneDefines.PhysicsKey.Collider].AsGodotObject() is CharacterSimulator hitsim)
-            return new FireHitResult.Hit(hits[SceneDefines.PhysicsKey.Position].AsVector3(), hitsim.Character);
+            return new FireHitResult.Hit(hits[SceneDefines.PhysicsKey.Position].AsVector2(), hitsim.Character);
         // hit something else
-        return new FireHitResult.Miss(hits[SceneDefines.PhysicsKey.Position].AsVector3());
+        return new FireHitResult.Miss(hits[SceneDefines.PhysicsKey.Position].AsVector2());
     }
 
     /// <summary>

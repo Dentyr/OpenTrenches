@@ -10,18 +10,13 @@ using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Server.Scene.World;
 
-public partial class ServerChunkLayer : AbstractChunkLayer<ServerChunkNode>
+public partial class ServerChunkLayer : ChunkLayer
 {
 
-    public ServerChunkLayer(ChunkArray2D ChunkGrid) : base(ChunkGrid) {}
+    public ServerChunkLayer(ChunkArray2D ChunkGrid) : base(ChunkGrid, TileSetLibrary.GrassTileSet) {}
 
     public bool Build(Vector2I cell, TileType buildTarget, float progress)
     {
         return Source.Build(cell.X, cell.Y, buildTarget, progress);
-    }
-
-    protected override ServerChunkNode _Initialize(IChunk chunk)
-    {
-        return new ServerChunkNode(chunk);
     }
 }

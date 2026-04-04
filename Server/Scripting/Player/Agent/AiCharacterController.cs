@@ -24,9 +24,9 @@ public class AiCharacterController
     {
         var movement = Character.Team.ID switch
         {
-            0 => Vector3.Right.Rotated(Vector3.Up, variable),
-            1 => Vector3.Left.Rotated(Vector3.Up, variable),
-            _ => Vector3.Zero,
+            0 => Vector2.Right.Rotated(variable),
+            1 => Vector2.Left.Rotated(variable),
+            _ => Vector2.Zero,
         };
 
         Character.MoveIn(movement);

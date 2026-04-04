@@ -26,7 +26,7 @@ public class Character : IIdObject
 
     //* World
 
-    public Vector3 Position { get; set; }
+    public Vector2 Position { get; set; }
 
 
     //* combat
@@ -71,7 +71,7 @@ public class Character : IIdObject
     public IReadOnlyList<ActivatedAbility> GetAbilities() => _abilities;
     // public event Action<int> AbilityActivated;
 
-    public Character(ushort ID, int Team, IClientState ClientState, Vector3 Position, float Health)
+    public Character(ushort ID, int Team, IClientState ClientState, Vector2 Position, float Health)
     {
         this.ID = ID;
         this.Team = Team;
@@ -109,7 +109,7 @@ public class Character : IIdObject
         switch (update.Attribute)
         {
             case CharacterAttribute.Position:
-                Position = Serialization.Deserialize<Vector3>(update.Payload);
+                Position = Serialization.Deserialize<Vector2>(update.Payload);
                 break;
             case CharacterAttribute.Health:
                 Health = Serialization.Deserialize<float>(update.Payload);

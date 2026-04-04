@@ -5,7 +5,7 @@ using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scripting.Teams;
 
-public class Team(int ID, FactionEnum Faction, Vector3 SpawnPoint)
+public class Team(int ID, FactionEnum Faction, Vector2 SpawnPoint)
 {
     //* identification
 
@@ -27,5 +27,5 @@ public class Team(int ID, FactionEnum Faction, Vector3 SpawnPoint)
 
     public bool RemoveCharacter(Character character) => _characters.Remove(character);
 
-    public Vector3 SpawnPoint { get; } = SpawnPoint;
+    public Vector2 SpawnPoint { get; } = SpawnPoint;
 }

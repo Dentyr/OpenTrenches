@@ -1,41 +1,90 @@
+using System;
+using System.Collections.Generic;
 using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Common.Scene.World;
 
-public abstract partial class AbstractChunkLayer<TChunkNode> : Node3D where TChunkNode : BaseChunkNode
+public partial class ChunkLayer : Node2D
 {
-    protected Grid2D<TChunkNode> Nodes { get; set; }
+    private readonly TileMapLayer TerrainLayer;
+
     protected ChunkArray2D Source { get; }
 
-    public AbstractChunkLayer(ChunkArray2D ChunkGrid)
+    public ChunkLayer(ChunkArray2D ChunkGrid, TileSet TileSetTerrain)
     {
         Source = ChunkGrid;
         Source.ChunkChangedEvent += SetChunk;
 
 
         // set chunks 
-        Nodes = new(CommonDefines.WorldSize, CommonDefines.WorldSize);
+        TerrainLayer = new()
+        {
+            TileSet = TileSetTerrain,
+        };
+        AddChild(TerrainLayer);
+
         for (int x = 0; x < ChunkGrid.SizeX; x ++) 
         {
             for (int y = 0; y < ChunkGrid.SizeY; y ++) 
             {
-                TChunkNode node = Initialize(x, y, ChunkGrid[x, y]);
-                Nodes[x, y] = node;
-                AddChild(node);
+                Initialize(x, y, ChunkGrid[x, y]);
             }
         }
     }
 
-    private TChunkNode Initialize(int x, int y, IChunk chunk)
+    private void Initialize(int x, int y, IChunk chunk)
     {
-        TChunkNode node = _Initialize(chunk);
-        node.Position = new(x * CommonDefines.ChunkSize, 0, y * CommonDefines.ChunkSize);
-        return node;
+        LoadChunk(x, y, chunk);
+        chunk.TerrainChangeEvent += UpdateTile;
     }
-    protected abstract TChunkNode _Initialize(IChunk chunk);
+
+    private void UpdateTile(Tile? tile, int x, int y)
+    {
+        
+        TerrainLayer.SetCellsTerrainConnect([new(x, y)], GetTerrainFromTile(tile?.Type), 0);
+    }
+
+    private void LoadChunk(int x, int y, IChunk chunk)
+    {
+        int xoffset = x * CommonDefines.ChunkSize;
+        int yoffset = y * CommonDefines.ChunkSize;
+        List<Vector2I> Grass = [];
+        List<Vector2I> Trench = [];
+        for (int cellx = 0; cellx < CommonDefines.ChunkSize; cellx ++)
+        {
+            for (int celly = 0; celly < CommonDefines.ChunkSize; celly ++)
+            {
+                Vector2I position = new(xoffset + cellx, yoffset + celly);
+                switch (chunk[x, y]?.Type)
+                {
+                    case null:
+                    case TileType.Clear:
+                        Grass.Add(position);
+                        break;
+                    case TileType.Trench:
+                        Trench.Add(position);
+                        break;
+                }
+            }
+        }
+        TerrainLayer.SetCellsTerrainConnect([..Grass], 0, 0);
+    }
+    private int GetTerrainFromTile(TileType? type)
+    {
+        switch (type)
+        {
+            default:
+            case null:
+            case TileType.Clear:
+                return 0;
+            case TileType.Trench:
+                return 1;
+        }
+    }
 
 
     private void SetChunk(ChunkRecord record)
@@ -44,8 +93,7 @@ public abstract partial class AbstractChunkLayer<TChunkNode> : Node3D where TChu
     }
     private void SetChunk(int x, int y, Chunk chunk)
     {
-        Nodes[x, y]?.QueueFree();
-        TChunkNode node = Initialize(x, y, chunk);
-        AddChild(node);
+        LoadChunk(x, y, chunk);
     }
+
 }

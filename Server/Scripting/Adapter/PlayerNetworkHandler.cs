@@ -44,19 +44,19 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
     }
     private void InterpretInput(InputStatusDTO input)
     {
-        Vector3 movement = Vector3.Zero;
+        Vector2 movement = Vector2.Zero;
         foreach (UserKey key in input.Keys)
         {
             switch(key)
             {
                 case UserKey.W:
-                    movement.Z -= 1;
+                    movement.Y -= 1;
                     break;
                 case UserKey.A:
                     movement.X -= 1;
                     break;
                 case UserKey.S:
-                    movement.Z += 1;
+                    movement.Y += 1;
                     break;
                 case UserKey.D:
                     movement.X += 1;
@@ -64,7 +64,7 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
             }
         }
         Character.MoveIn(movement);
-        Character.Direction = new(input.MousePos.X, Character.Position.Y, input.MousePos.Y);
+        Character.Direction = new(input.MousePos.X, input.MousePos.Y);
 
 
         if (input.Keys.Contains(UserKey.LMB)) Character.TrySwitch(CharacterState.Shooting);

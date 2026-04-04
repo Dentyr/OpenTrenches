@@ -57,21 +57,21 @@ public partial class KeyboardListener : Node
         // this.MPos = new(intersect.X, intersect.Z);
 
         if (Character is not null) 
-            MPos = new Vector2(Character.Position.X, Character.Position.Z) + mousePos - (GetViewport().GetVisibleRect().Size / 2f);
+            MPos = Character.Position + mousePos - (GetViewport().GetVisibleRect().Size / 2f);
 
         
     }
     /// <summary>
     /// Returns where the line from <paramref name="origin"/> to <paramref name="direction"/> intersects y=<paramref name="targetY"/>, or origin if close to a parallel line.
     /// </summary>
-    private Vector3 FindIntersect(Vector3 origin, Vector3 direction, float targetY)
+    private Vector2 FindIntersect(Vector2 origin, Vector2 direction, float targetY)
     {
         float dy = direction.Y;
         // float dy = direction.Y - origin.Y;
         if (Math.Abs(dy) < 1e-3) return origin;
 
         float t = (targetY - origin.Y) / dy;
-        Vector3 intersection = origin + t * direction;
+        Vector2 intersection = origin + t * direction;
         return intersection;
     }
 
@@ -98,11 +98,11 @@ public partial class KeyboardListener : Node
                 {
                     
                     // set targetted cell to current location
-                    Vector2I cell = new ((int)(Character.Position.X / CommonDefines.CellSize), (int)(Character.Position.Z / CommonDefines.CellSize));
+                    Vector2I cell = new ((int)(Character.Position.X / CommonDefines.CellSize), (int)(Character.Position.Y / CommonDefines.CellSize));
                     // If below ground (in trench) set cell to be an adjacent cell based on direction
                     if (Character.Position.Y < CommonDefines.TrenchThresholdY)
                     {
-                        Vector2 dir = MPos - new Vector2(Character.Position.X, Character.Position.Z);
+                        Vector2 dir = MPos - Character.Position;
 
                         Vector2I facing;
                         if (Mathf.Abs(dir.X) > Mathf.Abs(dir.Y)) 

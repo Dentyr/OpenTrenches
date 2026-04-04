@@ -26,14 +26,14 @@ public class Character : IIdObject
 
     //* State in World
     
-    public Vector3 Position { get; set; } = new (0, 10, 0);
+    public Vector2 Position { get; set; } = new (0, 0);
 
-    private readonly UpdateableProperty<Vector3> _direction = new(Vector3.Zero);
+    private readonly UpdateableProperty<Vector2> _direction = new(Vector2.Zero);
     /// <summary>
     /// The location this character is looking towards
     /// </summary>
     /// <value></value>
-    public Vector3 Direction
+    public Vector2 Direction
     {
         get => _direction.Value;
         set => _direction.Value = value;
@@ -42,11 +42,11 @@ public class Character : IIdObject
     /// <summary>
     /// Cardinal velocity
     /// </summary>
-    public Vector3 MovementVelocity { get; private set; } = Vector3.Zero;
+    public Vector2 MovementVelocity { get; private set; } = Vector2.Zero;
     /// <summary>
     /// Sets movement velocity in <paramref name="direction"/>
     /// </summary>
-    public void MoveIn(Vector3 direction)
+    public void MoveIn(Vector2 direction)
     {
         MovementVelocity = direction.Normalized() * 7f;
     }
@@ -92,7 +92,7 @@ public class Character : IIdObject
     public event Action? RespawnEvent;
 
 
-    public event Action<Character, Vector3>? FireEvent;
+    public event Action<Character, Vector2>? FireEvent;
     public event Action<Character>? ReloadEvent;
 
     
@@ -195,7 +195,7 @@ public class Character : IIdObject
             // human recoil spread
             var aimTarget = Position + (
                 (Direction - Position)
-                    .HSpread(_primarySlot.Recoil)
+                    .Spread(_primarySlot.Recoil)
                     .Normalized() 
                 * firearm.Stats.ProjectileDistance
             );
@@ -355,7 +355,7 @@ public class Character : IIdObject
 
     internal Vector2I GetCell()
     {
-        return new((int)(Position.X), (int)(Position.Z));
+        return new((int)(Position.X), (int)(Position.Y));
     }
 
     public void TryReload()

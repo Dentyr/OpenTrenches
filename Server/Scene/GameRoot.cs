@@ -47,6 +47,7 @@ public partial class GameRoot : Node
 
         //* debug camera
         World.AddChild(new Camera3D() {Position = new Vector3(50, 150, 50), Rotation = new Vector3((float)(-Math.PI / 2), 0f, 0f), Current = true});
+        // World.AddChild(new Camera2D() {Position = new Vector2(50, 50)});
 
         //* events
         GameState.CharacterAddedEvent += World.AddCharacter;

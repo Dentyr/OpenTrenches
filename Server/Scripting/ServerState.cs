@@ -55,8 +55,7 @@ public class ServerState : IServerState
         var spawnPoint = character.Team.SpawnPoint;
         character.Position = new(
             spawnPoint.X + (Random.Shared.NextSingle() * 10f - 5f),
-            spawnPoint.Y,
-            spawnPoint.Z + (Random.Shared.NextSingle() * 10f - 5f));
+            spawnPoint.Y + (Random.Shared.NextSingle() * 10f - 5f));
         character.FireEvent += HandleFire;
         character.ActivatedAbilityEvent += (idx) => HandleAbility(character.ID, idx);
 
@@ -67,7 +66,7 @@ public class ServerState : IServerState
         return character;
     }
     private ushort _teamId = 0;
-    private Team CreateTeam(FactionEnum faction, Vector3 spawnpoint)
+    private Team CreateTeam(FactionEnum faction, Vector2 spawnpoint)
     {
         Team team = new(_teamId ++, faction, spawnpoint);
         _teams.Add(team.ID, team);
@@ -77,8 +76,8 @@ public class ServerState : IServerState
 
     public ServerState()
     {
-        CreateTeam(FactionEnum.StandardDebug, new(16, 100, 50));
-        CreateTeam(FactionEnum.StandardDebug, new(112, 100, 50));
+        CreateTeam(FactionEnum.StandardDebug, new(16, 50));
+        CreateTeam(FactionEnum.StandardDebug, new(112, 50));
     }
 
     //* communication
@@ -88,7 +87,7 @@ public class ServerState : IServerState
     private void HandleAbility(uint charaIdx, int abilityIdx)
         => _commandQueue.Enqueue(new AbilityNotificationCommand(charaIdx, abilityIdx));
 
-    private void HandleFire(Character character, Vector3 target) 
+    private void HandleFire(Character character, Vector2 target) 
         => _commandQueue.Enqueue(new ProjectileNotificationCommand(character.Position, target, character.ID));
 
     public IEnumerable<AbstractCommandDTO> PollEvents() => _commandQueue.PollItems().Concat(Chunks.PollCellChanges());

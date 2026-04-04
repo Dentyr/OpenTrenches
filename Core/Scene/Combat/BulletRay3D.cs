@@ -4,17 +4,16 @@ using OpenTrenches.Common.Contracts.Defines;
 
 namespace OpenTrenches.Core.Scene.Combat;
 
-public partial class BulletRay3D : Line2D
+public partial class BulletRay2D : Line2D
 {
     private readonly double _decayTarget;
     private double _decay = 0;
-    public BulletRay3D(Vector3 begin, Vector3 end, double decayTarget = 0.05d)
+    public BulletRay2D(Vector2 begin, Vector2 end, double decayTarget = 0.05d)
     {
         begin += (end-begin).LimitLength(0.3f * CommonDefines.CellSize);
         begin *= CommonDefines.CellSize;
         end *= CommonDefines.CellSize;
-        this.Points = [new(begin.X, begin.Z), new(end.X, end.Z)];
-        Console.WriteLine("in " + this.Points.Stringify());
+        Points = [begin, end];
         _decayTarget = decayTarget;
 
     }

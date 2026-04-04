@@ -24,7 +24,7 @@ public partial class CharacterRenderer : Area2D
     {
         _clientState = ClientState;
         _character = Character;
-        Position = new(Character.Position.X, Character.Position.Z);
+        Position = Character.Position;
 
         _floatLabel = new(Character);
         AddChild(_floatLabel);
@@ -49,7 +49,7 @@ public partial class CharacterRenderer : Area2D
 
     public override void _Process(double delta)
     {        
-        Position = new Vector2(_character.Position.X, _character.Position.Z) * CommonDefines.CellSize;
+        Position = _character.Position * CommonDefines.CellSize;
         _character.Process((float)delta);
     }
 
