@@ -11,6 +11,13 @@ public partial class CharacterRenderer : Area2D
 {
     private IClientState _clientState { get; }
     private Character _character { get; }
+    /// <summary>
+    /// Sets local position to match <see cref="Character"/>'s position
+    /// </summary>
+    private void SyncPosition()
+    {
+        Position = _character.Position * CommonDefines.CellSize;
+    }
 
     public bool OnPlayerTeam => _clientState.PlayerCharacter?.Team == _character.Team;
     public bool PlayerCharacter => _clientState.PlayerCharacter == _character;
@@ -24,7 +31,7 @@ public partial class CharacterRenderer : Area2D
     {
         _clientState = ClientState;
         _character = Character;
-        Position = Character.Position;
+        SyncPosition();
 
         _floatLabel = new(Character);
         AddChild(_floatLabel);
@@ -49,7 +56,7 @@ public partial class CharacterRenderer : Area2D
 
     public override void _Process(double delta)
     {        
-        Position = _character.Position * CommonDefines.CellSize;
+        SyncPosition();
         _character.Process((float)delta);
     }
 

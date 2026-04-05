@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Server.Scripting.Player;
@@ -9,7 +10,22 @@ namespace OpenTrenches.Server.Scene.World;
 public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
 {
     public Character Character { get; }
-    
+    /// <summary>
+    /// Sets local position and velocity to match <see cref="Character"/>'s
+    /// </summary>
+    private void SyncPosition()
+    {
+        Position = Character.Position * CommonDefines.CellSize;
+        Velocity = Character.MovementVelocity * CommonDefines.CellSize;
+    }
+    /// <summary>
+    /// Sets <see cref="Character"/>'s position to match local position
+    /// </summary>
+    private void WritebackPosition()
+    {
+        Character.Position = Position / CommonDefines.CellSize;
+    }
+
     private IWorldSimulator World { get; } 
     IWorldSimulator ICharacterAdapter.World => World;
 
@@ -21,7 +37,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         //* character
         this.Character = Character;
         // convert local position to cell location
-        Position = Character.Position;
+        SyncPosition();
         
         Character.DiedEvent += Deactivate;
         Character.RespawnEvent += Activate;
@@ -37,13 +53,9 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         Activate();
     }
 
-    public override void _Process(double delta)
-    {        
-        Position = Character.Position;
-    }
-
     public override void _PhysicsProcess(double delta)
     {
+        SyncPosition();
         //* movement
         Move((float)delta);
 
@@ -53,11 +65,8 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
     }
     private void Move(float delta)
     {
-        
-        Position = Character.Position;
-        Velocity = Character.MovementVelocity;
         MoveAndSlide();
-        Character.Position = Position;
+        WritebackPosition();
     }
 
     FireHitResult ICharacterAdapter.AdaptFire(Vector2 target)

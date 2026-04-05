@@ -10,7 +10,7 @@ public partial class BulletRay2D : Line2D
     private double _decay = 0;
     public BulletRay2D(Vector2 begin, Vector2 end, double decayTarget = 0.05d)
     {
-        begin += (end-begin).LimitLength(0.3f * CommonDefines.CellSize);
+        begin += (end-begin).LimitLength(0.3f);
         begin *= CommonDefines.CellSize;
         end *= CommonDefines.CellSize;
         Points = [begin, end];
