@@ -52,7 +52,8 @@ public partial class ChunkLayer : Node2D
 
     private void UpdateTile(Tile? tile, int x, int y)
     {
-        TerrainLayer.SetCellsTerrainConnect([new(x, y)], GetTerrainFromTile(tile?.Type), 0);
+        // terrain
+        TerrainLayer.SetCellsTerrainConnect([new(x, y)], 0, GetTerrainFromTile(tile?.Type));
     }
 
     private void LoadChunk(int x, int y, IChunk chunk)
@@ -76,7 +77,7 @@ public partial class ChunkLayer : Node2D
         for (int terrainset = 0; terrainset < Terrains.Length; terrainset ++)
         {
             if (Terrains[terrainset].Count < 1) continue; // skip if empty
-            TerrainLayer.SetCellsTerrainConnect([..Terrains[terrainset]], terrainset, 0);
+            TerrainLayer.SetCellsTerrainConnect([..Terrains[terrainset]], 0, terrainset);
         }
     }
     /// <summary>
