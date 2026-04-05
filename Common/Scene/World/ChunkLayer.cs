@@ -42,6 +42,21 @@ public partial class ChunkLayer : Node2D
                 Initialize(x, y, ChunkGrid[x, y]);
             }
         }
+
+        int sizeX = ChunkGrid.SizeX * CommonDefines.ChunkSize;
+        int sizeY = ChunkGrid.SizeY * CommonDefines.ChunkSize;
+        List<Vector2I> border = new((sizeX + 2) * (sizeY + 2));
+        for (int x = -1; x < sizeX + 1; x ++)
+        {
+            border.Add(new(x, -1));
+            border.Add(new(x, sizeY));
+        }
+        for (int y = -1; y < sizeY * CommonDefines.ChunkSize + 1; y ++)
+        {
+            border.Add(new(-1, y));
+            border.Add(new(sizeX, y));
+        }
+        WallLayer.SetCellsTerrainConnect([..border], 0, 0);
     }
 
     private void Initialize(int x, int y, IChunk chunk)
