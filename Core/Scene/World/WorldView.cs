@@ -32,7 +32,7 @@ public partial class WorldView : Node2D
     {
         _clientState = State;
         
-        ChunkLayer = new(State.Chunks, TileSetLibrary.GrassTileSet);
+        ChunkLayer = new(State.Chunks);
         AddChild(ChunkLayer);
 
         
