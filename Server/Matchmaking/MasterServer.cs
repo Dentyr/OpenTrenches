@@ -24,10 +24,19 @@ public partial class MasterServer : Node
     private readonly List<ServerProcessRecord> _servers = [];
     private ProcessStartInfo GetProcessStartInfo(ushort port)
     {
+        string[] args = OS.GetCmdlineArgs();
+        string gdArgs = $"Server/Scene/GameRoot.tscn --headless --port {port}";
+        for(int i = 0; i < args.Length; i ++)
+        {
+            if (args[i] == "--debug-view")
+            {
+                gdArgs = $"Server/Scene/GameRoot.tscn --debug-collisions --port {port}";
+            }
+        }
         return new()
         {
             FileName = "godot-mono",
-            Arguments = $"Server/Scene/GameRoot.tscn --headless --port {port}",
+            Arguments = gdArgs,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,

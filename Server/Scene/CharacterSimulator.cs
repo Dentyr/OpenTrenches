@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Resources;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scene.World;
@@ -26,11 +27,11 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         Character.RespawnEvent += Activate;
 
         //* collision
-        AddChild(new CollisionShape3D()
+        AddChild(new CollisionShape2D()
         {
-            Shape = new BoxShape3D()
+            Shape = new CircleShape2D()
             {
-                Size = new(1, 2, 1),
+                Radius = 16,
             }
         });
         Activate();
@@ -65,7 +66,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         {
             From = Character.Position,
             To = target,
-            CollisionMask = SceneDefines.Map.BulletMask,
+            CollisionMask = SceneDefines.Map.CharacterLayer, //TODO make it interact with ground layer if shot from inside a trench
         });
         // hit nothing
         if (hits.Count == 0) return new FireHitResult.Miss(target);
@@ -92,7 +93,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
     private void Activate()
     {
         CollisionLayer = SceneDefines.Map.CharacterLayer;
-        CollisionMask = SceneDefines.Map.TerrainLayer;
+        CollisionMask = SceneDefines.Map.TrenchTileLayer | SceneDefines.Map.BarrierLayer;
         SetPhysicsProcess(true);
     }
 }
