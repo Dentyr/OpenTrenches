@@ -11,10 +11,11 @@ namespace OpenTrenches.Common.Scene.World;
 public partial class ChunkLayer : Node2D
 {
     private readonly TileMapLayer TerrainLayer;
+    private readonly TileMapLayer WallLayer;
 
     protected ChunkArray2D Source { get; }
 
-    public ChunkLayer(ChunkArray2D ChunkGrid, TileSet TileSetTerrain)
+    public ChunkLayer(ChunkArray2D ChunkGrid)
     {
         Source = ChunkGrid;
         Source.ChunkChangedEvent += SetChunk;
@@ -23,9 +24,15 @@ public partial class ChunkLayer : Node2D
         // set chunks 
         TerrainLayer = new()
         {
-            TileSet = TileSetTerrain,
+            TileSet = TileSetLibrary.GrassTileSet,
         };
         AddChild(TerrainLayer);
+
+        WallLayer = new()
+        {
+            TileSet = TileSetLibrary.WallTileSet,
+        };
+        AddChild(WallLayer);
 
         for (int x = 0; x < ChunkGrid.SizeX; x ++) 
         {
@@ -34,6 +41,8 @@ public partial class ChunkLayer : Node2D
                 Initialize(x, y, ChunkGrid[x, y]);
             }
         }
+
+
     }
 
     private void Initialize(int x, int y, IChunk chunk)

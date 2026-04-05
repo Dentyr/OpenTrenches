@@ -13,7 +13,7 @@ namespace OpenTrenches.Server.Scene.World;
 public partial class ServerChunkLayer : ChunkLayer
 {
 
-    public ServerChunkLayer(ChunkArray2D ChunkGrid) : base(ChunkGrid, TileSetLibrary.GrassTileSet) {}
+    public ServerChunkLayer(ChunkArray2D ChunkGrid) : base(ChunkGrid) {}
 
     public bool Build(Vector2I cell, TileType buildTarget, float progress)
     {
