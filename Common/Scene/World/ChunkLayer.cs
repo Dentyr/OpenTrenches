@@ -104,9 +104,19 @@ public partial class ChunkLayer : Node2D
             for (int y = 0; y < chunks.SizeY; y ++) 
             {
                 IChunk chunk = chunks[x, y];
+                int xoffset = x * CommonDefines.ChunkSize;
+                int yoffset = y * CommonDefines.ChunkSize;
 
                 LoadChunk(x, y, chunk);
-                chunk.TerrainChangeEvent += UpdateTile;
+                // Watch events
+                chunk.TerrainChangeEvent += 
+                    (tile, cellX, cellY) => 
+                    UpdateTile(
+                        tile, 
+                        new(
+                            cellX + xoffset, 
+                            cellY + yoffset)
+                    );
             }
         }
     }
@@ -114,9 +124,9 @@ public partial class ChunkLayer : Node2D
     /// <summary>
     /// Updates the tiles at <paramref name="x"/> and <paramref name="y"/> to match <paramref name="tile"/>
     /// </summary>
-    private void UpdateTile(Tile? tile, int x, int y)
+    private void UpdateTile(Tile? tile, Vector2I position)
     {
-        SetTerrain([new(x, y)], tile?.Type);
+        SetTerrain([position], tile?.Type);
     }
 
     private void LoadChunk(int chunkx, int chunky, IChunk chunk)
