@@ -2,7 +2,7 @@ using Godot;
 
 namespace OpenTrenches.Common.Resources;
 
-public static class Materials
+public static class MaterialLibrary
 {
     public static readonly StandardMaterial3D RedDebug = new()
     {

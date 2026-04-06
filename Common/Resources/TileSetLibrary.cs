@@ -1,5 +1,6 @@
 using Godot;
-using System;
+
+namespace OpenTrenches.Common.Resources;
 
 public static class TileSetLibrary
 {

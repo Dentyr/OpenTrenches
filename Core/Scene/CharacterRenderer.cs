@@ -42,8 +42,8 @@ public partial class CharacterRenderer : Area2D
 
         AddChild(new MeshInstance2D()
         {
-            Mesh = Meshes.Dirt,
-            Material = OnPlayerTeam ? Materials.WhiteDebug : Materials.RedDebug,
+            Mesh = MesheLibrary.Dirt,
+            Material = OnPlayerTeam ? MaterialLibrary.WhiteDebug : MaterialLibrary.RedDebug,
         });
         AddChild(new CollisionShape2D()
         {

@@ -2,7 +2,7 @@ using Godot;
 
 namespace OpenTrenches.Common.Resources;
 
-public static class Meshes
+public static class MesheLibrary
 {
     public static class Terrain
     {
