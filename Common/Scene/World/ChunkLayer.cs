@@ -44,16 +44,23 @@ public partial class ChunkLayer : Node2D
 
 
         // Initializing defaults
-
-        int cellSizeX = ChunkGrid.SizeX * CommonDefines.ChunkSize;
-        int cellSizeY = ChunkGrid.SizeY * CommonDefines.ChunkSize;
-
-        // Initializing terrain
+        Initializefill();
+        InitializeBorder();
+        InitializeChunks(Source);
 
 
-        for (int x = 0; x < cellSizeX; x ++)
+
+    }
+    /// <summary>
+    /// Fills the tilemaps with their default tiles
+    /// </summary>
+    private void Initializefill()
+    {
+        int cellsX = Source.SizeX * CommonDefines.ChunkSize;
+        int cellsY = Source.SizeY * CommonDefines.ChunkSize;
+        for (int x = 0; x < cellsX; x ++)
         {
-            for (int y = 0; y < cellSizeY; y ++)
+            for (int y = 0; y < cellsY; y ++)
             {
                 Vector2I cell = new(x, y);
                 GrassLayer.SetCell(cell, TileSetDefines.DefualtTerrainAtlasID, TileSetDefines.FillAtlasPosition);
@@ -61,42 +68,52 @@ public partial class ChunkLayer : Node2D
             }
             
         }
+    }
+    /// <summary>
+    /// Sets the border surrounding the tilemap
+    /// </summary>
+    private void InitializeBorder()
+    {
+        int cellsX = Source.SizeX * CommonDefines.ChunkSize;
+        int cellsY = Source.SizeY * CommonDefines.ChunkSize;
 
         //Initizing border
-        List<Vector2I> border = new((cellSizeX + 2) * (cellSizeY + 2));
-        for (int x = -1; x < cellSizeX + 1; x ++)
+        List<Vector2I> border = new((cellsX + 2) * (cellsY + 2));
+        for (int x = -1; x < cellsX + 1; x ++)
         {
             border.Add(new(x, -1));
-            border.Add(new(x, cellSizeY));
+            border.Add(new(x, cellsY));
         }
-        for (int y = -1; y < cellSizeY + 1; y ++)
+        for (int y = -1; y < cellsY + 1; y ++)
         {
             border.Add(new(-1, y));
-            border.Add(new(cellSizeX, y));
+            border.Add(new(cellsX, y));
         }
         WallLayer.SetCellsTerrainConnect([..border], 0, 0);
         GrassLayer.SetCellsTerrainConnect([..border], 0, 0);
         TrenchLayer.SetCellsTerrainConnect([..border], 0, 1);
-
-
-
-
+    }
+    /// <summary>
+    /// Initializes the additional constructions from <paramref name="chunks"/>, such as trenches, and implements.
+    /// </summary>
+    private void InitializeChunks(ChunkArray2D chunks)
+    {
         // Load chunk states
-        for (int x = 0; x < ChunkGrid.SizeX; x ++) 
+        for (int x = 0; x < chunks.SizeX; x ++) 
         {
-            for (int y = 0; y < ChunkGrid.SizeY; y ++) 
+            for (int y = 0; y < chunks.SizeY; y ++) 
             {
-                Initialize(x, y, ChunkGrid[x, y]);
+                IChunk chunk = chunks[x, y];
+
+                LoadChunk(x, y, chunk);
+                chunk.TerrainChangeEvent += UpdateTile;
             }
         }
     }
 
-    private void Initialize(int x, int y, IChunk chunk)
-    {
-        LoadChunk(x, y, chunk);
-        chunk.TerrainChangeEvent += UpdateTile;
-    }
-
+    /// <summary>
+    /// Updates the tiles at <paramref name="x"/> and <paramref name="y"/> to match <paramref name="tile"/>
+    /// </summary>
     private void UpdateTile(Tile? tile, int x, int y)
     {
         SetTerrain([new(x, y)], tile?.Type);
@@ -127,18 +144,6 @@ public partial class ChunkLayer : Node2D
         }
         SetTerrain([..TrenchTerrain], TileType.Trench);
         // GrassLayer.SetCellsTerrainConnect([..Terrains[terrainset]], 0, terrainset);
-    }
-    /// <summary>
-    /// Returns the tile map layer index associated with the tile type.
-    /// A number between 0 and 1 inclusive
-    /// </summary>
-    private int GetTerrainFromTile(TileType? type)
-    {
-        return type switch
-        {
-            TileType.Trench => 1,
-            _ => 0,
-        };
     }
 
     private void SetTerrain(Godot.Collections.Array<Vector2I> points, TileType? type)
