@@ -39,19 +39,6 @@ public partial class CharacterRenderer : Area2D
         _sprite = new();
         AddChild(_sprite);
         _sprite.Texture = TextureLibrary2D.Character.DefaultCharacter;
-
-        AddChild(new MeshInstance2D()
-        {
-            Mesh = MesheLibrary.Dirt,
-            Material = OnPlayerTeam ? MaterialLibrary.WhiteDebug : MaterialLibrary.RedDebug,
-        });
-        AddChild(new CollisionShape2D()
-        {
-            Shape = new RectangleShape2D()
-            {
-                Size = new(1, 1),
-            }
-        });
     }
 
     public override void _Process(double delta)
