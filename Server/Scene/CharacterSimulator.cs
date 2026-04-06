@@ -26,14 +26,8 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         Character.Position = Position / CommonDefines.CellSize;
     }
 
-    private IWorldSimulator World { get; } 
-    IWorldSimulator ICharacterAdapter.World => World;
-
-    public CharacterSimulator(Character Character, IWorldSimulator World)
+    public CharacterSimulator(Character Character)
     {
-        //* World DI
-        this.World = World;
-
         //* character
         this.Character = Character;
         // convert local position to cell location

@@ -41,39 +41,6 @@ public class ChunkArray2D : IChunkArray2D
     }
 
 
-    public bool Build(int x, int y, TileType buildTarget, float progress)
-    {
-        // only proceed if position is valid
-        if (TryGetTile(x, y, out Tile? tile))
-        {
-            if (tile is null)
-            {   //if no tile exists at position, make one with a build status.
-                tile = new(TileType.Clear, -1, new BuildStatus(buildTarget, progress));
-                return TrySetTile(x, y, tile);
-            }
-            else if (tile.Type == buildTarget) return false; // already constructed, no further action
-            else if (tile.Building is BuildStatus status) 
-            {   // If build status is not null, make progress on building status if the target is the same
-                if (status.BuildTarget == buildTarget && status.BuildProgress < 1)
-                {
-                    status.BuildProgress += progress;
-                    if (status.BuildProgress > 1) 
-                        return TrySetTile(x, y, new(tile.Building.BuildTarget, 100)); //TODO temp HP value of 100
-                    else Updates.Enqueue(WorldGridAttributeUpdateDTO.CreateBuildProgress(x, y, status.BuildProgress));
-                    return true;
-                }
-                else return false;
-            }
-            else
-            {   // if a tile exists, isn't the build target, and can be built, 
-                tile = new(TileType.Clear, -1, new BuildStatus(buildTarget, progress));
-                return TrySetTile(x, y, tile);
-            }
-        }
-
-        return false;
-    }
-
     //* Tile changes
     //*
 

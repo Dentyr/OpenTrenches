@@ -6,9 +6,6 @@ namespace OpenTrenches.Server.Scripting.Player;
 
 public interface ICharacterAdapter
 {
-    IWorldSimulator World { get; } 
-    
-
     /// <summary>
     /// Simulates this character shooting at <paramref name="target"/>
     /// </summary>
