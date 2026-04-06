@@ -18,17 +18,18 @@ public partial class WorldNode : Node3D, IWorldSimulator
 
     public WorldNode(ServerState serverState)
     {
+        ChunkLayer = new(serverState.Chunks)
+        {
+            Name = "Chunks",
+        };
+        AddChild(ChunkLayer);
+        
         CharacterLayer = new()
         {
             Name = "Characters",
         };
         AddChild(CharacterLayer);
 
-        ChunkLayer = new(serverState.Chunks)
-        {
-            Name = "Chunks",
-        };
-        AddChild(ChunkLayer);
 
         
         foreach (Character character in serverState.Characters.Values) AddCharacter(character); 
