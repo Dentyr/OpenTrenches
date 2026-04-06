@@ -88,9 +88,8 @@ public partial class KeyboardListener : Node
             case Key.E: // build
                 if (keyEvent.Pressed && Character is not null)
                 {
-                    
                     // set targetted cell to current location
-                    Vector2I cell = new ((int)(Character.Position.X / CommonDefines.CellSize), (int)(Character.Position.Y / CommonDefines.CellSize));
+                    Vector2I cell = new ((int)Character.Position.X, (int)Character.Position.Y);
                     // If below ground (in trench) set cell to be an adjacent cell based on direction
                     if (Character.Position.Y < CommonDefines.TrenchThresholdY)
                     {
