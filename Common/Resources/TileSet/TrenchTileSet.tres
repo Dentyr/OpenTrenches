@@ -1,9 +1,10 @@
-[gd_resource type="TileSet" format=3 uid="uid://cb2am2dcjh7qv"]
+[gd_resource type="TileSet" format=3 uid="uid://wa5u0pw66xoh"]
 
-[ext_resource type="Texture2D" uid="uid://pplo6ws8t0y2" path="res://Common/Resources/Img/Atlas/WallGen.png" id="1_lmshm"]
+[ext_resource type="Texture2D" uid="uid://cx3w3a6rbuvyt" path="res://Common/Resources/Img/Atlas/TrenchGen.png" id="1_7ulv2"]
+[ext_resource type="Texture2D" uid="uid://jttill3agxot" path="res://Common/Resources/Img/Atlas/TrenchAside.png" id="2_7ulv2"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_732w2"]
-texture = ExtResource("1_lmshm")
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7ulv2"]
+texture = ExtResource("1_7ulv2")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 0:0/0/terrain_set = 0
@@ -382,11 +383,36 @@ texture_region_size = Vector2i(32, 32)
 8:4/0/terrains_peering_bit/left_side = 0
 8:4/0/terrains_peering_bit/top_side = 0
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_sjdeg"]
+texture = ExtResource("2_7ulv2")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:1/0 = 0
+2:1/0/terrain_set = 0
+2:2/0 = 0
+2:2/0/terrain_set = 0
+1:2/0 = 0
+1:2/0/terrain_set = 0
+1:1/0 = 0
+1:1/0/terrain_set = 0
+0:1/0 = 0
+0:1/0/terrain_set = 0
+0:2/0 = 0
+0:2/0/terrain_set = 0
+
 [resource]
 tile_size = Vector2i(32, 32)
-physics_layer_0/collision_layer = 2147483648
+physics_layer_0/collision_layer = 16
 physics_layer_0/collision_mask = 0
 terrain_set_0/mode = 0
-terrain_set_0/terrain_0/name = "Wall"
-terrain_set_0/terrain_0/color = Color(0.59607846, 0.3882353, 0, 1)
-sources/1 = SubResource("TileSetAtlasSource_732w2")
+terrain_set_0/terrain_0/name = "Trench"
+terrain_set_0/terrain_0/color = Color(0.8840467, 0.75466365, 0.42115733, 1)
+terrain_set_0/terrain_1/name = "Topsoil"
+terrain_set_0/terrain_1/color = Color(0.5, 0.4375, 0.25, 1)
+sources/1 = SubResource("TileSetAtlasSource_7ulv2")
+sources/101 = SubResource("TileSetAtlasSource_sjdeg")
