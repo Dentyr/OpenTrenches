@@ -193,17 +193,18 @@ public class Character : IIdObject
             && _primarySlot.CanFire()
         ) {
             // human recoil spread
-            var aimTarget = Position + (
+
+            // Vector going in the direction of the bullet
+            var aimVector = 
                 (Direction - Position)
                     .Spread(_primarySlot.Recoil)
                     .Normalized() 
-                * firearm.Stats.ProjectileDistance
-            );
+                * firearm.Stats.ProjectileDistance;
             for (int i = 0; i < firearm.Stats.ProjectilesPerShot; i ++)
             {
                 
-                // machien spread
-                var kineticTarget = aimTarget;
+                // machine spread
+                var kineticTarget = aimVector;
                 // var kineticTarget = aimTarget.BoxSpread(firearm.Stats.SpreadMOA);
                 // var kineticTarget = Position + (
                 //     (Direction - Position)
@@ -212,7 +213,7 @@ public class Character : IIdObject
                 //     * firearm.Stats.ProjectileDistance
                 // );
                 
-                FireHitResult result = adapter.AdaptFire(kineticTarget);
+                FireHitResult result = adapter.AdaptFire(Position + aimVector);
                 if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
                 FireEvent?.Invoke(this, result.Position);

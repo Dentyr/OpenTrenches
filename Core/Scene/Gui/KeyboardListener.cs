@@ -45,21 +45,13 @@ public partial class KeyboardListener : Node
     }
     public override void _Process(double delta)
     {
-        Vector2 mousePos = GetViewport().GetMousePosition();
-
-        // 3D logic:
-        // // Project point in screen to world origin and direction
-        // Vector3 origin = camera.ProjectRayOrigin(mousePos);
-        // Vector3 direction = camera.ProjectRayNormal(mousePos);
-
-        // // From the ray projection, find the position level to the character.
-        // Vector3 intersect = FindIntersect(origin, direction, Character?.Position.Y ?? 0);
-        // this.MPos = new(intersect.X, intersect.Z);
-
-        if (Character is not null) 
-            MPos = Character.Position + mousePos - (GetViewport().GetVisibleRect().Size / 2f);
-
-        
+        // Camera offset of viewport + mosue position - half the screen size, divided by cell size
+        Viewport viewport = GetViewport();
+        if (viewport.GetCamera2D() is Camera2D camera)
+        {
+            var localpos = camera.GlobalPosition + viewport.GetMousePosition() - (viewport.GetVisibleRect().Size / 2f);
+            MPos = localpos / CommonDefines.CellSize;
+        }
     }
     /// <summary>
     /// Returns where the line from <paramref name="origin"/> to <paramref name="direction"/> intersects y=<paramref name="targetY"/>, or origin if close to a parallel line.

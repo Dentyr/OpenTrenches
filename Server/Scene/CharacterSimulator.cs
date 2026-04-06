@@ -71,19 +71,31 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
 
     FireHitResult ICharacterAdapter.AdaptFire(Vector2 target)
     {
+        // move from logical space to engine space
+        target *= CommonDefines.CellSize;
         var hits = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
         {
-            From = Character.Position,
+            From = Position,
             To = target,
-            CollisionMask = SceneDefines.Map.CharacterLayer, //TODO make it interact with ground layer if shot from inside a trench
+            CollisionMask = SceneDefines.Map.GroundObjectLayer | SceneDefines.Map.BarrierLayer, //TODO make it interact with ground layer if shot from inside a trench
         });
         // hit nothing
         if (hits.Count == 0) return new FireHitResult.Miss(target);
-        // hit character
-        else if (hits[SceneDefines.PhysicsKey.Collider].AsGodotObject() is CharacterSimulator hitsim)
-            return new FireHitResult.Hit(hits[SceneDefines.PhysicsKey.Position].AsVector2(), hitsim.Character);
-        // hit something else
-        return new FireHitResult.Miss(hits[SceneDefines.PhysicsKey.Position].AsVector2());
+        else
+        {
+            //if hit something
+            GodotObject hitObject = hits[SceneDefines.PhysicsKey.Collider].AsGodotObject();
+
+            // Hit position in logical space;
+            var hitPos = hits[SceneDefines.PhysicsKey.Position].AsVector2() / CommonDefines.CellSize;
+
+            // hit character
+            if (hitObject is CharacterSimulator hitsim)
+                return new FireHitResult.Hit(hitPos, hitsim.Character);
+            // hit something else
+            else 
+                return new FireHitResult.Miss(hitPos);
+        }
     }
 
     /// <summary>
@@ -101,7 +113,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
     /// </summary>
     private void Activate()
     {
-        CollisionLayer = SceneDefines.Map.CharacterLayer;
+        CollisionLayer = SceneDefines.Map.GroundObjectLayer;
         CollisionMask = SceneDefines.Map.TrenchTileLayer | SceneDefines.Map.BarrierLayer;
         SetPhysicsProcess(true);
     }
