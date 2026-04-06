@@ -198,13 +198,13 @@ public class Character : IIdObject
             var aimVector = 
                 (Direction - Position)
                     .Spread(_primarySlot.Recoil)
-                    .Normalized() 
-                * firearm.Stats.ProjectileDistance;
+                    .Normalized();
             for (int i = 0; i < firearm.Stats.ProjectilesPerShot; i ++)
             {
                 
                 // machine spread
-                var kineticTarget = aimVector;
+                // var kineticTarget = aimVector;                
+                var kineticTarget = aimVector.Spread(firearm.Stats.SpreadMOA) * firearm.Stats.ProjectileDistance;
                 // var kineticTarget = aimTarget.BoxSpread(firearm.Stats.SpreadMOA);
                 // var kineticTarget = Position + (
                 //     (Direction - Position)
@@ -213,7 +213,7 @@ public class Character : IIdObject
                 //     * firearm.Stats.ProjectileDistance
                 // );
                 
-                FireHitResult result = adapter.AdaptFire(Position + aimVector);
+                FireHitResult result = adapter.AdaptFire(Position + kineticTarget);
                 if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
                 FireEvent?.Invoke(this, result.Position);
