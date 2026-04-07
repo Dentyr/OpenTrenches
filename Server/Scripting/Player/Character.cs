@@ -26,9 +26,14 @@ public class Character : IIdObject
 
     //* State in World
     
-    public Vector2 Position { get; set; } = new (0, 0);
+    private readonly UpdateableProperty<Vector2> _position;
+    public Vector2 Position
+    {
+        get => _position.Value;
+        set => _position.Value = value;
+    }
 
-    private readonly UpdateableProperty<Vector2> _direction = new(Vector2.Zero);
+    private readonly UpdateableProperty<Vector2> _direction;
     /// <summary>
     /// The location this character is looking towards
     /// </summary>
@@ -51,7 +56,7 @@ public class Character : IIdObject
         MovementVelocity = direction.Normalized() * 7f;
     }
 
-    private UpdateableProperty<CharacterState> _state = new(CharacterState.Idle); 
+    private UpdateableProperty<CharacterState> _state; 
     public CharacterState State
     { 
         get => _state.Value;
@@ -59,7 +64,7 @@ public class Character : IIdObject
     }
 
     //* Combat status
-    private readonly UpdateableProperty<float> _health = new();
+    private readonly UpdateableProperty<float> _health;
     public float Health 
     { 
         get => _health;
@@ -67,7 +72,7 @@ public class Character : IIdObject
     }
 
 
-    private readonly UpdateableProperty<int> _logistics = new(100); //TODO debug logi
+    private readonly UpdateableProperty<int> _logistics; //TODO debug logi
     public int Logistics
     {
         get => _logistics.Value;
@@ -95,7 +100,7 @@ public class Character : IIdObject
     public event Action<Character, Vector2>? FireEvent;
     public event Action<Character>? ReloadEvent;
 
-    
+
     //TODO Update stats to be more modular
 
     private float _baseDefense { get; set; } = 0;
@@ -117,12 +122,42 @@ public class Character : IIdObject
     public TileType BuildTarget { get; private set; }
     public Vector2I BuildCell { get; private set; }
 
+    //* Update events
+    /// <summary>
+    /// Update for the character's state, publicly visible
+    /// </summary>
+    public event Action<AbstractUpdateDTO>? CharacterUpdateEvent;
+    /// <summary>
+    /// Update for the player's state, should only be visible to controller
+    /// </summary>
+    public event Action<AbstractUpdateDTO>? PlayerUpdateEvent;
+
+    private void PropagateUpdate<T>(CharacterAttribute type, T value)
+        => CharacterUpdateEvent?.Invoke(new CharacterUpdateDTO(type, Serialization.Serialize(value), ID));
+
+    private void PropagateUpdate<T>(PlayerAttribute type, T value)
+        => CharacterUpdateEvent?.Invoke(new PlayerUpdateDTO(type, Serialization.Serialize(value)));
+
+    private void PropagateUpdate(FirearmSlotAttribute type, byte[] payload)
+        => PlayerUpdateEvent?.Invoke(new FirearmSlotUpdateDTO(type, payload));
 
     public Character(IServerState ServerState, ushort ID, Team Team)
     {
         this.ServerState = ServerState;
         this.ID = ID;
         this.Team = Team;
+
+        //* Initializing shared props
+        _position = new(x => PropagateUpdate(CharacterAttribute.Position, x));
+        _direction = new(x => PropagateUpdate(CharacterAttribute.Direction, x));
+        _state = new(CharacterState.Idle, x => PropagateUpdate(CharacterAttribute.State, x));
+        _health = new(x => PropagateUpdate(CharacterAttribute.Health, x));
+
+        _primarySlot.EquipmentUpdateEvent += x => PropagateUpdate(CharacterAttribute.PrimarySlot, x);
+
+        //* Initializing player props
+        _primarySlot.AttributeChangedEvent += PropagateUpdate;
+        _logistics = new(100, x => PropagateUpdate(PlayerAttribute.Logistics, x));
 
         Respawn();
     }
@@ -289,62 +324,6 @@ public class Character : IIdObject
 
     //* Updates
 
-    public CharacterUpdateDTO GetUpdate(CharacterAttribute type)
-    {
-        byte[]? payload = null;
-        switch (type)
-        {
-            case CharacterAttribute.Position:
-                payload = Serialization.Serialize(Position);
-                break;
-            case CharacterAttribute.Health:
-                payload = Serialization.Serialize(Health);
-                break;
-            case CharacterAttribute.Direction:
-                payload = Serialization.Serialize(Direction);
-                break;
-            case CharacterAttribute.State:
-                payload = Serialization.Serialize(State);
-                break;
-            case CharacterAttribute.PrimarySlot:
-                payload = Serialization.Serialize(_primarySlot.EquipmentEnum);
-                break;
-        }
-        if (payload is null) throw new Exception();
-        return new CharacterUpdateDTO(type, payload, ID);
-    }
-    public PlayerUpdateDTO GetUpdate(PlayerAttribute type)
-    {
-        byte[]? payload = null;
-        switch (type)
-        {
-            case PlayerAttribute.Logistics:
-                payload = Serialization.Serialize(Logistics);
-                break;
-        }
-        if (payload is null) throw new Exception();
-        return new PlayerUpdateDTO(type, payload);
-    }
-
-    /// <summary>
-    /// Polls updates that should be shown to all players
-    /// </summary>
-    public IEnumerable<AbstractUpdateDTO> PollUpdates()
-    {
-        if (_health.PollChanged())      yield return GetUpdate(CharacterAttribute.Health);
-        if (_direction.PollChanged())   yield return GetUpdate(CharacterAttribute.Direction);
-        if (_state.PollChanged())       yield return GetUpdate(CharacterAttribute.State);
-
-        if (_primarySlot.PollEquipmentUpdate()) yield return GetUpdate(CharacterAttribute.PrimarySlot);
-    }
-    /// <summary>
-    /// Updates that should only be seen by the player associated with this character
-    /// </summary>
-    public IEnumerable<AbstractUpdateDTO> PollPlayerUpdates()
-    {
-        if (_logistics.PollChanged()) yield return GetUpdate(PlayerAttribute.Logistics);
-        foreach( var kvp in _primarySlot.PollUpdates() ) yield return new FirearmSlotUpdateDTO(kvp.Key, kvp.Value);
-    }
 
     public void SetBuildTarget(int x, int y, TileType tile)
     {

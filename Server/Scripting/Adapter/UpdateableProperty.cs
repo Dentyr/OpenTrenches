@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
@@ -12,27 +13,18 @@ public class UpdateableProperty<T>
         get => _value;
         set
         {
-            if(!EqualityComparer<T>.Default.Equals(_value, value)) _changed = true;
+            if(!EqualityComparer<T>.Default.Equals(_value, value)) UpdatedEvent?.Invoke(value);
             _value = value;
         }
     }
-    private bool _changed;
+    private event Action<T> UpdatedEvent;
 
-    public UpdateableProperty() : this(default!) {}
-    public UpdateableProperty(T Value)
+    public UpdateableProperty(Action<T> UpdateEvent) : this(default!, UpdateEvent) {}
+
+    public UpdateableProperty(T Value, Action<T> UpdateEvent)
     {
         _value = Value;
-        _changed = false;
-    }
-
-    public bool PollChanged() 
-    {
-        if (_changed)
-        {
-            _changed = false;
-            return true;
-        }
-        return false;
+        UpdatedEvent = UpdateEvent;
     }
     
     public static implicit operator T(UpdateableProperty<T> prop) => prop.Value;

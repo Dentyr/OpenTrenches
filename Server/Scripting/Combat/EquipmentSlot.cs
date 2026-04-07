@@ -10,22 +10,21 @@ public abstract class EquipmentSlot<T> : IReadOnlyEquipmentSlot<T> where T : str
 
 
     #region equipment property
-    private UpdateableProperty<T?> _equipment = new();
-    public bool PollEquipmentUpdate() => _equipment.PollChanged();
+    private UpdateableProperty<T?> _equipment;
+    public event Action<T?>? EquipmentUpdateEvent;
     public T? EquipmentEnum
     {
         get => _equipment.Value;
         protected set => _equipment.Value = value;
     }
 
-
-    // notification event
-    public event Action<FirearmType?>? SlotValueChangedEvent; 
     #endregion
 
 
     protected EquipmentSlot(EquipmentCategory category, T equipment)
     {
+        _equipment = new(x => EquipmentUpdateEvent?.Invoke(x));
+
         Category = category;
         EquipmentEnum = equipment;
     }

@@ -51,6 +51,10 @@ public partial class GameRoot : Node
         //* events
         GameState.CharacterAddedEvent += World.AddCharacter;
         GameState.CharacterAddedEvent += BroadcastCharacter;
+        GameState.CharacterAddedEvent += character =>
+        {
+            character.CharacterUpdateEvent += NetworkAdapter.Send;
+        };
 
         //* Initialization
         for (int i = 0; i < 100; i ++)
@@ -104,17 +108,6 @@ public partial class GameRoot : Node
         NetworkAdapter.Poll();
 
         //* player updates
-        // outgoing updates
-        foreach(Character character in GameState.Characters.Values)
-        {
-            NetworkAdapter.Send(character.GetUpdate(CharacterAttribute.Position));
-            foreach(AbstractUpdateDTO update in character.PollUpdates()) NetworkAdapter.Send(update);
-        }
-        // player specific message; shown to respective player only
-        foreach(PlayerNetworkHandler player in _players)
-        {
-            foreach(AbstractUpdateDTO update in player.Character.PollPlayerUpdates()) player.Adapter.Send(update);
-        }
 
         // outgoing messages
         foreach (AbstractCommandDTO command in GameState.PollEvents()) NetworkAdapter.Send(command);

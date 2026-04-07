@@ -23,6 +23,7 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         this.GameState = GameState;
         Character = GameState.CreateCharacter();
         Character.ReloadEvent += HandleReload;
+        Character.PlayerUpdateEvent += Adapter.Send;
     }
 
     private void HandleReload(Character character)
