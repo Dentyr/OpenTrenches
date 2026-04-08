@@ -17,7 +17,19 @@ public class UpdateableProperty<T>
             _value = value;
         }
     }
-    private event Action<T> UpdatedEvent;
+    /// <summary>
+    /// Returns true if the property was changed, false if it stayed the same
+    /// </summary>
+    public bool Set(T value)
+    {
+        if(EqualityComparer<T>.Default.Equals(_value, value)) 
+            return false;
+        
+        _value = value;
+        UpdatedEvent?.Invoke(value);
+        return true;
+    }
+    private readonly Action<T> UpdatedEvent;
 
     public UpdateableProperty(Action<T> UpdateEvent) : this(default!, UpdateEvent) {}
 
