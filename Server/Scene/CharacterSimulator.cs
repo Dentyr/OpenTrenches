@@ -3,6 +3,7 @@ using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Resources;
+using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scene.World;
@@ -35,6 +36,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         
         Character.DiedEvent += Deactivate;
         Character.RespawnEvent += Activate;
+        Character.LayerChangedEvent += SetCollisionLayer;
 
         //* collision
         AddChild(new CollisionShape2D()
@@ -107,8 +109,27 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
     /// </summary>
     private void Activate()
     {
-        CollisionLayer = SceneDefines.Map.GroundObjectLayer;
-        CollisionMask = SceneDefines.Map.TrenchTileLayer | SceneDefines.Map.BarrierLayer;
         SetPhysicsProcess(true);
+        SetCollisionLayer(Character.Layer);
+    }
+
+    /// <summary>
+    /// Sets collision layer and mask to the appropriate values, if processing physics
+    /// </summary>
+    /// <param name="layer"></param>
+    private void SetCollisionLayer(WorldLayer layer)
+    {
+        if (!IsPhysicsProcessing()) return;
+        switch (layer)
+        {
+            case WorldLayer.Ground:
+                CollisionLayer = SceneDefines.Map.GroundObjectLayer;
+                CollisionMask = SceneDefines.Map.BarrierLayer;
+                break;
+            case WorldLayer.Trench:
+                CollisionLayer = SceneDefines.Map.TrenchObjectLayer;
+                CollisionMask = SceneDefines.Map.GroundTileLayer | SceneDefines.Map.BarrierLayer;
+                break;
+        }
     }
 }

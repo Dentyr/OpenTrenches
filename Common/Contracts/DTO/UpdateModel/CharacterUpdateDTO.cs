@@ -18,6 +18,7 @@ public enum CharacterAttribute : byte
     Direction,
     Health,
     State,
+    Layer,
 
     PrimarySlot,
 }

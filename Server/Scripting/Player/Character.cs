@@ -33,6 +33,17 @@ public class Character : IIdObject
         set => _position.Value = value;
     }
 
+    private readonly UpdateableProperty<WorldLayer> _layer;
+    public WorldLayer Layer
+    {
+        get => _layer.Value;
+        private set 
+        {
+            if (_layer.Set(value)) LayerChangedEvent?.Invoke(value);
+        }
+    }
+    public event Action<WorldLayer>? LayerChangedEvent;
+
     private readonly UpdateableProperty<Vector2> _direction;
     /// <summary>
     /// The location this character is looking towards
@@ -152,6 +163,8 @@ public class Character : IIdObject
         _direction = new(x => PropagateUpdate(CharacterAttribute.Direction, x));
         _state = new(CharacterState.Idle, x => PropagateUpdate(CharacterAttribute.State, x));
         _health = new(x => PropagateUpdate(CharacterAttribute.Health, x));
+        _layer = new(x => PropagateUpdate(CharacterAttribute.Layer, x));
+
 
         _primarySlot.EquipmentUpdateEvent += x => PropagateUpdate(CharacterAttribute.PrimarySlot, x);
 
@@ -218,8 +231,14 @@ public class Character : IIdObject
             else CancelTask();
         }
 
-        //* Position
-        if (Position.Y < -10) Health = 0;
+        //* Position changes
+        // Drop to lower level if on ground level, but current cell is trench level
+        if (Layer == WorldLayer.Ground 
+            && ServerState.Chunks.TryGetTile(GetCell(), out Tile? current) 
+            && current?.Type == TileType.Trench)
+        {
+            Layer = WorldLayer.Trench;
+        }
     }
     private void TryFire(ICharacterAdapter adapter)
     {
