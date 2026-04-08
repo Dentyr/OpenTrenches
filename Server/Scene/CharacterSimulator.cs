@@ -41,7 +41,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         {
             Shape = new CircleShape2D()
             {
-                Radius = 16,
+                Radius = 12,
             }
         });
         Activate();

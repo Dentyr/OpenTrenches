@@ -36,9 +36,12 @@ public partial class CharacterRenderer : Area2D
         _floatLabel = new(Character);
         AddChild(_floatLabel);
 
-        _sprite = new();
+        _sprite = new()
+        {
+            Texture = TextureLibrary2D.Character.DefaultCharacter
+        };
+        _sprite.Scale = new Vector2(24f, 24f) / _sprite.Texture.GetSize();
         AddChild(_sprite);
-        _sprite.Texture = TextureLibrary2D.Character.DefaultCharacter;
     }
 
     public override void _Process(double delta)
