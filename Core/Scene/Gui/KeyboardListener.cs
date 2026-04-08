@@ -8,6 +8,7 @@ using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
+using OpenTrenches.Common.World;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Player;
 
@@ -90,8 +91,8 @@ public partial class KeyboardListener : Node
                 {
                     // set targetted cell to current location
                     Vector2I cell = new ((int)Character.Position.X, (int)Character.Position.Y);
-                    // If below ground (in trench) set cell to be an adjacent cell based on direction
-                    if (Character.Position.Y < CommonDefines.TrenchThresholdY)
+                    // If in trench set cell to be an adjacent cell based on direction
+                    if (Character.Layer == WorldLayer.Trench)
                     {
                         Vector2 dir = MPos - Character.Position;
 

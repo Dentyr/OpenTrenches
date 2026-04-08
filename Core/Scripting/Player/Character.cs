@@ -10,6 +10,7 @@ using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
+using OpenTrenches.Common.World;
 using OpenTrenches.Core.Scripting.Combat;
 
 namespace OpenTrenches.Core.Scripting.Player;
@@ -26,7 +27,9 @@ public class Character : IIdObject
 
     //* World
 
-    public Vector2 Position { get; set; }
+    public Vector2 Position { get; private set; }
+
+    public WorldLayer Layer { get; private set; }
 
 
     //* combat
@@ -121,6 +124,9 @@ public class Character : IIdObject
                 break;
             case CharacterAttribute.PrimarySlot:
                 Primary = Serialization.Deserialize<FirearmEnum>(update.Payload);
+                break;
+            case CharacterAttribute.Layer:
+                Layer = Serialization.Deserialize<WorldLayer>(update.Payload);
                 break;
         }
     }
