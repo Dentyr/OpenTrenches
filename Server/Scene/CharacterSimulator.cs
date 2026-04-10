@@ -121,8 +121,9 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         // ensure space is unoccupied
         var occupationHits = GetViewport().World2D.DirectSpaceState.IntersectShape(new PhysicsShapeQueryParameters2D()
         {
-            Transform = new(Vector2.Zero, Vector2.One, targetPosition),
+            Transform = new(Vector2.Right, Vector2.Down, targetPosition),
             Shape = new CircleShape2D() { Radius = CommonDefines.CharacterSize / 2 }, // TODO make runtime constant
+            // Modify for collision later
             CollisionMask = SceneDefines.Map.BarrierLayer,
         });
 
