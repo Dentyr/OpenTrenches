@@ -73,7 +73,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         {
             From = Position,
             To = target,
-            CollisionMask = SceneDefines.Map.GroundObjectLayer | SceneDefines.Map.BarrierLayer, //TODO make it interact with ground layer if shot from inside a trench
+            CollisionMask = SceneDefines.Map.GetMask(Character.Layer),
         });
         // hit nothing
         if (hits.Count == 0) return new FireHitResult.Miss(target);

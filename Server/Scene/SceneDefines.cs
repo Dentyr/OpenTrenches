@@ -1,4 +1,5 @@
 using Godot;
+using OpenTrenches.Common.World;
 namespace OpenTrenches.Server.Scene;
 
 public static class SceneDefines
@@ -29,6 +30,18 @@ public static class SceneDefines
         /// Inaccessible area
         /// </summary>
         public const uint BarrierLayer = (uint)1 << 31;
+
+
+        /// <summary>
+        /// Mask for bullets shot at ground level
+        /// </summary>
+        public const uint BulletMaskGround = GroundObjectLayer | BarrierLayer;
+        /// <summary>
+        /// Mask for bullets shot inside a trench
+        /// </summary>
+        public const uint BulletMaskTrench = TrenchObjectLayer | GroundTileLayer | BarrierLayer;
+
+        public static uint GetMask(WorldLayer layer) => layer == WorldLayer.Ground ? BulletMaskGround : BulletMaskTrench;
         
 
 
