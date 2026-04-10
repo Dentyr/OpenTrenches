@@ -43,7 +43,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         {
             Shape = new CircleShape2D()
             {
-                Radius = 12,
+                Radius = CommonDefines.CharacterSize / 2,
             }
         });
         Activate();
@@ -92,6 +92,44 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             else 
                 return new FireHitResult.Miss(hitPos);
         }
+    }
+
+    /// <summary>
+    /// Checks for a ground tile nearby in <paramref name="direction"/>, and if unoccupied, returns the position in game position
+    /// </summary>
+    /// <returns></returns>
+    public Vector2? AdaptJump(Vector2 direction)
+    {
+        direction = direction.Normalized();
+        var target = Position + direction * CommonDefines.CellSize / 2;
+
+        // find nearest ground tile
+        var hits = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
+        {
+            From = Position,
+            To = target,
+            CollisionMask = SceneDefines.Map.GroundTileLayer,
+        });
+        if (hits.Count == 0) return null; //could not find a nearby ledge
+
+        Vector2 normal = hits[SceneDefines.PhysicsKey.Normal].AsVector2();
+        Vector2 hitlocation = hits[SceneDefines.PhysicsKey.Position].AsVector2();
+
+        // target position to move to
+        Vector2 targetPosition = hitlocation - (normal * CommonDefines.CellSize / 2);
+
+        // ensure space is unoccupied
+        var occupationHits = GetViewport().World2D.DirectSpaceState.IntersectShape(new PhysicsShapeQueryParameters2D()
+        {
+            Transform = new(Vector2.Zero, Vector2.One, targetPosition),
+            Shape = new CircleShape2D() { Radius = CommonDefines.CharacterSize / 2 }, // TODO make runtime constant
+            CollisionMask = SceneDefines.Map.BarrierLayer,
+        });
+
+        if (occupationHits.Count > 0) return null;
+        
+        // convert back to world position
+        return targetPosition / CommonDefines.CellSize;
     }
 
     /// <summary>

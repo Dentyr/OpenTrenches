@@ -44,6 +44,7 @@ public static class SceneDefines
         public const string Collider = "collider";
 
         public const string Shape = "shape";
+        public const string Normal = "normal";
 
         public const string Position = "position";
     }

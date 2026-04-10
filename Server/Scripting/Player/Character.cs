@@ -195,40 +195,63 @@ public class Character : IIdObject
         foreach (var abiltiy in this.Abilities) abiltiy.ProgressTimer(delta);
         _primarySlot.Cooldown(delta);
         
-        if (State == CharacterState.Shooting) TryFire(adapter);
 
 
         //* building
-
-        if (State == CharacterState.Building)
+        switch (State)
         {
-            if (GetCell().DistanceTo(BuildCell) > 1f) 
-            {
-                CancelTask();
-                return;
-            }
+            case CharacterState.Idle:
+                break;
+            case CharacterState.Aiming:
+                break;
+            case CharacterState.Shooting:
+                TryFire(adapter);
+                break;
+            case CharacterState.Reloading:
+                break;
+            case CharacterState.Building:
+                if (GetCell().DistanceTo(BuildCell) > 1f) 
+                {
+                    CancelTask();
+                    return;
+                }
 
-            // only proceed if position is valid
-            if (ServerState.Chunks.TryGetTile(BuildCell, out Tile? tile))
-            {
-                if (tile is null)
-                {   //if no tile exists at position, make one with a build status.
-                    ServerState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
+                // only proceed if position is valid
+                if (ServerState.Chunks.TryGetTile(BuildCell, out Tile? tile))
+                {
+                    if (tile is null)
+                    {   //if no tile exists at position, make one with a build status.
+                        ServerState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
+                    }
+                    else if (tile.Type == BuildTarget)
+                        CancelTask(); // already constructed, no further action
+                    else if (tile.Building is BuildStatus status && status.BuildTarget == BuildTarget) 
+                    {   // If build status is not null, make progress on building status if the target is the same
+                        if (ServerState.Chunks.ProgressBuild(BuildCell, delta)) CancelTask();
+                    }
+                    else if (tile.Building is null)
+                    {   // if a tile exists, isn't the build target, and can be built, 
+                        ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
+                    }
+                    else CancelTask();
                 }
-                else if (tile.Type == BuildTarget)
-                    CancelTask(); // already constructed, no further action
-                else if (tile.Building is BuildStatus status && status.BuildTarget == BuildTarget) 
-                {   // If build status is not null, make progress on building status if the target is the same
-                    if (ServerState.Chunks.ProgressBuild(BuildCell, delta)) CancelTask();
-                }
-                else if (tile.Building is null)
-                {   // if a tile exists, isn't the build target, and can be built, 
-                    ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
-                }
+
                 else CancelTask();
-            }
+                break;
+            // Jump out of trench
+            case CharacterState.Jumping:
+                State = CharacterState.Idle;
+                //Must be in trench
+                if (Layer != WorldLayer.Trench) break;
+                Vector2? target = adapter.AdaptJump(Direction - Position);
 
-            else CancelTask();
+                // can't move up because blocked or no ledge
+                if (target is null) break;
+                
+                Layer = WorldLayer.Ground;
+                Position = (Vector2)target;
+
+                break;
         }
 
         //* Position changes
@@ -380,4 +403,11 @@ public class Character : IIdObject
         }
     }
 
+    /// <summary>
+    /// Attempts to leave a trench in the current facing direction
+    /// </summary>
+    public void TryExitTrench()
+    {
+        State = CharacterState.Jumping;
+    }
 }

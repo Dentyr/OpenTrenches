@@ -7,4 +7,5 @@ public enum CharacterState
     Shooting,
     Reloading,
     Building,
+    Jumping,
 }

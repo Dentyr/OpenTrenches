@@ -13,6 +13,10 @@ public static class CommonDefines
     /// Pixels a cell spans
     /// </summary>
     public const float CellSize = 32f;
+    /// <summary>
+    /// Pixels a character spans
+    /// </summary>
+    public const float CharacterSize = 16f;
 
     public const float MaxHealth = 25f;
 }

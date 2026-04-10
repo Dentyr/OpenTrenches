@@ -99,6 +99,10 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         {
             Character.TryReload();
         }
+        else if (command is ExitTrenchCommandRequest exitTrenchRequest)
+        {
+            Character.TryExitTrench();
+        }
         else if (command is PurchaseCommandRequest purchaseRequest)
         {
             Character.TryPurchase(purchaseRequest.Equipment);

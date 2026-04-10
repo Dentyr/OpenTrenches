@@ -106,6 +106,9 @@ public partial class KeyboardListener : Node
                     _queuedCommands.Enqueue(new BuildCommandRequest(cell.X, cell.Y, TileType.Trench));
                 }
                 break;
+            case Key.Space:
+                if (keyEvent.Pressed) _queuedCommands.Enqueue(new ExitTrenchCommandRequest());
+                break;
             case Key.R:
                 if (keyEvent.Pressed) _queuedCommands.Enqueue(new ReloadCommandRequest());
                 break;
