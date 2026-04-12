@@ -28,4 +28,9 @@ public static class TextureLibrary2D
     {
         public static Texture2D DefaultCharacter = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Default.png");
     }
+
+    public static class Structure
+    {
+        public static Texture2D Camp = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Structure/Camp.png");
+    }
 }
