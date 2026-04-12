@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Common.World;
 
@@ -16,9 +14,9 @@ public partial class ChunkLayer : Node2D
 
     private readonly TileMapLayer WallLayer;
 
-    protected ChunkArray2D Source { get; }
+    protected IChunkArray2D Source { get; }
 
-    public ChunkLayer(ChunkArray2D ChunkGrid)
+    public ChunkLayer(IChunkArray2D ChunkGrid)
     {
         Source = ChunkGrid;
         Source.ChunkChangedEvent += SetChunk;
@@ -96,7 +94,7 @@ public partial class ChunkLayer : Node2D
     /// <summary>
     /// Initializes the additional constructions from <paramref name="chunks"/>, such as trenches, and implements.
     /// </summary>
-    private void InitializeChunks(ChunkArray2D chunks)
+    private void InitializeChunks(IChunkArray2D chunks)
     {
         // Load chunk states
         for (int x = 0; x < chunks.SizeX; x ++) 

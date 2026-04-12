@@ -1,5 +1,3 @@
-using OpenTrenches.Common.Contracts.DTO.UpdateModel;
-
 namespace OpenTrenches.Common.World;
 public class Tile(TileType Type, float Health, BuildStatus? Building = null)
 {

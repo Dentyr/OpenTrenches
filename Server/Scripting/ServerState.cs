@@ -13,14 +13,15 @@ using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Server.Scripting.Player;
 using OpenTrenches.Server.Scripting.Teams;
+using OpenTrenches.Server.Scripting.World;
 
 public class ServerState : IServerState
 {
     //* State
 
     //* chunks
-    public ChunkArray2D Chunks { get; } = new();
-    IChunkArray2D IServerState.Chunks => Chunks;
+    public ServerChunkArray Chunks { get; } = new();
+    IServerChunkArray IServerState.Chunks => Chunks;
     
     //TODO change ushort to be consistent with other dictionaries
     //* characters
@@ -101,5 +102,5 @@ public class ServerState : IServerState
 
 public interface IServerState
 {
-    public IChunkArray2D Chunks { get; }
+    public IServerChunkArray Chunks { get; }
 }

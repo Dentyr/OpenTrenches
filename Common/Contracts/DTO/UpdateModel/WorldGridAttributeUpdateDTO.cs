@@ -1,5 +1,6 @@
 using Godot;
 using MessagePack;
+using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
@@ -19,12 +20,6 @@ public record class WorldGridAttributeUpdateDTO(GridTilettribute Attribute, int 
     [Key(3)]
     public byte[] Payload { get; } = Payload;
 
-}
-public enum TileType : byte
-{
-    Clear = 0,
-    Trench,
-    
 }
 public enum GridTilettribute : byte
 {

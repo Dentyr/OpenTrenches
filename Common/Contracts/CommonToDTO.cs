@@ -1,6 +1,5 @@
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
-using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Common.Contracts;

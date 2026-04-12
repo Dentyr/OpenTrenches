@@ -16,6 +16,7 @@ using OpenTrenches.Common.Contracts.DTO.ServerComands;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using System.Diagnostics.CodeAnalysis;
 using OpenTrenches.Common.Combat;
+using OpenTrenches.Core.Scripting.World;
 
 namespace OpenTrenches.Core.Scripting;
 
@@ -67,7 +68,7 @@ public sealed class ClientState : IClientState
     }
 
     //* 
-    public ChunkArray2D Chunks { get; } = new(); //TODO send required size in create message
+    public ClientChunkArray Chunks { get; } = new(); //TODO send required size in create message
 
 
     private readonly Dictionary<int, ClientTeam> _teams = [];

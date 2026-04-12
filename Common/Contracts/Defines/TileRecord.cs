@@ -1,5 +1,5 @@
 using MessagePack;
-using OpenTrenches.Common.Contracts.DTO.UpdateModel;
+using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Common.Contracts.Defines;
 
