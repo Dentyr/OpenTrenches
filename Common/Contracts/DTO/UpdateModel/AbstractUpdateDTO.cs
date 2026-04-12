@@ -8,6 +8,7 @@ namespace OpenTrenches.Common.Contracts.DTO.UpdateModel;
 [Union(1, typeof(FirearmSlotUpdateDTO))]
 [Union(2, typeof(PlayerUpdateDTO))]
 [Union(10, typeof(WorldGridAttributeUpdateDTO))]
+[Union(11, typeof(StructureUpdateDTO))]
 public abstract record class AbstractUpdateDTO
 {
     [IgnoreMember]

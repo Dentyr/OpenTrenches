@@ -1,9 +1,9 @@
 using Godot;
 
 namespace OpenTrenches.Common.World;
-
 public class StructureType
 {
+    public StructureEnum Category { get; }
     /// <summary>
     /// The structure's profile is the rectangle of cells surrounded by begin and end
     /// </summary>
@@ -13,8 +13,9 @@ public class StructureType
     /// </summary>
     public Vector2I End { get; }
 
-    public StructureType(Vector2I Begin, Vector2I End)
+    public StructureType(StructureEnum Category, Vector2I Begin, Vector2I End)
     {
+        this.Category = Category;
         this.Begin = Begin;
         this.End = End;
     }
