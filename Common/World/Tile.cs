@@ -1,11 +1,10 @@
 namespace OpenTrenches.Common.World;
-public class Tile(TileType Type, float Health, BuildStatus? Building = null)
+public class Tile(TileType Type, BuildStatus? Building = null)
 {
     public TileType Type { get; } = Type;
-    public float Health { get; } = Health;
     public BuildStatus? Building { get; } = Building;
 
-    public override string ToString() => $"{Type}, {Health}, {Building}";
+    public override string ToString() => $"{Type}, {Building}";
 }
 
 public class BuildStatus(TileType BuildTarget, float BuildProgress)

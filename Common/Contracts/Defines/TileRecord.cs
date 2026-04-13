@@ -7,7 +7,6 @@ namespace OpenTrenches.Common.Contracts.Defines;
 [MessagePackObject]
 public record class TileRecord(
     [property: Key(0)] TileType Tile, 
-    [property: Key(1)] float Health,
     [property: Key(3)] BuildingRecord? Building
 );
 [MessagePackObject]

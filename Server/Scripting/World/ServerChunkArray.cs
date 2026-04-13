@@ -82,7 +82,7 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
             status.BuildProgress += progress;
             if (status.BuildProgress > 1)
             {
-                return TrySetTile(x, y, new(tile.Building.BuildTarget, 100)); //TODO temp HP value of 100
+                return TrySetTile(x, y, new(tile.Building.BuildTarget));
             }
             else 
             {
@@ -96,7 +96,7 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
 
     public void StartBuild(int x, int y, TileType buildTarget, float initialProgress)
     {
-        Tile tile = new(TileType.Clear, -1, new BuildStatus(buildTarget, initialProgress));
+        Tile tile = new(TileType.Clear, new BuildStatus(buildTarget, initialProgress));
         TrySetTile(x, y, tile);
     }
     public void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0) => StartBuild(buildCell.X, buildCell.Y, buildTarget, initialProgress);
