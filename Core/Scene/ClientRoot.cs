@@ -127,6 +127,7 @@ public partial class ClientRoot : Node
 
         //* Hook rendered events
         State.CharacterAddedEvent += World.AddCharacter;
+        State.StructureAddedEvent += World.AddStructure;
         State.FireEvent += World.RenderProjectile;
 
         //* Hook state changes
@@ -148,6 +149,14 @@ public partial class ClientRoot : Node
     }
     private void SetWorld(ClientState state)
     {
+        // clean previous world
+        if (World is not null)
+        {
+            var temp = World;
+            RemoveChild(World);
+            temp.QueueFree();
+        }
+
         World = new(state);
         World.DisablePhysics();
         AddChild(World);

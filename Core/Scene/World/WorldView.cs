@@ -6,6 +6,10 @@ using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scene.World;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Common.Scene.World;
+using OpenTrenches.Core.Scripting.World;
+using System;
+using OpenTrenches.Server.Scripting.World;
+using System.IO;
 
 namespace OpenTrenches.Core.Scene.World;
 
@@ -15,6 +19,10 @@ public partial class WorldView : Node2D
     //* Characters
     private readonly Dictionary<ushort, CharacterNodesRecord> _characters = [];
     private Node2D _characterLayer { get; }
+
+    //* Structure
+    private readonly Dictionary<int, StructureRenderer> _structure = [];
+    private Node2D _structureLayer { get; }
 
     //* tiles
     private ChunkLayer ChunkLayer { get; set; } = null!;
@@ -36,6 +44,12 @@ public partial class WorldView : Node2D
         AddChild(ChunkLayer);
 
         
+        _structureLayer = new()
+        {
+            Name = "Structures",
+        };
+        AddChild(_structureLayer);
+
         _characterLayer = new()
         {
             Name = "Characters",
@@ -57,6 +71,7 @@ public partial class WorldView : Node2D
 
         //* Load from state
         foreach(var chara in State.Characters.Values) AddCharacter(chara);
+        foreach(var structure in State.Chunks.StructureDict.Values) AddStructure(structure);
     }
 
 
@@ -71,6 +86,15 @@ public partial class WorldView : Node2D
             
             node.SetPhysicsProcess(ChildPhysicsEnabled);
         }
+    }
+
+    public void AddStructure(ClientStructure structure)
+    {
+        StructureRenderer renderer = new(structure);
+        _structureLayer.AddChild(renderer);
+        renderer.SetPhysicsProcess(ChildPhysicsEnabled);
+
+        _structure[structure.Id] = renderer;
     }
     public void DisablePhysics()
     {

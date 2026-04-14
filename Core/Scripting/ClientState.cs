@@ -70,6 +70,12 @@ public sealed class ClientState : IClientState
     //* 
     public ClientChunkArray Chunks { get; } = new(); //TODO send required size in create message
 
+    public event Action<ClientStructure>? StructureAddedEvent;
+
+    private void AddStructure(ClientStructure structure)
+    {
+        Chunks.AddStructure(structure);
+    }
 
     private readonly Dictionary<int, ClientTeam> _teams = [];
     public IReadOnlyDictionary<int, ClientTeam> Team => _teams;
@@ -106,9 +112,7 @@ public sealed class ClientState : IClientState
         if (dTO is CharacterDTO character) AddCharacter(FromDTO.Convert(character, this));
         else if (dTO is WorldChunkDTO chunk) Chunks.SetChunk(CommonFromDTO.Convert(chunk));
         else if (dTO is TeamDTO team) AddTeam(FromDTO.Convert(team));
-        // else if (dTO is WorldChunkDTO chunk) {
-        //     Chunks.SetChunk(CommonFromDTO.Convert(chunk));
-        // }
+        else if (dTO is StructureDTO structure) AddStructure(FromDTO.Convert(structure));
     }
     public void Receive(AbstractCommandDTO dto)
     {

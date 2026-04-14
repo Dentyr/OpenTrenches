@@ -21,6 +21,7 @@ public class Character : IIdObject
 
     public ushort ID { get; }
     public int Team { get; }
+    //TODO consider removing
     public IClientState ClientState { get; }
     public CharacterState ActionState { get; private set; }
 

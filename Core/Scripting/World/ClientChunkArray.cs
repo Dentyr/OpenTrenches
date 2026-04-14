@@ -25,6 +25,15 @@ public class ClientChunkArray : IChunkArray2D
     }
 
 
+    //* Structures
+    //*
+    private Dictionary<int, ClientStructure> _structuresDictionary = [];
+
+    public IReadOnlyDictionary<int, ClientStructure> StructureDict => _structuresDictionary;
+
+
+    public event Action<ClientStructure>? NewStructureEvent;
+
     public ClientChunkArray() { }
 
     public bool TryGetTile(int x, int y, out Tile? tile) => _chunkArray.TryGetTile(x, y, out tile);
@@ -34,6 +43,11 @@ public class ClientChunkArray : IChunkArray2D
 
     //* Networking changes interface
     //*
+
+    public void AddStructure(ClientStructure structure)
+    {
+        _structuresDictionary.Add(structure.Id, structure);
+    }
 
 
     public void Execute(SetCellCommand setCell)
