@@ -87,8 +87,8 @@ public class ServerState : IServerState
         CreateTeam(FactionEnum.StandardDebug, new(16, 50));
         CreateTeam(FactionEnum.StandardDebug, new(112, 50));
 
-        _chunks.TryBuild(new(4, 4), 0, StructureEnum.Camp);
-        _chunks.TryBuild(new(10, 10), 0, StructureEnum.Camp);
+        _chunks.TryBuild(new(4, 4), Teams[0], StructureEnum.Camp);
+        _chunks.TryBuild(new(10, 10), Teams[1], StructureEnum.Camp);
     }
 
     //* communication

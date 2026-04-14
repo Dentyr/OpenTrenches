@@ -86,8 +86,10 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             var hitPos = hits[SceneDefines.PhysicsKey.Position].AsVector2() / CommonDefines.CellSize;
 
             // hit character
-            if (hitObject is CharacterSimulator hitsim)
-                return new FireHitResult.Hit(hitPos, hitsim.Character);
+            if (hitObject is CharacterSimulator charaSim)
+                return new FireHitResult.HitCharacter(hitPos, charaSim.Character);
+            if (hitObject is StructureSimulator structSim)
+                return new FireHitResult.HitStructure(hitPos, structSim.Structure);
             // hit something else
             else 
                 return new FireHitResult.Miss(hitPos);

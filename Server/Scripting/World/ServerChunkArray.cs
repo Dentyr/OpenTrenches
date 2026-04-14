@@ -5,6 +5,7 @@ using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
 
@@ -15,7 +16,7 @@ public interface IServerChunkArray : IChunkArray2D
     bool ProgressBuild(Vector2I buildCell, float progress);
     void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0);
 
-    bool TryBuild(Vector2I buildCell, int team, StructureEnum structure);
+    bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure);
     
     public event Action<ServerStructure>? NewStructureEvent;
 }
@@ -124,7 +125,7 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
     //* server structure build
     //*
 
-    private ServerStructure MakeNewStructure(StructureType type, int team, Vector2I position)
+    private ServerStructure MakeNewStructure(StructureType type, Team team, Vector2I position)
     {
         ServerStructure structure = new(RequestNextStructureId(), team, type, position);
         _structuresDictionary.Add(structure.Id, structure);
@@ -138,7 +139,7 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
     }
 
 
-    public bool TryBuild(Vector2I buildCell, int team, StructureEnum structure)
+    public bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure)
     {
         StructureType type = StructureTypes.Get(structure);
 

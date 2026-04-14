@@ -1,12 +1,14 @@
+using System;
 using Godot;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
 
 public class ServerStructure
 {
     public int Id { get; }
-    public int Team { get; }
+    public Team Team { get; }
 
     public Vector2I Position { get; }
 
@@ -14,8 +16,10 @@ public class ServerStructure
 
     public float Health { get; private set; }
 
+    public event Action? DestroyedEvent;
 
-    public ServerStructure(int Id, int Team, StructureType Type,Vector2I Position)
+
+    public ServerStructure(int Id, Team Team, StructureType Type, Vector2I Position)
     {
         this.Id = Id;
         this.Team = Team;
@@ -31,4 +35,14 @@ public class ServerStructure
     /// The area this structure spans in the world space
     /// </summary>
     public Rect2I GetProfile() => StructureTypes.Get(Enum).Profile.Translate(Position);
+
+    public void ApplyDamage(float damage)
+    {
+        if (Health > 0)
+        {
+            Health -= damage;
+            GD.Print(Health);
+            if (Health <= 0) DestroyedEvent?.Invoke();
+        }
+    }
 }

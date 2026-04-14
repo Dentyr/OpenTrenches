@@ -291,7 +291,8 @@ public class Character : IIdObject
                 // );
                 
                 FireHitResult result = adapter.AdaptFire(Position + kineticTarget);
-                if (result is FireHitResult.Hit hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
+                if (result is FireHitResult.HitCharacter hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
+                else if (result is FireHitResult.HitStructure hitStruct && hitStruct.Structure.Team != Team) hitStruct.Structure.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
                 FireEvent?.Invoke(this, result.Position);
             }
