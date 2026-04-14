@@ -147,7 +147,7 @@ public class Character : IIdObject
         => CharacterUpdateEvent?.Invoke(new CharacterUpdateDTO(type, Serialization.Serialize(value), ID));
 
     private void PropagateUpdate<T>(PlayerAttribute type, T value)
-        => CharacterUpdateEvent?.Invoke(new PlayerUpdateDTO(type, Serialization.Serialize(value)));
+        => PlayerUpdateEvent?.Invoke(new PlayerUpdateDTO(type, Serialization.Serialize(value)));
 
     private void PropagateUpdate(FirearmSlotAttribute type, byte[] payload)
         => PlayerUpdateEvent?.Invoke(new FirearmSlotUpdateDTO(type, payload));

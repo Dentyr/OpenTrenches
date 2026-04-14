@@ -3,6 +3,7 @@ using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Core.Scripting;
+using OpenTrenches.Core.Scripting.Graphics;
 using OpenTrenches.Core.Scripting.Player;
 
 namespace OpenTrenches.Core.Scene.World;
@@ -38,7 +39,8 @@ public partial class CharacterRenderer : Area2D
 
         _sprite = new()
         {
-            Texture = TextureLibrary2D.Character.DefaultCharacter
+            Texture = TextureLibrary2D.Character.DefaultCharacter,
+            Modulate = TeamModulate.GetColor(Character.Team == ClientState.PlayerCharacter?.Team),
         };
         _sprite.Scale = new Vector2(24f, 24f) / _sprite.Texture.GetSize();
         AddChild(_sprite);

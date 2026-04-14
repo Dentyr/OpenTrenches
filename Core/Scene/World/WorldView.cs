@@ -90,7 +90,7 @@ public partial class WorldView : Node2D
 
     public void AddStructure(ClientStructure structure)
     {
-        StructureRenderer renderer = new(structure);
+        StructureRenderer renderer = new(structure, _clientState);
         _structureLayer.AddChild(renderer);
         renderer.SetPhysicsProcess(ChildPhysicsEnabled);
 
