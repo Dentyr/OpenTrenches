@@ -14,13 +14,14 @@ public partial class StructureRenderer : Node2D
     {
         _structure = Structure;
 
-        Position = ((Vector2)Structure.Position) * CommonDefines.CellSize;
+        // Position is at the center of the designated cell.
+        Position = ((Vector2)Structure.Position + new Vector2(0.5f, 0.5f)) * CommonDefines.CellSize;
 
         StructureType type = StructureTypes.Get(StructureEnum.Camp);
 
         Sprite2D sprite = new()
         {
-            Position = ((Vector2)type.Profile.GetCenter()) * CommonDefines.CellSize,
+            Position = (Vector2)type.Profile.GetCenter() * CommonDefines.CellSize,
             Texture = TextureLibrary2D.Structure.Camp,
         };
         AddChild(sprite);

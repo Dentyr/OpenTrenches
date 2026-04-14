@@ -13,12 +13,12 @@ public partial class StructureSimulator : StaticBody2D
     {
         this.Structure = Structure;
 
-        Position = ((Vector2)Structure.Position) * CommonDefines.CellSize;
+        Position = ((Vector2)Structure.Position + new Vector2(0.5f, 0.5f)) * CommonDefines.CellSize;
         StructureType type = StructureTypes.Get(Structure.Enum);
 
         AddChild(new CollisionShape2D() 
             {
-                Position = ((Vector2)type.Profile.Position) * CommonDefines.CellSize,
+                Position = (Vector2)type.Profile.GetCenter() * CommonDefines.CellSize,
                 Shape = new RectangleShape2D()
                 {
                     Size = ((Vector2)type.Profile.Size) * CommonDefines.CellSize
