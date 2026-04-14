@@ -26,6 +26,6 @@ public static class MathExtensions
 
     public static Rect2I Translate(this Rect2I rect, Vector2I position)
     {
-        return new(rect.Position + position, rect.End + position);
+        return new(rect.Position + position, rect.Size);
     }
 }
