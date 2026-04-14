@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
@@ -6,6 +7,9 @@ using OpenTrenches.Common.Contracts.DTO;
 namespace OpenTrenches.Common.World;
 
 
+/// <summary>
+/// Chunks are a store of tiles and structures in a localized area
+/// </summary>
 public class Chunk : IChunk
 {
     private Grid2D<Tile?> Tiles { get; }
@@ -23,6 +27,9 @@ public class Chunk : IChunk
             }
         }
     }
+
+    private HashSet<int> _structures = [];
+    public IReadOnlySet<int> Structures => _structures;
 
     public Tile?[][] CopyTiles() => Tiles.CopyTiles();
     public T[][] Select<T>(Func<Tile?, T> selector) => Tiles.CopySelect(selector);
@@ -45,6 +52,15 @@ public class Chunk : IChunk
     {
         Tiles = new(CommonDefines.ChunkSize, CommonDefines.ChunkSize);
     }
+
+    public void AddStructureId(int structureId)
+    {
+        _structures.Add(structureId);
+    }
+    public void RemoveStructureId(int structureId)
+    {
+        _structures.Remove(structureId);
+    }
 }
 public interface IChunk
 {
@@ -52,6 +68,8 @@ public interface IChunk
     {
         get;
     }
+
+    public IReadOnlySet<int> Structures { get; }
 
     public event Action<Tile?, int, int> TerrainChangeEvent;
 }

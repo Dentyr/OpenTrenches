@@ -3,21 +3,18 @@ using Godot;
 namespace OpenTrenches.Common.World;
 public class StructureType
 {
-    public StructureEnum Category { get; }
-    /// <summary>
-    /// The structure's profile is the rectangle of cells surrounded by begin and end
-    /// </summary>
-    public Vector2I Begin { get; }
-    /// <summary>
-    /// The structure's profile is the rectangle of cells surrounded by begin and end
-    /// </summary>
-    public Vector2I End { get; }
+    public StructureEnum Enum { get; }
 
-    public StructureType(StructureEnum Category, Vector2I Begin, Vector2I End)
+    /// <summary>
+    /// The space the structure spans
+    /// </summary>
+    /// <value></value>
+    public Rect2I Profile { get; }
+
+    public StructureType(StructureEnum Enum, Rect2I Profile)
     {
-        this.Category = Category;
-        this.Begin = Begin;
-        this.End = End;
+        this.Enum = Enum;
+        this.Profile = Profile;
     }
 
     public bool Constructable { get; init; } = true;

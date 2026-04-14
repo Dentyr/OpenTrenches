@@ -23,4 +23,9 @@ public static class MathExtensions
 
         return dir.Rotated(angle);
     }
+
+    public static Rect2I Translate(this Rect2I rect, Vector2I position)
+    {
+        return new(rect.Position + position, rect.End + position);
+    }
 }

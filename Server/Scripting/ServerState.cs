@@ -20,8 +20,8 @@ public class ServerState : IServerState
     //* State
 
     //* chunks
-    public ServerChunkArray Chunks { get; } = new();
-    IServerChunkArray IServerState.Chunks => Chunks;
+    private ServerChunkArray _chunks { get; } = new();
+    public IServerChunkArray Chunks => _chunks;
     
     //TODO change ushort to be consistent with other dictionaries
     //* characters
@@ -44,6 +44,8 @@ public class ServerState : IServerState
 
 
     public event Action<Character>? CharacterAddedEvent; 
+
+    public event Action<ServerStructure>? StructureCreatedEvent;
 
     //* creation
     private ushort _charId = 0;
@@ -79,6 +81,8 @@ public class ServerState : IServerState
     {
         CreateTeam(FactionEnum.StandardDebug, new(16, 50));
         CreateTeam(FactionEnum.StandardDebug, new(112, 50));
+
+        _chunks.NewStructureEvent += structure => StructureCreatedEvent?.Invoke(structure);
     }
 
     //* communication
@@ -91,11 +95,11 @@ public class ServerState : IServerState
     private void HandleFire(Character character, Vector2 target) 
         => _commandQueue.Enqueue(new ProjectileNotificationCommand(character.Position, target, character.ID));
 
-    public IEnumerable<AbstractCommandDTO> PollEvents() => _commandQueue.PollItems().Concat(Chunks.PollCellChanges());
+    public IEnumerable<AbstractCommandDTO> PollEvents() => _commandQueue.PollItems().Concat(_chunks.PollCellChanges());
 
     public IEnumerable<AbstractCreateDTO> GetInitDTOs()
         => _characters.Values.Select(ObjectToDTO.Convert).Cast<AbstractCreateDTO>()
-            .Concat(Chunks.GetChunks().Select(CommonToDTO.Convert))
+            .Concat(_chunks.GetChunks().Select(CommonToDTO.Convert))
             .Concat(Teams.Values.Select(ObjectToDTO.Convert));
             // .Concat(Chunks.GetChunks().Select(chunk => CommonToDTO.Convert(chunk)));
 }

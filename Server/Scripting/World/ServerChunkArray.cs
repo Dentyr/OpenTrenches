@@ -12,6 +12,10 @@ public interface IServerChunkArray : IChunkArray2D
 {
     bool ProgressBuild(Vector2I buildCell, float progress);
     void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0);
+
+    bool TryBuild(Vector2I buildCell, int team, StructureEnum structure);
+    
+    public event Action<ServerStructure>? NewStructureEvent;
 }
 
 public class ServerChunkArray : IChunkArray2D, IServerChunkArray
@@ -30,6 +34,17 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
         add => _chunkArray.ChunkChangedEvent += value;
         remove => _chunkArray.ChunkChangedEvent -= value;
     }
+
+    //* Structures
+    //*
+    private Dictionary<int, ServerStructure> _structuresDictionary = [];
+
+    public IReadOnlyDictionary<int, ServerStructure> StructureDict => _structuresDictionary;
+
+    private int _nextStructureId = 0;
+    private int RequestNextStructureId() => _nextStructureId ++;
+
+    public event Action<ServerStructure>? NewStructureEvent;
 
 
     //* Updates
@@ -68,6 +83,9 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
         for (byte x = 0; x < SizeX; x ++) for (byte y = 0; y < SizeY; y ++) yield return new ChunkRecord(this[x, y], x, y);
     }
 
+    private bool IsAreaInBounds(Rect2I area) 
+        => _chunkArray.IsAreaInBounds(area.Position.X, area.Position.Y, area.End.X, area.End.Y);
+
     //* Server functions
     //*
 
@@ -100,4 +118,55 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
         TrySetTile(x, y, tile);
     }
     public void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0) => StartBuild(buildCell.X, buildCell.Y, buildTarget, initialProgress);
+
+    //* server structure build
+    //*
+
+    private ServerStructure MakeNewStructure(StructureType type, int team, Vector2I position)
+    {
+        ServerStructure structure = new(RequestNextStructureId(), team, type, position);
+        _structuresDictionary.Add(structure.Id, structure);
+
+        // note id in chunk if exists
+        if (_chunkArray.TryGetChunkContaining(position.X, position.Y, out var chunk))
+            chunk.AddStructureId(structure.Id);
+
+        NewStructureEvent?.Invoke(structure);
+        return structure;
+    }
+
+
+    public bool TryBuild(Vector2I buildCell, int team, StructureEnum structure)
+    {
+        StructureType type = StructureTypes.Get(structure);
+
+        Rect2I area = type.Profile.Translate(buildCell);
+        if (IsAreaInBounds(area) && !IsSpaceOccupied(area))
+        {
+            MakeNewStructure(type, team, buildCell);
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the spaces in the rect2I overlap with any structure
+    /// </summary>
+    private bool IsSpaceOccupied(Rect2I space)
+    {
+        //TODO optimize only check nearby chunks
+        foreach(ServerStructure structure in StructureDict.Values)
+            if (structure.GetProfile().Intersects(space)) return true;
+        return false;
+    }
+    /// <summary>
+    /// Checks if <paramref name="cell"/> is occupied by any structure
+    /// </summary>
+    private bool IsSpaceOccupied(Vector2I cell)
+    {
+        //TODO optimize only check nearby chunks
+        foreach(ServerStructure structure in StructureDict.Values)
+            if (structure.GetProfile().HasPoint(cell)) return true;
+        return false;
+    }
 }

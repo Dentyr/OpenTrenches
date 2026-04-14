@@ -14,6 +14,7 @@ using System.Threading;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Server.Scripting.Player.Agent;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scene;
 
@@ -49,11 +50,18 @@ public partial class GameRoot : Node
         World.AddChild(new Camera2D() {Position = new Vector2(200, 100), Zoom=new Vector2(0.4f, 0.4f)});
 
         //* events
-        GameState.CharacterAddedEvent += World.AddCharacter;
-        GameState.CharacterAddedEvent += BroadcastCharacter;
+        // add character to world, notify clients, and ensure future updates go to clients.
         GameState.CharacterAddedEvent += character =>
         {
+            World.AddCharacter(character);
+            BroadcastCharacter(character);
             character.CharacterUpdateEvent += NetworkAdapter.Send;
+        };
+
+        // notify structures to clients.
+        GameState.StructureCreatedEvent += structure => 
+        {
+            BroadCastStructure(structure);
         };
 
         //* Initialization
@@ -84,6 +92,8 @@ public partial class GameRoot : Node
 
     private void BroadcastCharacter(Character character) 
         => NetworkAdapter.Send(new CreateDatagram(ObjectToDTO.Convert(character)));
+    private void BroadCastStructure(ServerStructure structure)
+        => NetworkAdapter.Send(new StructureDTO(structure.Id, structure.Team, structure.Position.X, structure.Position.Y, structure.Enum, structure.Health));
 
 
     private void Connection(INetworkConnectionAdapter connection)
