@@ -79,10 +79,16 @@ public class ServerState : IServerState
 
     public ServerState()
     {
+        //* event wiring
+        _chunks.NewStructureEvent += structure => StructureCreatedEvent?.Invoke(structure);
+
+        //* Initial object state
+
         CreateTeam(FactionEnum.StandardDebug, new(16, 50));
         CreateTeam(FactionEnum.StandardDebug, new(112, 50));
 
-        _chunks.NewStructureEvent += structure => StructureCreatedEvent?.Invoke(structure);
+        _chunks.TryBuild(new(4, 4), 0, StructureEnum.Camp);
+        _chunks.TryBuild(new(10, 10), 0, StructureEnum.Camp);
     }
 
     //* communication
@@ -100,7 +106,8 @@ public class ServerState : IServerState
     public IEnumerable<AbstractCreateDTO> GetInitDTOs()
         => _characters.Values.Select(ObjectToDTO.Convert).Cast<AbstractCreateDTO>()
             .Concat(_chunks.GetChunks().Select(CommonToDTO.Convert))
-            .Concat(Teams.Values.Select(ObjectToDTO.Convert));
+            .Concat(Teams.Values.Select(ObjectToDTO.Convert))
+            .Concat(_chunks.StructureDict.Values.Select(ObjectToDTO.Convert));
             // .Concat(Chunks.GetChunks().Select(chunk => CommonToDTO.Convert(chunk)));
 }
 

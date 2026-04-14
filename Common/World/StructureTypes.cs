@@ -11,7 +11,7 @@ public static class StructureTypes
     {
         { 
             StructureEnum.Camp, 
-            new(StructureEnum.Camp, new(-1, -1, 1, 1))
+            new(StructureEnum.Camp, new(-1, -1, 3, 3))
             {
                 Constructable = false,
                 HitPoints = 1000,

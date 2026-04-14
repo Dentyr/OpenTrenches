@@ -5,6 +5,7 @@ using Godot;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Scene.World;
 using OpenTrenches.Server.Scripting.Player;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scene.World;
 
@@ -13,6 +14,10 @@ public partial class WorldNode : Node3D
     //* Characters
     private Dictionary<ushort, CharacterSimulator> _characters = [];
     private Node3D CharacterLayer { get; }
+
+    //* Structures
+    private Dictionary<int, StructureSimulator> _structures = [];
+    private Node3D StructureLayer { get; }
 
     //* gridmap
     private ChunkLayer? ChunkLayer { get; set; } 
@@ -31,6 +36,12 @@ public partial class WorldNode : Node3D
         };
         AddChild(CharacterLayer);
 
+        StructureLayer = new()
+        {
+            Name = "Structures",
+        };
+        AddChild(StructureLayer);
+
 
         
         foreach (Character character in serverState.Characters.Values) AddCharacter(character); 
@@ -44,6 +55,15 @@ public partial class WorldNode : Node3D
         {
             CharacterSimulator node = _characters[character.ID];
             CharacterLayer.AddChild(node);
+        }
+    }
+
+    public void AddStructure(ServerStructure structure)
+    {
+        if (_structures.TryAdd(structure.Id, new StructureSimulator(structure)))
+        {
+            StructureSimulator node = _structures[structure.Id];
+            StructureLayer.AddChild(node);
         }
     }
 }

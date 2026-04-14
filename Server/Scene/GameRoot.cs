@@ -51,18 +51,14 @@ public partial class GameRoot : Node
 
         //* events
         // add character to world, notify clients, and ensure future updates go to clients.
-        GameState.CharacterAddedEvent += character =>
-        {
-            World.AddCharacter(character);
-            BroadcastCharacter(character);
-            character.CharacterUpdateEvent += NetworkAdapter.Send;
-        };
+        GameState.CharacterAddedEvent += HandleNewCharacter;
 
         // notify structures to clients.
-        GameState.StructureCreatedEvent += structure => 
-        {
-            BroadCastStructure(structure);
-        };
+        GameState.StructureCreatedEvent += HandleNewStructure;
+
+        //* synchronize initial state
+        foreach (Character character in GameState.Characters.Values) HandleNewCharacter(character);
+        foreach (ServerStructure structure in GameState.Chunks.StructureDict.Values) HandleNewStructure(structure);
 
         //* Initialization
         for (int i = 0; i < 100; i ++)
@@ -89,11 +85,25 @@ public partial class GameRoot : Node
         GetTree().Quit();
         return;
     }
+    #region handling game objects
+    private void HandleNewCharacter(Character character)
+    {
+        World.AddCharacter(character);
+        BroadcastCharacter(character);
+        character.CharacterUpdateEvent += NetworkAdapter.Send;
+    }
+    private void HandleNewStructure(ServerStructure structure)
+    {
+        World.AddStructure(structure);
+        BroadCastStructure(structure);
+    }
+
+    #endregion
 
     private void BroadcastCharacter(Character character) 
         => NetworkAdapter.Send(new CreateDatagram(ObjectToDTO.Convert(character)));
     private void BroadCastStructure(ServerStructure structure)
-        => NetworkAdapter.Send(new StructureDTO(structure.Id, structure.Team, structure.Position.X, structure.Position.Y, structure.Enum, structure.Health));
+        => NetworkAdapter.Send(new CreateDatagram(ObjectToDTO.Convert(structure)));
 
 
     private void Connection(INetworkConnectionAdapter connection)

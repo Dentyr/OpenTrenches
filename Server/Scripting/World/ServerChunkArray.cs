@@ -10,6 +10,8 @@ namespace OpenTrenches.Server.Scripting.World;
 
 public interface IServerChunkArray : IChunkArray2D
 {
+    public IReadOnlyDictionary<int, ServerStructure> StructureDict { get; }
+
     bool ProgressBuild(Vector2I buildCell, float progress);
     void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0);
 
