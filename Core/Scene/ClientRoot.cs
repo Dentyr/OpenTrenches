@@ -22,27 +22,19 @@ namespace OpenTrenches.Core.Scene;
 [GlobalClass]
 public partial class ClientRoot : Node
 {
-    // TODO? combine network classes into root class
-    //* Networking
-    private IClientNetworkAdapter NetworkAdapter { get; }
-    private ClientNetworkHandler? ClientNetworkHandler;
+    ClientNetworkManager ClientNetworkManager;
+    
+    //* GD
+    private WorldView World { get; set; } = default!;
 
-    private readonly ConnectionAgent ConnectionAgent;
+    private KeyboardListener KeyboardListener { get; }
 
-    // TODO?combine godot elements into single renderer class
-    #region
-        //* GD
-        private WorldView World { get; set; } = default!;
+    //* GUI
+    private CharacterControlUi _characterUI = null!; 
 
-        private KeyboardListener KeyboardListener { get; }
+    private DeathScreen _deathScreen = null!;
 
-        //* GUI
-        private CharacterControlUi _characterUI = null!; 
-
-        private DeathScreen _deathScreen = null!;
-
-        private GameEndScreen _gameEndScreen = null!;
-    #endregion
+    private GameEndScreen _gameEndScreen = null!;
 
 
     //* State
@@ -51,13 +43,8 @@ public partial class ClientRoot : Node
 
     public ClientRoot()
     {
-        //* Network
-
-        NetworkAdapter = new LiteNetClientAdapter();
-        NetworkAdapter.Start();
-
-        ConnectionAgent = new();
-        ConnectionAgent.ReceivedServersEvent += UpdateServerList;
+        ClientNetworkManager = new();
+        ClientNetworkManager.JoinGameEvent += SetState;
 
         // Nodes
 
@@ -82,7 +69,7 @@ public partial class ClientRoot : Node
         _gameEndScreen.ReturnRequestEvent += HandleReturnAttempt;
 
         //* Try to connect to server
-        ConnectionAgent.PollRecords();
+        ClientNetworkManager.PollAvailableServers();
     }
 
     //* handling user input
@@ -90,26 +77,13 @@ public partial class ClientRoot : Node
     /// <summary>
     /// Sends a respawn attempt to the server.
     /// </summary>
-    public void HandleRespawnAttempt() => ClientNetworkHandler?.Adapter.Send(new RespawnCommandRequest());
+    public void HandleRespawnAttempt() => ClientNetworkManager.Send(new RespawnCommandRequest());
 
     public void HandleReturnAttempt() => GD.Print(" not yet implemented "); //TODO implement main menu screen
 
 
     //* Changing state
 
-    /// <summary>
-    /// Attempts to connect to the game server at <paramref name="endPoint"/>
-    /// </summary>
-    private async void TryJoin(IPEndPoint endPoint)
-    {
-        //TODO consider failure to game instance
-        //TODO clarify order of network and load events
-        lock (this)
-        {
-            ClientNetworkHandler = new(NetworkAdapter.Connect(endPoint));
-        }
-        SetState(ClientNetworkHandler.State);
-    }
 
     /// <summary>
     /// Renders <paramref name="state"/>
@@ -181,15 +155,6 @@ public partial class ClientRoot : Node
 
     //* Network
 
-    /// <summary>
-    /// Informs the user that they can connect to <paramref name="servers"/>
-    /// </summary>
-    /// <param name="obj"></param>
-    private void UpdateServerList(ServerRecord[] servers)
-    {
-        //TODO make available to player
-        if (servers.Length > 0) TryJoin(servers[0].EndPoint);
-    }
 
     /// <summary>
     /// Polls outgoing user commands from nodes that can produce them
@@ -200,14 +165,13 @@ public partial class ClientRoot : Node
 
     public override void _Process(double delta)
     {
-        NetworkAdapter.Poll();
+        ClientNetworkManager.Poll();
 
-        if (ClientNetworkHandler is not null)
+        if (ClientNetworkManager.CanSend)
         {
             // Stream user key and mouse input
-            ClientNetworkHandler.Adapter.Send(KeyboardListener.GetStatus());
-            foreach (AbstractCommandDTO cmd in PollCommands()) ClientNetworkHandler.Adapter.Send(cmd);
+            ClientNetworkManager.Send(KeyboardListener.GetStatus());
+            foreach (AbstractCommandDTO cmd in PollCommands()) ClientNetworkManager.Send(cmd);
         }
-
     }
 }
