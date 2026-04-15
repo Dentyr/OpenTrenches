@@ -63,3 +63,11 @@ public interface IServerNetworkAdapter : IHostNetworkAdapter
     public void Send(AbstractCommandDTO dTO) =>  Send(new CommandDatagram(dTO));
     public void Send(AbstractStreamDTO dTO) =>  Send(new StreamDatagram(dTO));
 }
+
+public interface INetworkSender
+{
+    public void Send(AbstractUpdateDTO dTO);
+    public void Send(AbstractCreateDTO dTO);
+    public void Send(AbstractCommandDTO dTO);
+    public void Send(AbstractStreamDTO dTO);
+}
