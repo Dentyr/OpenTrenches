@@ -40,6 +40,8 @@ public partial class ClientRoot : Node
         private CharacterControlUi _characterUI = null!; 
 
         private DeathScreen _deathScreen = null!;
+
+        private GameEndScreen _gameEndScreen = null!;
     #endregion
 
 
@@ -71,9 +73,13 @@ public partial class ClientRoot : Node
     {
         _characterUI = GetNode<CharacterControlUi>("UICanvas/CharacterControlUi");
         _deathScreen = GetNode<DeathScreen>("UICanvas/DeathScreen");
-        _deathScreen.Hide();
+        _deathScreen.Visible = false;
         // Send player respawn request to server when requested
         _deathScreen.OnRespawnClicked += HandleRespawnAttempt;
+
+        _gameEndScreen = GetNode<GameEndScreen>("UICanvas/GameEndScreen");
+        _gameEndScreen.Visible = false;
+        _gameEndScreen.ReturnRequestEvent += HandleReturnAttempt;
 
         //* Try to connect to server
         ConnectionAgent.PollRecords();
@@ -85,6 +91,8 @@ public partial class ClientRoot : Node
     /// Sends a respawn attempt to the server.
     /// </summary>
     public void HandleRespawnAttempt() => ClientNetworkHandler?.Adapter.Send(new RespawnCommandRequest());
+
+    public void HandleReturnAttempt() => GD.Print(" not yet implemented "); //TODO implement main menu screen
 
 
     //* Changing state
@@ -141,6 +149,8 @@ public partial class ClientRoot : Node
 
         State.PlayerDeathEvent += _deathScreen.Show;
         State.PlayerRespawnEvent += _deathScreen.Hide;
+
+        State.GameEndEvent += victor => _gameEndScreen.ShowEnd(victor, State);
 
         //* Initialize values
         if (State.PlayerCharacterId is uint notnull && State.TryGetCharacter(notnull, out var player)) SetPlayer(new LocalPlayerView(player, State.PlayerState));

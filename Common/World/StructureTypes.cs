@@ -15,6 +15,7 @@ public static class StructureTypes
             {
                 Constructable = false,
                 HitPoints = 1000,
+                Persistent = true,
             }
         }
     };

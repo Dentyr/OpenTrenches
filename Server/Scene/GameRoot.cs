@@ -15,6 +15,7 @@ using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Server.Scripting.Player.Agent;
 using OpenTrenches.Server.Scripting.World;
+using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scene;
 
@@ -27,7 +28,7 @@ public partial class GameRoot : Node
     private readonly List<PlayerNetworkHandler> _players = [];
     private readonly List<AiCharacterController> _npcs = [];
 
-    private ServerState GameState { get; } = new();
+    private ServerState GameState { get; }
 
     public GameRoot()
     {
@@ -47,7 +48,7 @@ public partial class GameRoot : Node
         AddChild(World);
 
         //* debug camera
-        World.AddChild(new Camera2D() {Position = new Vector2(200, 100), Zoom=new Vector2(0.4f, 0.4f)});
+        World.AddChild(new Camera2D() {Position = new Vector2(2500, 1500), Zoom=new Vector2(0.25f, 0.25f)});
 
         //* events
         // add character to world, notify clients, and ensure future updates go to clients.
@@ -55,6 +56,8 @@ public partial class GameRoot : Node
 
         // notify structures to clients.
         GameState.StructureCreatedEvent += HandleNewStructure;
+
+        GameState.GameEndedEvent += HandleGameEnd;
 
         //* synchronize initial state
         foreach (Character character in GameState.Characters.Values) HandleNewCharacter(character);
@@ -84,6 +87,11 @@ public partial class GameRoot : Node
         Console.Error.WriteLine("Failed to get port argument");
         GetTree().Quit();
         return;
+    }
+
+    private void HandleGameEnd(Team? victor)
+    {
+        NetworkAdapter.Send(new GameEndNotificationCommand(victor is null ? -1 : victor.ID));
     }
     #region handling game objects
     private void HandleNewCharacter(Character character)

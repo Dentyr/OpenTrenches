@@ -54,8 +54,8 @@ public partial class ChunkLayer : Node2D
     /// </summary>
     private void Initializefill()
     {
-        int cellsX = Source.SizeX * CommonDefines.ChunkSize;
-        int cellsY = Source.SizeY * CommonDefines.ChunkSize;
+        int cellsX = Source.ChunkSizeX * CommonDefines.ChunkSize;
+        int cellsY = Source.ChunkSizeY * CommonDefines.ChunkSize;
         for (int x = 0; x < cellsX; x ++)
         {
             for (int y = 0; y < cellsY; y ++)
@@ -72,8 +72,8 @@ public partial class ChunkLayer : Node2D
     /// </summary>
     private void InitializeBorder()
     {
-        int cellsX = Source.SizeX * CommonDefines.ChunkSize;
-        int cellsY = Source.SizeY * CommonDefines.ChunkSize;
+        int cellsX = Source.ChunkSizeX * CommonDefines.ChunkSize;
+        int cellsY = Source.ChunkSizeY * CommonDefines.ChunkSize;
 
         //Initizing border
         List<Vector2I> border = new((cellsX + 2) * (cellsY + 2));
@@ -97,9 +97,9 @@ public partial class ChunkLayer : Node2D
     private void InitializeChunks(IChunkArray2D chunks)
     {
         // Load chunk states
-        for (int x = 0; x < chunks.SizeX; x ++) 
+        for (int x = 0; x < chunks.ChunkSizeX; x ++) 
         {
-            for (int y = 0; y < chunks.SizeY; y ++) 
+            for (int y = 0; y < chunks.ChunkSizeY; y ++) 
             {
                 IChunk chunk = chunks[x, y];
                 int xoffset = x * CommonDefines.ChunkSize;

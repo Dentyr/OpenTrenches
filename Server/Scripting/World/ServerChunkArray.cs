@@ -16,7 +16,7 @@ public interface IServerChunkArray : IChunkArray2D
     bool ProgressBuild(Vector2I buildCell, float progress);
     void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0);
 
-    bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure);
+    bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure, out ServerStructure? result);
     
     public event Action<ServerStructure>? NewStructureEvent;
 }
@@ -27,8 +27,12 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
     //* 
     private ChunkArray2D _chunkArray = new();
 
-    public int SizeX => _chunkArray.SizeX;
-    public int SizeY => _chunkArray.SizeY;
+    public int ChunkSizeX => _chunkArray.ChunkSizeX;
+    public int ChunkSizeY => _chunkArray.ChunkSizeY;
+
+
+    public int CellSizeX => _chunkArray.CellSizeX;
+    public int CellSizeY => _chunkArray.CellSizeY;
 
     public Chunk this[int x, int y] => _chunkArray[x, y];
 
@@ -83,7 +87,7 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
 
     public IEnumerable<ChunkRecord> GetChunks()
     {
-        for (byte x = 0; x < SizeX; x ++) for (byte y = 0; y < SizeY; y ++) yield return new ChunkRecord(this[x, y], x, y);
+        for (byte x = 0; x < ChunkSizeX; x ++) for (byte y = 0; y < ChunkSizeY; y ++) yield return new ChunkRecord(this[x, y], x, y);
     }
 
     private bool IsAreaInBounds(Rect2I area) 
@@ -139,16 +143,17 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
     }
 
 
-    public bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure)
+    public bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure, out ServerStructure? buildResult)
     {
         StructureType type = StructureTypes.Get(structure);
 
         Rect2I area = type.Profile.Translate(buildCell);
         if (IsAreaInBounds(area) && !IsSpaceOccupied(area))
         {
-            MakeNewStructure(type, team, buildCell);
+            buildResult = MakeNewStructure(type, team, buildCell);
             return true;
         }
+        buildResult = null;
         return false;
     }
 

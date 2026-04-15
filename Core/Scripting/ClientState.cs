@@ -20,6 +20,8 @@ using OpenTrenches.Core.Scripting.World;
 
 namespace OpenTrenches.Core.Scripting;
 
+public delegate void GameEndDelegate(ClientTeam victor);
+
 public sealed class ClientState : IClientState
 {
     //* Status
@@ -39,6 +41,8 @@ public sealed class ClientState : IClientState
 
     public event Action? PlayerReloadEvent;
     public event Action? PlayerFireEvent;
+
+    public event GameEndDelegate? GameEndEvent;
 
     //* State
 
@@ -170,6 +174,10 @@ public sealed class ClientState : IClientState
         else if (dto is ReloadNotificationCommand)
         {
             PlayerReloadEvent?.Invoke();
+        }
+        else if (dto is GameEndNotificationCommand gameend)
+        {
+            if (_teams.TryGetValue(gameend.VictorTeam, out var winner)) GameEndEvent?.Invoke(winner);
         }
     }
 }

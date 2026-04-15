@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 
@@ -9,10 +10,10 @@ public class ChunkArray2D : IChunkArray2D
 {
     private readonly Grid2D<Chunk> Chunks = new(CommonDefines.WorldSize, CommonDefines.WorldSize, (_, _) => new Chunk());
 
-    public int SizeX => Chunks.SizeX;
-    public int SizeY => Chunks.SizeY;
-    public int CellSizeX => CommonDefines.ChunkSize * SizeX;
-    public int CellSizeY => CommonDefines.ChunkSize * SizeY;
+    public int ChunkSizeX => Chunks.SizeX;
+    public int ChunkSizeY => Chunks.SizeY;
+    public int CellSizeX => CommonDefines.ChunkSize * ChunkSizeX;
+    public int CellSizeY => CommonDefines.ChunkSize * ChunkSizeY;
 
     public Chunk this[int x, int y] => Chunks[x, y];
 
@@ -29,7 +30,6 @@ public class ChunkArray2D : IChunkArray2D
             (miny, maxy) = (maxy, miny);
         if (maxx < minx)
             (minx, maxx) = (maxx, minx);
-
         // within borderse if minimum values are greater than or equal to (0,0) and maxmimum values are within the borders
         return minx >= 0 &&
             miny >= 0 &&

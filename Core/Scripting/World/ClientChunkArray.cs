@@ -13,8 +13,8 @@ public class ClientChunkArray : IChunkArray2D
     //* 
     private ChunkArray2D _chunkArray = new();
 
-    public int SizeX => _chunkArray.SizeX;
-    public int SizeY => _chunkArray.SizeY;
+    public int ChunkSizeX => _chunkArray.ChunkSizeX;
+    public int ChunkSizeY => _chunkArray.ChunkSizeY;
 
     public Chunk this[int x, int y] => _chunkArray[x, y];
 

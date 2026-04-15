@@ -15,7 +15,11 @@ public class ServerStructure
     public StructureEnum Enum { get; }
 
     public float Health { get; private set; }
+    public bool Destroyed => Health <= 0;
 
+    /// <summary>
+    /// Event when <see cref="Health"/> reaches 0.
+    /// </summary>
     public event Action? DestroyedEvent;
 
 
@@ -41,7 +45,6 @@ public class ServerStructure
         if (Health > 0)
         {
             Health -= damage;
-            GD.Print(Health);
             if (Health <= 0) DestroyedEvent?.Invoke();
         }
     }

@@ -17,12 +17,14 @@ using OpenTrenches.Server.Scripting.World;
 
 public class ServerState : IServerState
 {
+    public delegate void GameEndedDelegate(Team? victor);
+
     //* State
 
     //* chunks
     private ServerChunkArray _chunks { get; } = new();
     public IServerChunkArray Chunks => _chunks;
-    
+
     //TODO change ushort to be consistent with other dictionaries
     //* characters
     private readonly Dictionary<ushort, Character> _characters = [];
@@ -46,6 +48,13 @@ public class ServerState : IServerState
     public event Action<Character>? CharacterAddedEvent; 
 
     public event Action<ServerStructure>? StructureCreatedEvent;
+
+    public event Action<Team>? TeamDestroyedEvent;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public event GameEndedDelegate? GameEndedEvent;
 
     //* creation
     private ushort _charId = 0;
@@ -72,23 +81,63 @@ public class ServerState : IServerState
     private Team CreateTeam(FactionEnum faction, Vector2 spawnpoint)
     {
         Team team = new(_teamId ++, faction, spawnpoint);
+        team.DestroyedEvent += () => HandleTeamDestroyed(team);
         _teams.Add(team.ID, team);
 
         return team;
     }
 
+
     public ServerState()
     {
         //* event wiring
-        _chunks.NewStructureEvent += structure => StructureCreatedEvent?.Invoke(structure);
+        _chunks.NewStructureEvent += HandleStructureCreated;
 
         //* Initial object state
 
         CreateTeam(FactionEnum.StandardDebug, new(16, 50));
         CreateTeam(FactionEnum.StandardDebug, new(112, 50));
 
-        _chunks.TryBuild(new(4, 4), Teams[0], StructureEnum.Camp);
-        _chunks.TryBuild(new(10, 10), Teams[1], StructureEnum.Camp);
+        for (int i = 0; i < 3; i ++)
+        {
+            int xoffset = i == 1 ? 20 : 10;
+
+            int x1 = xoffset;
+            int x2 = _chunks.CellSizeX - xoffset;
+
+            int y = _chunks.CellSizeY * ((i * 2) + 1) / 6;
+            if (!_chunks.TryBuild(new(x1, y), Teams[0], StructureEnum.Camp, out var camp1))
+                throw new Exception("Initiializing camp failed at " + x1 + ", " + y);
+            if (!_chunks.TryBuild(new(x2, y), Teams[1], StructureEnum.Camp, out var camp2))
+                throw new Exception("Initiializing camp failed at " + x2 + ", " + y);
+
+        }
+    }
+
+    private void HandleStructureCreated(ServerStructure structure)
+    {
+        if (_teams.TryGetValue(structure.Id, out Team? team)) team.AddStructure(structure);
+        StructureCreatedEvent?.Invoke(structure);
+    }
+        
+    private void HandleTeamDestroyed(Team destroyed)
+    {
+        TeamDestroyedEvent?.Invoke(destroyed);
+
+        Team? victor = null;
+        // If there is only one non-destroyed team, they win. 
+        // If somehow there is no one left, game ends with no victor.
+        foreach(Team team in Teams.Values)
+        {
+            if (!team.Destroyed)
+            {
+                // If there are multiple active teams, nothing happens
+                if (victor != null) return; 
+                victor = team;
+            }
+        }
+        
+        GameEndedEvent?.Invoke(victor);
     }
 
     //* communication

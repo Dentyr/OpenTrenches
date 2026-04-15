@@ -8,8 +8,8 @@ public interface IChunkArray2D
 {
     public Chunk this[int x, int y] { get; }
 
-    public int SizeX { get; }
-    public int SizeY { get; }
+    public int ChunkSizeX { get; }
+    public int ChunkSizeY { get; }
 
     public event Action<ChunkRecord>? ChunkChangedEvent;
 

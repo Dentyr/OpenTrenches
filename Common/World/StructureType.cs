@@ -21,4 +21,9 @@ public class StructureType
 
     public int HitPoints { get; init; } = -1;
     public bool Destructable => HitPoints > 0;
+
+    /// <summary>
+    /// Whether or not this structure will continue to have a profile even if destroyed, as a collapsed structure.
+    /// </summary>
+    public bool Persistent { get; init; } = false;
 }

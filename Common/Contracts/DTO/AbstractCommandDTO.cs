@@ -10,7 +10,6 @@ namespace OpenTrenches.Common.Contracts.DTO;
 [MessagePackObject]
 [Union(100,     typeof(ProjectileNotificationCommand))]
 [Union(101,     typeof(ReloadNotificationCommand))]
-[Union(110,     typeof(AbstractCommandDTO))]
 [Union(111,     typeof(AbilityNotificationCommand))]
 [Union(199,     typeof(InitializedNotificationCommand))]
 
@@ -28,4 +27,7 @@ namespace OpenTrenches.Common.Contracts.DTO;
 [Union(203,     typeof(ReloadCommandRequest))]
 [Union(204,     typeof(PurchaseCommandRequest))]
 [Union(205,     typeof(ExitTrenchCommandRequest))]
+
+
+[Union(9900,     typeof(GameEndNotificationCommand))]
 public abstract record class AbstractCommandDTO {}
