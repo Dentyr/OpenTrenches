@@ -22,23 +22,29 @@ namespace OpenTrenches.Core.Scene;
 [GlobalClass]
 public partial class ClientRoot : Node
 {
-    ClientNetworkManager ClientNetworkManager;
+    private ClientNetworkManager ClientNetworkManager;
     
-    ClientGameRoot ClientGameRoot = null!;
+    private ClientGameRoot ClientGameRoot = null!;
 
-
+    private MainMenuLayer MainMenuRoot = null!;
 
     public ClientRoot()
     {
         ClientNetworkManager = new();
-        ClientNetworkManager.JoinGameEvent += SetState;
+        ClientNetworkManager.JoinGameEvent += JoinGame;
 
 
     }
 
-    private void SetState(ClientState state)
+    private void JoinGame(ClientState state)
     {
+        MainMenuRoot.Hide();
         ClientGameRoot?.SetState(state);
+    }
+
+    private void NavigateMainMenu()
+    {
+        MainMenuRoot.Show();
     }
 
 
@@ -52,8 +58,13 @@ public partial class ClientRoot : Node
         ClientGameRoot.OutgoingCreateEvent += ClientNetworkManager.Send;
         ClientGameRoot.OutgoingCommandEvent += ClientNetworkManager.Send;
         ClientGameRoot.OutgoingStreamEvent += ClientNetworkManager.Send;
-        //* Try to connect to server
-        ClientNetworkManager.PollAvailableServers();
+
+        ClientGameRoot.ExitGameEvent += NavigateMainMenu;
+
+
+        MainMenuRoot = GetNode<MainMenuLayer>("MainMenu");
+        MainMenuRoot.Initialize(ClientNetworkManager.ConnectionAgent);
+        MainMenuRoot.TryJoinServerEvent += record => ClientNetworkManager.TryJoin(record.EndPoint);
     }
 
 

@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://llvxnvmisr8n"]
+
+[ext_resource type="Script" uid="uid://ctyh47qph722y" path="res://Core/Scene/Main/ServersPage.cs" id="1_eby50"]
+
+[node name="Servers" type="Control" unique_id=647736506]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_eby50")
+
+[node name="Refresh" type="Button" parent="." unique_id=311032483]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -57.0
+offset_bottom = 53.0
+grow_horizontal = 0
+text = "Refr"
+
+[node name="Button" type="Button" parent="." unique_id=2104919921]
+layout_mode = 0
+offset_right = 300.0
+offset_bottom = 52.0
+text = "Open Trenches"
+
+[node name="ServersScroll" type="ScrollContainer" parent="." unique_id=1199375363]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 59.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="ServersScroll" unique_id=1712125224]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="." unique_id=1036774517]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 305.0
+offset_bottom = 52.0
+grow_horizontal = 2
+text = "Server List"
+horizontal_alignment = 1
+vertical_alignment = 1

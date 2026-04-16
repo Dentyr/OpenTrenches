@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bggyc833cpgfn" path="res://Core/Scene/Gui/CharacterControlUI.tscn" id="2_rtlfk"]
 [ext_resource type="PackedScene" uid="uid://8kdoof7mnddi" path="res://Core/Scene/Gui/DeathScreen.tscn" id="3_f08st"]
 [ext_resource type="PackedScene" uid="uid://dxxjot7nx7v3" path="res://Core/Scene/Gui/GameEndScreen.tscn" id="4_77orb"]
+[ext_resource type="PackedScene" uid="uid://diye761px52ak" path="res://Core/Scene/MainMenuLayer.tscn" id="6_iq41g"]
 
 [node name="ClientRoot" type="Node" unique_id=770046232]
 script = ExtResource("1_2i6bf")
@@ -20,3 +21,5 @@ mouse_filter = 2
 [node name="DeathScreen" parent="GameRoot/UICanvas" unique_id=659891129 instance=ExtResource("3_f08st")]
 
 [node name="GameEndScreen" parent="GameRoot/UICanvas" unique_id=1399647118 instance=ExtResource("4_77orb")]
+
+[node name="MainMenu" parent="." unique_id=1406957760 instance=ExtResource("6_iq41g")]

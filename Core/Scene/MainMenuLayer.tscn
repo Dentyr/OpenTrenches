@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://diye761px52ak"]
+
+[ext_resource type="Script" uid="uid://b4kxe502voyi2" path="res://Core/Scene/Main/PagesNode.cs" id="1_7fl4g"]
+[ext_resource type="PackedScene" uid="uid://dlfedsp4e8qbq" path="res://Core/Scene/Main/TitlePage.tscn" id="1_nolty"]
+[ext_resource type="Script" uid="uid://taois77hboh0" path="res://Core/Scene/Main/MainMenuLayer.cs" id="1_stls8"]
+[ext_resource type="PackedScene" uid="uid://llvxnvmisr8n" path="res://Core/Scene/Main/ServersPage.tscn" id="2_hdp2h"]
+[ext_resource type="Texture2D" uid="uid://b4xsvkcagal2v" path="res://Common/Resources/Img/DimGray.png" id="2_stls8"]
+
+[node name="MainMenuLayer" type="CanvasLayer" unique_id=1246626505]
+script = ExtResource("1_stls8")
+
+[node name="Background" type="TextureRect" parent="." unique_id=377980327]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_stls8")
+
+[node name="Pages" type="Control" parent="." unique_id=2007662744]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7fl4g")
+
+[node name="Title" parent="Pages" unique_id=61750156 instance=ExtResource("1_nolty")]
+layout_mode = 1
+
+[node name="Servers" parent="Pages" unique_id=647736506 instance=ExtResource("2_hdp2h")]
+layout_mode = 1

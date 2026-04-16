@@ -18,7 +18,7 @@ public class ClientNetworkManager
 
     public bool CanSend => ClientNetworkHandler is not null;
 
-    private readonly ConnectionAgent ConnectionAgent;
+    public readonly ConnectionAgent ConnectionAgent;
 
     public event Action<ClientState>? JoinGameEvent;
 
@@ -30,7 +30,6 @@ public class ClientNetworkManager
         NetworkAdapter.Start();
 
         ConnectionAgent = new();
-        ConnectionAgent.ReceivedServersEvent += UpdateServerList;
     }
 
     public void Send(AbstractUpdateDTO dTO) =>  ClientNetworkHandler?.Adapter.Send(new UpdateDatagram(dTO));
@@ -40,18 +39,9 @@ public class ClientNetworkManager
 
     
     /// <summary>
-    /// Informs the user that they can connect to <paramref name="servers"/>
-    /// </summary>
-    /// <param name="obj"></param>
-    private void UpdateServerList(ServerRecord[] servers)
-    {
-        //TODO make available to player
-        if (servers.Length > 0) TryJoin(servers[0].EndPoint);
-    }
-    /// <summary>
     /// Attempts to connect to the game server at <paramref name="endPoint"/>
     /// </summary>
-    private async void TryJoin(IPEndPoint endPoint)
+    public async void TryJoin(IPEndPoint endPoint)
     {
         //TODO consider failure to game instance
         //TODO clarify order of network and load events
