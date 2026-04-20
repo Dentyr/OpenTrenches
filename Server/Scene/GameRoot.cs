@@ -26,7 +26,7 @@ public partial class GameRoot : Node
     private WorldNode World { get; }
 
     private readonly List<PlayerNetworkHandler> _players = [];
-    private readonly List<AiCharacterController> _npcs = [];
+    private readonly List<Character> _npcs = [];
 
     private ServerState GameState { get; }
 
@@ -66,7 +66,9 @@ public partial class GameRoot : Node
         //* Initialization
         for (int i = 0; i < 100; i ++)
         {
-            _npcs.Add(new AiCharacterController(GameState));
+            var chara = GameState.CreateCharacter();
+            _npcs.Add(chara);
+            chara.NewAgent();
         }
     }
     public override void _EnterTree()
@@ -139,11 +141,5 @@ public partial class GameRoot : Node
 
         // outgoing messages
         foreach (AbstractCommandDTO command in GameState.PollEvents()) NetworkAdapter.Send(command);
-
-        //* Npc updates
-        foreach (var npc in _npcs)
-        {
-            npc.Think();
-        }
     }
 }
