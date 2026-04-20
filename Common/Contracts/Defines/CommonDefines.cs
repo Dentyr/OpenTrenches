@@ -17,6 +17,7 @@ public static class CommonDefines
     /// Pixels a character spans
     /// </summary>
     public const float CharacterSize = 16f;
+    public const float CharacterRadius = CharacterSize / 2;
 
     public const float MaxHealth = 25f;
 }

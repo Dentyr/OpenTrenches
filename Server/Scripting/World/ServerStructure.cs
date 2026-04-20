@@ -5,17 +5,20 @@ using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
 
-public class ServerStructure
+public class ServerStructure : IWorldObject
 {
     public int Id { get; }
     public Team Team { get; }
 
     public Vector2I Position { get; }
+    Vector2 IWorldObject.Position => Position;
 
     public StructureEnum Enum { get; }
 
     public float Health { get; private set; }
+    float IWorldObject.Hp => Health;
     public bool Destroyed => Health <= 0;
+
 
     /// <summary>
     /// Event when <see cref="Health"/> reaches 0.

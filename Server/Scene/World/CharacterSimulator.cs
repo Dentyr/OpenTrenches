@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Resources;
+using OpenTrenches.Common.Util;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scene.World;
 
@@ -43,7 +46,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         {
             Shape = new CircleShape2D()
             {
-                Radius = CommonDefines.CharacterSize / 2,
+                Radius = CommonDefines.CharacterRadius,
             }
         });
         Activate();
@@ -85,15 +88,44 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             // Hit position in logical space;
             var hitPos = hits[SceneDefines.PhysicsKey.Position].AsVector2() / CommonDefines.CellSize;
 
-            // hit character
+            // hit valid
             if (hitObject is CharacterSimulator charaSim)
                 return new FireHitResult.HitCharacter(hitPos, charaSim.Character);
-            if (hitObject is StructureSimulator structSim)
+            else if (hitObject is StructureSimulator structSim)
                 return new FireHitResult.HitStructure(hitPos, structSim.Structure);
             // hit something else
             else 
                 return new FireHitResult.Miss(hitPos);
         }
+    }
+    
+    WorldQueryResult ICharacterAdapter.Query(WorldQuery query)
+    {
+        // get correct shape
+        var hits = GetViewport().World2D.DirectSpaceState.IntersectShape(new PhysicsShapeQueryParameters2D()
+        {
+            Transform = GeometryServices.MakeTranslate(Position),
+            Shape = WorldQueryInterpreter.GetIntersectShape(query),
+            CollisionMask = WorldQueryInterpreter.GetMask(query)
+        });
+        // Get intersect
+        List<Character> characters = [];
+        List<ServerStructure> structures = [];
+
+        foreach(var hit in hits)
+        {
+            GodotObject hitobj = hit[SceneDefines.PhysicsKey.Collider].AsGodotObject();
+            // hit valid
+            if (hitobj is CharacterSimulator charaSim)
+                characters.Add(charaSim.Character);
+            else if (hitobj is StructureSimulator structSim)
+                structures.Add(structSim.Structure);
+        }
+
+        return new WorldQueryResult.Found(
+            characters,
+            structures
+        );
     }
 
     /// <summary>
@@ -123,8 +155,8 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         // ensure space is unoccupied
         var occupationHits = GetViewport().World2D.DirectSpaceState.IntersectShape(new PhysicsShapeQueryParameters2D()
         {
-            Transform = new(Vector2.Right, Vector2.Down, targetPosition),
-            Shape = new CircleShape2D() { Radius = CommonDefines.CharacterSize / 2 }, // TODO make runtime constant
+            Transform = GeometryServices.MakeTranslate(targetPosition),
+            Shape = new CircleShape2D() { Radius = CommonDefines.CharacterRadius }, // TODO make runtime constant
             // Modify for collision later
             CollisionMask = SceneDefines.Map.BarrierLayer,
         });

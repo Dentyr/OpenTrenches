@@ -16,4 +16,7 @@ public interface ICharacterAdapter
     /// </summary>
     /// <returns>null if failed to jump, the position if successful and unoccupied</returns>
     Vector2? AdaptJump(Vector2 direction);
+
+
+    WorldQueryResult Query(WorldQuery query);
 }

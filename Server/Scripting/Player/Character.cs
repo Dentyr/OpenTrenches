@@ -18,7 +18,7 @@ using OpenTrenches.Server.Scripting.Player.Agent;
 using OpenTrenches.Server.Scripting.Teams;
 namespace OpenTrenches.Server.Scripting.Player;
 
-public class Character : IIdObject
+public class Character : IIdObject, IWorldObject
 {
     //* Identification
     private IServerState ServerState { get; }
@@ -90,6 +90,7 @@ public class Character : IIdObject
         get => _health;
         private set => _health.Value = value;
     }
+    float IWorldObject.Hp => Health;
 
 
     private readonly UpdateableProperty<int> _logistics; //TODO debug logi
