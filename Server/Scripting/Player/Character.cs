@@ -170,7 +170,7 @@ public class Character : IIdObject, IWorldObject
         //* Initializing shared props
         _position = new(x => PropagateUpdate(CharacterAttribute.Position, x));
         _direction = new(x => PropagateUpdate(CharacterAttribute.Direction, x));
-        _state = new(CharacterState.Idle, x => PropagateUpdate(CharacterAttribute.State, x));
+        _state = new(0, x => PropagateUpdate(CharacterAttribute.State, x));
         _health = new(x => PropagateUpdate(CharacterAttribute.Health, x));
         _layer = new(x => PropagateUpdate(CharacterAttribute.Layer, x));
 
@@ -204,71 +204,67 @@ public class Character : IIdObject, IWorldObject
         }
 
         // Cooldowns
-        foreach (var abiltiy in this.Abilities) abiltiy.ProgressTimer(delta);
+        foreach (var abiltiy in Abilities) abiltiy.ProgressTimer(delta);
         _primarySlot.Cooldown(delta);
         
 
 
         //* building
-        switch (State)
+        if (State.HasFlag(CharacterState.Shooting))
         {
-            case CharacterState.Idle:
-                break;
-            case CharacterState.Aiming:
-                break;
-            case CharacterState.Shooting:
-                TryFire(adapter);
-                break;
-            case CharacterState.Reloading:
-                break;
-            case CharacterState.Building:
-                if (GetCell().DistanceTo(BuildCell) > 1f) 
-                {
-                    CancelTask();
-                    return;
-                }
+            TryFire(adapter);
+        }
+        if (State.HasFlag(CharacterState.Building))
+        {
+            if (GetCell().DistanceTo(BuildCell) > 1f) 
+            {
+                CancelTasks();
+                return;
+            }
 
-                // only proceed if position is valid
-                if (ServerState.Chunks.TryGetTile(BuildCell, out Tile? tile))
-                {
-                    if (tile is null)
-                    {   //if no tile exists at position, make one with a build status.
-                        ServerState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
-                    }
-                    else if (tile.Type == BuildTarget)
-                        CancelTask(); // already constructed, no further action
-                    else if (tile.Building is BuildStatus status && status.BuildTarget == BuildTarget) 
-                    {   // If build status is not null, make progress on building status if the target is the same
-                        if (ServerState.Chunks.ProgressBuild(BuildCell, delta)) CancelTask();
-                    }
-                    else if (tile.Building is null)
-                    {   // if a tile exists, isn't the build target, and can be built, 
-                        ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
-                    }
-                    else CancelTask();
+            // only proceed if position is valid
+            if (ServerState.Chunks.TryGetTile(BuildCell, out Tile? tile))
+            {
+                if (tile is null)
+                {   //if no tile exists at position, make one with a build status.
+                    ServerState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
                 }
+                else if (tile.Type == BuildTarget)
+                    CancelTasks(); // already constructed, no further action
+                else if (tile.Building is BuildStatus status && status.BuildTarget == BuildTarget) 
+                {   // If build status is not null, make progress on building status if the target is the same
+                    if (ServerState.Chunks.ProgressBuild(BuildCell, delta)) CancelTasks();
+                }
+                else if (tile.Building is null)
+                {   // if a tile exists, isn't the build target, and can be built, 
+                    ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
+                }
+                else CancelTasks();
+            }
 
-                else CancelTask();
-                break;
-            // Jump out of trench
-            case CharacterState.Jumping:
-                State = CharacterState.Idle;
-                //Must be in trench
-                if (Layer != WorldLayer.Trench) break;
+            else CancelTasks();
+        }
+        // Jump out of trench
+        if (State.HasFlag(CharacterState.Jumping))
+        {
+            TryClear(CharacterState.Jumping);
+            //Must be in trench
+            if (Layer == WorldLayer.Trench)
+            {
                 Vector2? target = adapter.AdaptJump(Direction - Position);
 
                 // can't move up because blocked or no ledge
-                if (target is null) break;
-                
-                Layer = WorldLayer.Ground;
-                Position = (Vector2)target;
-
-                break;
+                if (target is not null)
+                {
+                    Layer = WorldLayer.Ground;
+                    Position = (Vector2)target;
+                }
+            }
         }
 
         //* Position changes
         // Drop to lower level if on ground level, but current cell is trench level
-        if (Layer == WorldLayer.Ground 
+        if (Layer == WorldLayer.Ground
             && ServerState.Chunks.TryGetTile(GetCell(), out Tile? current) 
             && current?.Type == TileType.Trench)
         {
@@ -278,10 +274,10 @@ public class Character : IIdObject, IWorldObject
     private void TryFire(ICharacterAdapter adapter)
     {
         if (Position != Direction 
-            && _primarySlot.Equipment is FirearmType firearm
             && _primarySlot.CanFire()
         ) {
             // human recoil spread
+            FirearmType firearm = _primarySlot.Equipment;
 
             // Vector going in the direction of the bullet
             var aimVector = 
@@ -312,30 +308,34 @@ public class Character : IIdObject, IWorldObject
             _primarySlot.UseBullet();
             _primarySlot.ApplyCooldownAndRecoil();
         }
+        else TryClear(CharacterState.Shooting);
     }
 
-    private void CancelTask()
+    public void CancelTasks()
     {
-        State = CharacterState.Idle;
+        State = 0;
     }
 
-    public void TrySwitch(CharacterState newState)
+    //TODO hide member and expose functions for specific members
+    public void TrySet(CharacterState flag)
     {
-        switch (newState)
+        switch (flag)
         {
-            case CharacterState.Idle:
-                break;
             case CharacterState.Aiming:
                 break;
             case CharacterState.Shooting:
-                if (State == CharacterState.Reloading) return;
-                break;
-            case CharacterState.Reloading:
+                if (!_primarySlot.CanFire()) return;
                 break;
             case CharacterState.Building:
+                return; // do not set building from here
+            case CharacterState.Jumping:
                 break;
         }
-        State = newState;
+        State |= flag;
+    }
+    public void TryClear(CharacterState flag)
+    {
+        State &= ~flag;
     }
 
     //* combat

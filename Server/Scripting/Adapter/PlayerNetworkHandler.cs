@@ -68,8 +68,11 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         Character.Direction = new(input.MousePos.X, input.MousePos.Y);
 
 
-        if (input.Keys.Contains(UserKey.LMB)) Character.TrySwitch(CharacterState.Shooting);
-        else if (Character.State == CharacterState.Shooting) Character.TrySwitch(CharacterState.Idle);
+        if (input.Keys.Contains(UserKey.LMB)) Character.TrySet(CharacterState.Shooting);
+        else if (Character.State == CharacterState.Shooting) Character.TryClear(CharacterState.Shooting);
+
+        if (input.Keys.Contains(UserKey.RMB)) Character.TrySet(CharacterState.Aiming);
+        else Character.TryClear(CharacterState.Aiming);
 
 
     }

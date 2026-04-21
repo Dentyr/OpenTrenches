@@ -20,6 +20,7 @@ public partial class KeyboardListener : Node
     public bool S { get; set; }
     public bool D { get; set; }
     public bool LMB { get; set; } //left mouse button
+    public bool RMB { get; set; } //right mouse button
     
     public Vector2 MPos { get; set; } //mouse position within world
 
@@ -37,6 +38,9 @@ public partial class KeyboardListener : Node
             {
                 case MouseButton.Left:
                     LMB = mouseEvent.Pressed;
+                    break;
+                case MouseButton.Right:
+                    RMB = mouseEvent.Pressed;
                     break;
                 default:
                     break;
@@ -133,5 +137,6 @@ public partial class KeyboardListener : Node
         if (S) yield return UserKey.S;
         if (D) yield return UserKey.D;
         if (LMB) yield return UserKey.LMB;
+        if (RMB) yield return UserKey.RMB;
     }
 }

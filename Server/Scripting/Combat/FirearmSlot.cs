@@ -116,6 +116,7 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
     }
 
 
+    [MemberNotNullWhen(true, nameof(Equipment))]
     public bool CanFire()
     {
         return EquipmentEnum is not null && Reloaded && CooledDown && AmmoLoaded > 0;

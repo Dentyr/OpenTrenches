@@ -43,8 +43,7 @@ public class CharacterAgent
                 _fireTarget.Hp <= 0 ||
                 _fireTarget.Position.DistanceSquaredTo(character.Position) > 400
             )
-        )
-            character.TrySwitch(CharacterState.Idle);
+        )   character.CancelTasks();
 
     }
 
@@ -71,7 +70,7 @@ public class CharacterAgent
                 if (target.Team != character.Team)
                 {
                     _fireTarget = target;
-                    character.TrySwitch(Common.Contracts.Defines.CharacterState.Shooting);
+                    character.TrySet(CharacterState.Shooting);
                     return;
                 }
             }
