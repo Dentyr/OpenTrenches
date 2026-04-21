@@ -12,6 +12,6 @@ public partial class CharacterFloat : Label
     }
     public override void _Process(double delta)
     {
-        Text = Character.Health.ToString();
+        Text = Character.Hp.ToString();
     }
 }

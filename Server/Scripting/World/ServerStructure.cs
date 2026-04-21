@@ -15,13 +15,12 @@ public class ServerStructure : IWorldObject
 
     public StructureEnum Enum { get; }
 
-    public float Health { get; private set; }
-    float IWorldObject.Hp => Health;
-    public bool Destroyed => Health <= 0;
+    public float Hp { get; private set; }
+    public bool Destroyed => Hp <= 0;
 
 
     /// <summary>
-    /// Event when <see cref="Health"/> reaches 0.
+    /// Event when <see cref="Hp"/> reaches 0.
     /// </summary>
     public event Action? DestroyedEvent;
 
@@ -33,10 +32,10 @@ public class ServerStructure : IWorldObject
         Enum = Type.Enum;
         
         this.Position = Position;
-        Health = Type.HitPoints;
+        Hp = Type.Hp;
     }
 
-    public void TakeDamage(float damage) => Health -= damage;
+    public void TakeDamage(float damage) => Hp -= damage;
 
     /// <summary>
     /// The area this structure spans in the world space
@@ -45,10 +44,10 @@ public class ServerStructure : IWorldObject
 
     public void ApplyDamage(float damage)
     {
-        if (Health > 0)
+        if (Hp > 0)
         {
-            Health -= damage;
-            if (Health <= 0) DestroyedEvent?.Invoke();
+            Hp -= damage;
+            if (Hp <= 0) DestroyedEvent?.Invoke();
         }
     }
 }

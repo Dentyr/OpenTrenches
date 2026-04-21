@@ -26,6 +26,6 @@ public static class FromDTO
             Team: structure.Team, 
             Type: StructureTypes.Get(structure.Category), 
             Position: new (structure.X, structure.Y), 
-            Health: structure.Health);
+            Hp: structure.Hp);
     }
 }

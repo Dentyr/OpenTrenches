@@ -35,14 +35,14 @@ public class Character : IIdObject
 
     //* combat
 
-    private float _health = 1;
-    public float Health 
+    private float _hp = 1;
+    public float Hp 
     { 
-        get => _health;
+        get => _hp;
         private set
         {
             bool wasAlive = IsActive;
-            _health = value;
+            _hp = value;
             bool isAlive  = IsActive;
 
             if (wasAlive != isAlive)
@@ -53,7 +53,7 @@ public class Character : IIdObject
         }
     }
 
-    public bool IsActive => _health > 0;
+    public bool IsActive => _hp > 0;
     public event Action? InactivatedEvent;
     public event Action? ActivatedEvent;
     
@@ -81,7 +81,7 @@ public class Character : IIdObject
         this.Team = Team;
         this.ClientState = ClientState;
         this.Position = Position;
-        this.Health = Health;
+        this.Hp = Health;
     }
 
     //* Modifying state
@@ -116,7 +116,7 @@ public class Character : IIdObject
                 Position = Serialization.Deserialize<Vector2>(update.Payload);
                 break;
             case CharacterAttribute.Health:
-                Health = Serialization.Deserialize<float>(update.Payload);
+                Hp = Serialization.Deserialize<float>(update.Payload);
                 break;
             case CharacterAttribute.Direction:
                 break;

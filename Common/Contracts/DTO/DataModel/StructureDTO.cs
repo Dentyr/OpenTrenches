@@ -12,5 +12,5 @@ public record  class StructureDTO (
     [property: Key(2)] int X,
     [property: Key(3)] int Y,
     [property: Key(4)] StructureEnum Category,
-    [property: Key(5)] float Health
+    [property: Key(5)] float Hp
 ) : AbstractCreateDTO {}

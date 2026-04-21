@@ -19,14 +19,14 @@ public class ClientStructure
     public event Action? DestroyedEvent;
 
 
-    public ClientStructure(int Id, int Team, StructureType Type, Vector2I Position, float Health)
+    public ClientStructure(int Id, int Team, StructureType Type, Vector2I Position, float Hp)
     {
         this.Id = Id;
         this.Team = Team;
         Enum = Type.Enum;
         
         this.Position = Position;
-        this.Health = Health;
+        this.Health = Hp;
     }
 
 }

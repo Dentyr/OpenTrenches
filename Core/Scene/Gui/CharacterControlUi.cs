@@ -101,8 +101,8 @@ public partial class CharacterControlUi : Control
     {
         if (_character is not null)
         {
-            _healthLabel.Text = _character.Health + "/" + CommonDefines.MaxHealth;
-            _healthBar.Value = _character.Health / CommonDefines.MaxHealth;
+            _healthLabel.Text = _character.Hp + "/" + CommonDefines.MaxHp;
+            _healthBar.Value = _character.Hp / CommonDefines.MaxHp;
         }
     }
 

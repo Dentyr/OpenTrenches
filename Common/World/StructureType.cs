@@ -19,8 +19,8 @@ public class StructureType
 
     public bool Constructable { get; init; } = true;
 
-    public int HitPoints { get; init; } = -1;
-    public bool Destructable => HitPoints > 0;
+    public int Hp { get; init; } = -1;
+    public bool Destructable => Hp > 0;
 
     /// <summary>
     /// Whether or not this structure will continue to have a profile even if destroyed, as a collapsed structure.

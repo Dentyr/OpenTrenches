@@ -19,5 +19,5 @@ public static class CommonDefines
     public const float CharacterSize = 16f;
     public const float CharacterRadius = CharacterSize / 2;
 
-    public const float MaxHealth = 25f;
+    public const float MaxHp = 25f;
 }

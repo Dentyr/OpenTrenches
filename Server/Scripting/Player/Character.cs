@@ -85,12 +85,11 @@ public class Character : IIdObject, IWorldObject
 
     //* Combat status
     private readonly UpdateableProperty<float> _health;
-    public float Health 
+    public float Hp 
     { 
         get => _health;
         private set => _health.Value = value;
     }
-    float IWorldObject.Hp => Health;
 
 
     private readonly UpdateableProperty<int> _logistics; //TODO debug logi
@@ -346,7 +345,7 @@ public class Character : IIdObject, IWorldObject
     /// </summary>
     public void Respawn()
     {
-        Health = CommonDefines.MaxHealth; 
+        Hp = CommonDefines.MaxHp; 
         Position = Team.SpawnPoint;
         RespawnEvent?.Invoke();
     }
@@ -356,7 +355,7 @@ public class Character : IIdObject, IWorldObject
     /// </summary>
     public void RequestRespawn()
     {
-        if (Health <= 0) Respawn();
+        if (Hp <= 0) Respawn();
     }
 
     /// <summary>
@@ -372,9 +371,9 @@ public class Character : IIdObject, IWorldObject
 
     private void ApplyDamage(float dmg)
     {
-        if (Health < 0) return;
-        Health -= dmg / (Math.Max(0, GetDefense()) + 1);
-        if (Health <= 0) DiedEvent?.Invoke();
+        if (Hp < 0) return;
+        Hp -= dmg / (Math.Max(0, GetDefense()) + 1);
+        if (Hp <= 0) DiedEvent?.Invoke();
     }
 
 
