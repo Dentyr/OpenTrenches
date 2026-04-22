@@ -80,8 +80,12 @@ public class Character : IIdObject, IWorldObject
     public CharacterState State
     { 
         get => _state.Value;
-        set => _state.Value = value;
+        set 
+        {
+            if (_state.Set(value)) StateChangedEvent?.Invoke(_state);
+        }
     }
+    public event Action<CharacterState>? StateChangedEvent;
 
     //* Combat status
     private readonly UpdateableProperty<float> _health;

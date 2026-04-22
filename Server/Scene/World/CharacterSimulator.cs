@@ -76,7 +76,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         {
             From = Position,
             To = target,
-            CollisionMask = SceneDefines.Map.GetMask(Character.Layer),
+            CollisionMask = SceneDefines.Map.GetBulletMask(Character.Layer, Character.State.HasFlag(CharacterState.Aiming)),
         });
         // hit nothing
         if (hits.Count == 0) return new FireHitResult.Miss(target);
@@ -204,5 +204,25 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
                 CollisionMask = SceneDefines.Map.GroundTileLayer | SceneDefines.Map.BarrierLayer;
                 break;
         }
+    }
+
+    private void HandleStateChange(CharacterState state)
+    {
+        //? Maybe change to have individual events fire for specific flag clearing and setting instead of having a single point for state changes
+        UpdateCollisionAiming(state.HasFlag(CharacterState.Aiming));
+    }
+    /// <summary>
+    /// Modifies collision layer to be hittable by ground fire if the character is aiming out of a trench
+    /// </summary>
+    private void UpdateCollisionAiming(bool isAiming)
+    {
+        //? check whether it needs updating first if performance is issue
+
+        // if aiming out of trench, it should be able to be hit by ground targets
+        if (isAiming)
+            CollisionLayer &= SceneDefines.Map.GroundTileLayer;
+        // otherwise if it's inside a trench then it should be protected
+        else if (Character.Layer == WorldLayer.Trench)
+            CollisionLayer &= ~SceneDefines.Map.GroundTileLayer;
     }
 }

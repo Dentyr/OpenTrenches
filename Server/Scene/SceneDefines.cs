@@ -32,16 +32,16 @@ public static class SceneDefines
         public const uint BarrierLayer = (uint)1 << 31;
 
 
-        /// <summary>
-        /// Mask for bullets shot at ground level
-        /// </summary>
-        public const uint BulletMaskGround = GroundObjectLayer | BarrierLayer;
-        /// <summary>
-        /// Mask for bullets shot inside a trench
-        /// </summary>
-        public const uint BulletMaskTrench = TrenchObjectLayer | GroundTileLayer | BarrierLayer;
 
-        public static uint GetMask(WorldLayer layer) => layer == WorldLayer.Ground ? BulletMaskGround : BulletMaskTrench;
+        public static uint GetBulletMask(WorldLayer layer, bool aiming) 
+        {
+            // Can only hit ground level objects when on ground level
+            if (layer == WorldLayer.Ground) return GroundObjectLayer | BarrierLayer;
+            // Can hit characters inside and outside a trench when aiming from trench
+            else if (aiming) return TrenchObjectLayer | GroundObjectLayer | BarrierLayer;
+            // Can only hit trench objects inside trench and not aiming.
+            else return TrenchObjectLayer | GroundTileLayer | BarrierLayer;
+        } 
         
 
 

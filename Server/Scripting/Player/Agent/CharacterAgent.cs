@@ -4,6 +4,9 @@ using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
+/// <summary>
+/// makes NPC character decisions
+/// </summary>
 public class CharacterAgent
 {
     private float _variable = GD.Randf() - 0.5f;
