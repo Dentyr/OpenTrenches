@@ -2,32 +2,33 @@ using Godot;
 
 namespace OpenTrenches.Server.Scripting.Player;
 
-//TODO make modular like godot physics queries
-public record class WorldQuery
+public class WorldQuery
 {
-    public virtual bool IncludeAlly() => true;
-    public virtual bool IncludeEnemy() => true;
-    public virtual bool IncludeStructure() => true;
-    public virtual bool IncludeCharacter() => true;
+    public bool IncludeAlly { get; init; } = true;
+    public bool IncludeEnemy { get; init; } = true;
+    public bool IncludeStructure { get; init; } = true;
+    public bool IncludeCharacter { get; init; } = true;
+
+    public Vector2 Direction { get; init; } = Vector2.Zero;
 
     /// <summary>
-    /// Finds very close characters that can quickly reach the character
+    /// The shape of the area which will be queried for matches.
+    /// <see cref="Shape.Meelee"/> by default.
     /// </summary>
-    public record MeeleeThreats : WorldQuery
+    /// <value></value>
+    public Shape QueryArea { get; init; } = Shape.Meelee;
+
+
+    public enum Shape
     {
-        public override bool IncludeAlly() => false;
-    }
-    /// <summary>
-    /// objects facing <paramref name="direction"/>
-    /// </summary>
-    public record RangeForward(Vector2 direction) : WorldQuery;
-
-
-    /// <summary>
-    /// Finds moderately nearby enemies that comfortably shoot at the character.
-    /// </summary>
-    public record Threats : WorldQuery
-    {
-        public override bool IncludeAlly() => false;
+        Meelee,
+        /// <summary>
+        /// Units close enough to comfortably shoot at
+        /// </summary>
+        Range,
+        /// <summary>
+        /// Loner range threats focused on direction
+        /// </summary>
+        Distance,
     }
 }

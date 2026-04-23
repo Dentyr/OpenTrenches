@@ -118,23 +118,23 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             // hit valid
             if (hitobj is CharacterSimulator charaSim)
             {
-                if ((charaSim.Character.Team == Character.Team && query.IncludeAlly()) ||
-                    (charaSim.Character.Team != Character.Team && query.IncludeEnemy())
+                if ((charaSim.Character.Team == Character.Team && query.IncludeAlly) ||
+                    (charaSim.Character.Team != Character.Team && query.IncludeEnemy)
                 ) {
                     characters.Add(charaSim.Character);
                 }
             }
             else if (hitobj is StructureSimulator structSim)
             {
-                if ((structSim.Structure.Team == Character.Team && query.IncludeAlly()) ||
-                    (structSim.Structure.Team != Character.Team && query.IncludeEnemy())
+                if ((structSim.Structure.Team == Character.Team && query.IncludeAlly) ||
+                    (structSim.Structure.Team != Character.Team && query.IncludeEnemy)
                 ) {
                     structures.Add(structSim.Structure);
                 }
             }
         }
 
-        return new WorldQueryResult.Found(
+        return new WorldQueryResult(
             characters,
             structures
         );

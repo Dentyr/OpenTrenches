@@ -3,10 +3,16 @@ using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player;
 
-public abstract record WorldQueryResult
+public class WorldQueryResult
 {
-    public record Found(
-        List<Character> Characters,
-        List<ServerStructure> Structures
-    ) : WorldQueryResult;
+
+    public IReadOnlyList<Character> Characters { get; init; }
+    public IReadOnlyList<ServerStructure> Structures { get; init; }
+
+    public WorldQueryResult(IReadOnlyList<Character> Characters, 
+        IReadOnlyList<ServerStructure> Structures)
+    {
+        this.Characters = Characters;
+        this.Structures = Structures;
+    }
 }

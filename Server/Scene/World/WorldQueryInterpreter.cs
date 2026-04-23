@@ -16,24 +16,24 @@ public static class WorldQueryInterpreter
 {
     //TODO? maybe convert to something like Equipment type
     private delegate Shape2D MakeShape(Vector2 origin);
-    private static Dictionary<Type, Shape2D> _intersectDictionary = new Dictionary<Type, Shape2D>()
+    private static Dictionary<WorldQuery.Shape, Shape2D> _intersectDictionary = new Dictionary<WorldQuery.Shape, Shape2D>()
     {
         {
-            typeof(WorldQuery.MeeleeThreats), 
+            WorldQuery.Shape.Meelee, 
             new CircleShape2D()
             {
                 Radius = 4 * CommonDefines.CellSize,
             }
         },
         {
-            typeof(WorldQuery.Threats), 
+            WorldQuery.Shape.Range, 
             new CircleShape2D()
             {
                 Radius = 10 * CommonDefines.CellSize,
             }
         },
         {
-            typeof(WorldQuery.RangeForward), 
+            WorldQuery.Shape.Distance, 
             new CircleShape2D()
             {
                 Radius = 5 * CommonDefines.CellSize,
@@ -43,7 +43,7 @@ public static class WorldQueryInterpreter
     public static Shape2D GetIntersectShape(WorldQuery query)
     {
 
-        return _intersectDictionary[query.GetType()];
+        return _intersectDictionary[query.QueryArea];
     }
 
     public static uint GetMask(WorldQuery query)
