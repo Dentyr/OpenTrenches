@@ -15,8 +15,11 @@ public class CharacterAgent
 
     private IWorldObject? _fireTarget;
 
+    private AbstractAgentTask _task;
+
     public CharacterAgent()
     {
+        _task = new IdleTask();
     }
 
     /// <summary>
@@ -28,8 +31,9 @@ public class CharacterAgent
 
         if (GD.Randf() > 0.975f)
         {
+            _task = _task.Reason(character, adapter);
             DecideMovementTarget(character, adapter);
-            DecideShootingTarget(character, adapter);
+            // DecideShootingTarget(character, adapter);
         }
 
         if (character.Position.DistanceSquaredTo(_movementTarget.Position) > 0.3f) 
@@ -37,16 +41,7 @@ public class CharacterAgent
         else 
             character.MoveIn(Vector2.Zero);
 
-        if (_fireTarget is not null) 
-            character.Direction = _fireTarget.Position;
-
-        if (character.State == CharacterState.Shooting &&
-            (
-                _fireTarget is null ||
-                _fireTarget.Hp <= 0 ||
-                _fireTarget.Position.DistanceSquaredTo(character.Position) > 400
-            )
-        )   character.CancelTasks();
+        _task.Process(character, adapter);
 
     }
 
@@ -62,24 +57,5 @@ public class CharacterAgent
         };
 
         _movementTarget = new WorldPosition(character.Position + (movement * 50f));
-    }
-    private void DecideShootingTarget(Character character, ICharacterAdapter adapter)
-    {        
-        if (adapter.Query(new WorldQuery.Threats()) is WorldQueryResult.Found found)
-        {
-            foreach (Character target in found.Characters)
-            {
-                //TODO swap to random target
-                if (target.Team != character.Team)
-                {
-                    _fireTarget = target;
-                    character.TrySet(CharacterState.Shooting);
-                    return;
-                }
-            }
-        }
-
-
-
     }
 }

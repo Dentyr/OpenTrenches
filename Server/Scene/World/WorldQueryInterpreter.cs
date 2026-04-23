@@ -10,10 +10,11 @@ using OpenTrenches.Server.Scripting.Player;
 
 
 /// <summary>
-/// Interprets aspects of <see cref="WorldQuery"/>
+/// Interprets aspects of <see cref="WorldQuery"/> to engine specs like godot shapes.
 /// </summary>
 public static class WorldQueryInterpreter
 {
+    //TODO? maybe convert to something like Equipment type
     private delegate Shape2D MakeShape(Vector2 origin);
     private static Dictionary<Type, Shape2D> _intersectDictionary = new Dictionary<Type, Shape2D>()
     {

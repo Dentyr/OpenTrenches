@@ -12,12 +12,21 @@ public abstract record FireHitResult(Vector2 Position)
     public record Miss(Vector2 Position) : FireHitResult(Position);
 }
 
-public abstract record WorldQuery
+//TODO make modular like godot physics queries
+public record class WorldQuery
 {
+    public virtual bool IncludeAlly() => true;
+    public virtual bool IncludeEnemy() => true;
+    public virtual bool IncludeStructure() => true;
+    public virtual bool IncludeCharacter() => true;
+
     /// <summary>
-    /// Finds very close enemies that can or will quickly reach the character
+    /// Finds very close characters that can quickly reach the character
     /// </summary>
-    public record MeeleeThreats : WorldQuery;
+    public record MeeleeThreats : WorldQuery
+    {
+        public override bool IncludeAlly() => false;
+    }
     /// <summary>
     /// objects facing <paramref name="direction"/>
     /// </summary>
@@ -27,7 +36,10 @@ public abstract record WorldQuery
     /// <summary>
     /// Finds moderately nearby enemies that comfortably shoot at the character.
     /// </summary>
-    public record Threats : WorldQuery;
+    public record Threats : WorldQuery
+    {
+        public override bool IncludeAlly() => false;
+    }
 }
 
 public abstract record WorldQueryResult

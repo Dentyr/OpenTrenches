@@ -117,9 +117,21 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             GodotObject hitobj = hit[SceneDefines.PhysicsKey.Collider].AsGodotObject();
             // hit valid
             if (hitobj is CharacterSimulator charaSim)
-                characters.Add(charaSim.Character);
+            {
+                if ((charaSim.Character.Team == Character.Team && query.IncludeAlly()) ||
+                    (charaSim.Character.Team != Character.Team && query.IncludeEnemy())
+                ) {
+                    characters.Add(charaSim.Character);
+                }
+            }
             else if (hitobj is StructureSimulator structSim)
-                structures.Add(structSim.Structure);
+            {
+                if ((structSim.Structure.Team == Character.Team && query.IncludeAlly()) ||
+                    (structSim.Structure.Team != Character.Team && query.IncludeEnemy())
+                ) {
+                    structures.Add(structSim.Structure);
+                }
+            }
         }
 
         return new WorldQueryResult.Found(
