@@ -15,4 +15,6 @@ public interface IReadOnlyFirearmSlot : IReadOnlyEquipmentSlot<FirearmEnum>
     public float FireCooldown { get; }
     public int AmmoLoaded { get; }
     public int AmmoStored { get; }
+
+    public bool Reloaded { get; }
 }
