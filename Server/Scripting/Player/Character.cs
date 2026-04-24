@@ -42,7 +42,11 @@ public class Character : IIdObject, IWorldObject
         set => _position.Value = value;
     }
 
+
     private readonly UpdateableProperty<WorldLayer> _layer;
+    /// <summary>
+    /// Where this character exists in relation to possible movement
+    /// </summary>
     public WorldLayer Layer
     {
         get => _layer.Value;
@@ -52,6 +56,7 @@ public class Character : IIdObject, IWorldObject
         }
     }
     public event Action<WorldLayer>? LayerChangedEvent;
+
 
     private readonly UpdateableProperty<Vector2> _direction;
     /// <summary>
@@ -176,6 +181,7 @@ public class Character : IIdObject, IWorldObject
         _direction = new(x => PropagateUpdate(CharacterAttribute.Direction, x));
         _state = new(0, x => PropagateUpdate(CharacterAttribute.State, x));
         _health = new(x => PropagateUpdate(CharacterAttribute.Health, x));
+
         _layer = new(x => PropagateUpdate(CharacterAttribute.Layer, x));
 
 
@@ -292,17 +298,20 @@ public class Character : IIdObject, IWorldObject
             {
                 
                 // machine spread
-                // var kineticTarget = aimVector;                
                 var kineticTarget = aimVector.Spread(firearm.Stats.SpreadMOA) * firearm.Stats.ProjectileDistance;
-                // var kineticTarget = aimTarget.BoxSpread(firearm.Stats.SpreadMOA);
-                // var kineticTarget = Position + (
-                //     (Direction - Position)
-                //         .BoxSpread(firearm.Stats.SpreadMOA)
-                //         .Normalized() 
-                //     * firearm.Stats.ProjectileDistance
-                // );
+
+                WorldLayer fireLayer = Layer;
+
+                // If the character is aiming at a ground tile from inside a trench, they shoot from ground level
+                if (fireLayer == WorldLayer.Trench && 
+                    State.HasFlag(CharacterState.Aiming) && 
+                    GetTargetLayer() == WorldLayer.Ground)
+                {
+                    fireLayer = WorldLayer.Ground;
+                }
+                GD.Print("shootin from " + fireLayer);
                 
-                FireHitResult result = adapter.AdaptFire(Position + kineticTarget);
+                FireHitResult result = adapter.AdaptFire(fireLayer, Position + kineticTarget);
                 if (result is FireHitResult.HitCharacter hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 else if (result is FireHitResult.HitStructure hitStruct && hitStruct.Structure.Team != Team) hitStruct.Structure.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
@@ -344,6 +353,20 @@ public class Character : IIdObject, IWorldObject
 
     //* combat
 
+    /// <summary>
+    /// Returns the <see cref="WorldLayer"/> of the tile at <see cref="Direction"/>
+    /// </summary>
+    /// <returns></returns>
+    public WorldLayer GetTargetLayer()
+    {
+        if (ServerState.Chunks.TryGetTile((int)Direction.X, (int)Direction.Y, out Tile? tile))
+            return TileLayerConversion.LayerOf(tile?.Type);
+        
+        return WorldLayer.Ground;
+    }
+
+
+    
     /// <summary>
     /// Sets character back to full health and at team spawnpoint
     /// </summary>

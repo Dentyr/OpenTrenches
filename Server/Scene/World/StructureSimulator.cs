@@ -26,7 +26,7 @@ public partial class StructureSimulator : StaticBody2D
             }
         );
 
-        CollisionLayer = SceneDefines.Map.GroundObjectLayer;
+        CollisionLayer = SceneDefines.Map.StructureLayer;
         CollisionMask = 0;
     }
 

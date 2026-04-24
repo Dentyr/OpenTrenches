@@ -1,9 +1,10 @@
 using Godot;
+using OpenTrenches.Common.Combat;
 
 namespace OpenTrenches.Common.World;
 
 /// <summary>
-/// Any object that's positioned within worldspace
+/// Any interactable object that's positioned within worldspace 
 /// </summary>
 public interface IWorldObject
 {
@@ -12,7 +13,4 @@ public interface IWorldObject
     float Hp { get; }
 }
 
-public record class WorldPosition(Vector2 Position) : IWorldObject
-{
-    public float Hp => 0;
-}
+public record class WorldPosition(Vector2 Position);

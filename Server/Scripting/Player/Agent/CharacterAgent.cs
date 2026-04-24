@@ -1,5 +1,4 @@
 using Godot;
-using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
@@ -11,7 +10,7 @@ public class CharacterAgent
 {
     private float _variable = GD.Randf() - 0.5f;
 
-    private IWorldObject _movementTarget = new WorldPosition(Vector2.Zero);
+    private WorldPosition _movementTarget = new WorldPosition(Vector2.Zero);
 
     private IWorldObject? _fireTarget;
 

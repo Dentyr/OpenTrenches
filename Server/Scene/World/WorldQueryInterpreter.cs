@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scene;
 using OpenTrenches.Server.Scene.World;
 using OpenTrenches.Server.Scripting.Player;
@@ -48,6 +47,6 @@ public static class WorldQueryInterpreter
 
     public static uint GetMask(WorldQuery query)
     {
-        return SceneDefines.Map.GroundObjectLayer | SceneDefines.Map.GroundTileLayer;
+        return SceneDefines.Map.CharacterLayer;
     }
 }

@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
-using OpenTrenches.Common.Contracts.DTO;
-using OpenTrenches.Common.Resources;
 using OpenTrenches.Common.Util;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Combat;
 using OpenTrenches.Server.Scripting.Player;
 using OpenTrenches.Server.Scripting.World;
 
@@ -39,7 +38,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         
         Character.DiedEvent += Deactivate;
         Character.RespawnEvent += Activate;
-        Character.LayerChangedEvent += SetCollisionLayer;
+        Character.LayerChangedEvent += SetMovementMask;
 
         //* collision
         AddChild(new CollisionShape2D()
@@ -68,34 +67,49 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
         WritebackPosition();
     }
 
-    FireHitResult ICharacterAdapter.AdaptFire(Vector2 target)
+    FireHitResult ICharacterAdapter.AdaptFire(WorldLayer channel, Vector2 target)
     {
         // move from logical space to engine space
         target *= CommonDefines.CellSize;
-        var hits = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
-        {
-            From = Position,
-            To = target,
-            CollisionMask = SceneDefines.Map.GetBulletMask(Character.Layer, Character.State.HasFlag(CharacterState.Aiming)),
-        });
-        // hit nothing
-        if (hits.Count == 0) return new FireHitResult.Miss(target);
-        else
-        {
-            //if hit something
-            GodotObject hitObject = hits[SceneDefines.PhysicsKey.Collider].AsGodotObject();
 
-            // Hit position in logical space;
-            var hitPos = hits[SceneDefines.PhysicsKey.Position].AsVector2() / CommonDefines.CellSize;
+        Godot.Collections.Array<Rid> exclude = [];
 
-            // hit valid
-            if (hitObject is CharacterSimulator charaSim)
-                return new FireHitResult.HitCharacter(hitPos, charaSim.Character);
-            else if (hitObject is StructureSimulator structSim)
-                return new FireHitResult.HitStructure(hitPos, structSim.Structure);
-            // hit something else
-            else 
-                return new FireHitResult.Miss(hitPos);
+        while ( true )
+        {
+            var hits = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
+            {
+                From = Position,
+                To = target,
+                CollisionMask = PhysicsLayerInterpreter.GetScanLayer(channel),
+                Exclude = exclude,
+            });
+
+            // hit nothing
+            if (hits.Count == 0) return new FireHitResult.Miss(target);
+            else
+            {
+                //if hit something
+                GodotObject hitObject = hits[SceneDefines.PhysicsKey.Collider].AsGodotObject();
+
+                // Hit position in logical space;
+                var hitPos = hits[SceneDefines.PhysicsKey.Position].AsVector2() / CommonDefines.CellSize;
+
+                // hit valid
+                if (hitObject is CharacterSimulator charaSim)
+                {
+                    if (CombatCalculationService.TryHit(channel, charaSim.Character))
+                        return new FireHitResult.HitCharacter(hitPos, charaSim.Character);
+                    exclude.Add(hits[SceneDefines.PhysicsKey.Rid].AsRid());
+                }
+                else if (hitObject is StructureSimulator structSim)
+                {
+                    GD.Print("STRUC SIM");
+                    return new FireHitResult.HitStructure(hitPos, structSim.Structure);
+                }
+                // hit something else
+                else 
+                    return new FireHitResult.Miss(hitPos);
+            }
         }
     }
     
@@ -195,46 +209,45 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
     private void Activate()
     {
         SetPhysicsProcess(true);
-        SetCollisionLayer(Character.Layer);
+        CollisionLayer = SceneDefines.Map.CharacterLayer;;
+        SetMovementMask(Character.Layer);
     }
 
     /// <summary>
     /// Sets collision layer and mask to the appropriate values, if processing physics
     /// </summary>
     /// <param name="layer"></param>
-    private void SetCollisionLayer(WorldLayer layer)
+    private void SetMovementMask(WorldLayer layer)
     {
         if (!IsPhysicsProcessing()) return;
         switch (layer)
         {
             case WorldLayer.Ground:
-                CollisionLayer = SceneDefines.Map.GroundObjectLayer;
                 CollisionMask = SceneDefines.Map.BarrierLayer;
                 break;
             case WorldLayer.Trench:
-                CollisionLayer = SceneDefines.Map.TrenchObjectLayer;
                 CollisionMask = SceneDefines.Map.GroundTileLayer | SceneDefines.Map.BarrierLayer;
                 break;
         }
     }
 
-    private void HandleStateChange(CharacterState state)
-    {
-        //? Maybe change to have individual events fire for specific flag clearing and setting instead of having a single point for state changes
-        UpdateCollisionAiming(state.HasFlag(CharacterState.Aiming));
-    }
-    /// <summary>
-    /// Modifies collision layer to be hittable by ground fire if the character is aiming out of a trench
-    /// </summary>
-    private void UpdateCollisionAiming(bool isAiming)
-    {
-        //? check whether it needs updating first if performance is issue
+    // private void HandleStateChange(CharacterState state)
+    // {
+    //     //? Maybe change to have individual events fire for specific flag clearing and setting instead of having a single point for state changes
+    //     UpdateCollisionAiming(state.HasFlag(CharacterState.Aiming));
+    // }
+    // /// <summary>
+    // /// Modifies collision layer to be hittable by ground fire if the character is aiming out of a trench
+    // /// </summary>
+    // private void UpdateCollisionAiming(bool isAiming)
+    // {
+    //     //? check whether it needs updating first if performance is issue
 
-        // if aiming out of trench, it should be able to be hit by ground targets
-        if (isAiming)
-            CollisionLayer &= SceneDefines.Map.GroundTileLayer;
-        // otherwise if it's inside a trench then it should be protected
-        else if (Character.Layer == WorldLayer.Trench)
-            CollisionLayer &= ~SceneDefines.Map.GroundTileLayer;
-    }
+    //     // if aiming out of trench, it should be able to be hit by ground targets
+    //     if (isAiming)
+    //         CollisionLayer |= SceneDefines.Map.GroundTileLayer;
+    //     // otherwise if it's inside a trench then it should be protected
+    //     else if (Character.MovementLayer == WorldLayer.Trench)
+    //         CollisionLayer &= ~SceneDefines.Map.GroundTileLayer;
+    // }
 }

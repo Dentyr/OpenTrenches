@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Teams;
 
