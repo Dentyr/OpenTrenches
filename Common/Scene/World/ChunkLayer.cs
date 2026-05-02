@@ -7,6 +7,7 @@ using OpenTrenches.Common.World;
 
 namespace OpenTrenches.Common.Scene.World;
 
+//TODO split into server and client, where server doesn't use tilesets
 public partial class ChunkLayer : Node2D
 {
     private readonly TileMapLayer GrassLayer;
@@ -122,9 +123,9 @@ public partial class ChunkLayer : Node2D
     /// <summary>
     /// Updates the tiles at <paramref name="x"/> and <paramref name="y"/> to match <paramref name="tile"/>
     /// </summary>
-    private void UpdateTile(Tile? tile, Vector2I position)
+    private void UpdateTile(TileType tile, Vector2I position)
     {
-        SetTerrain([position], tile?.Type);
+        SetTerrain([position], tile);
     }
 
     private void LoadChunk(int chunkx, int chunky, IChunk chunk)
@@ -144,7 +145,7 @@ public partial class ChunkLayer : Node2D
 
 
                 // For each cell in the chunk, add it to its respective terrain list
-                if (chunk[cellx, celly]?.Type == TileType.Trench)
+                if (chunk[cellx, celly] == TileType.Trench)
                 {
                     TrenchTerrain.Add(new(x, y));
                 }

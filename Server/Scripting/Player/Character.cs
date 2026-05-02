@@ -233,19 +233,20 @@ public class Character : IIdObject, IWorldObject
             }
 
             // only proceed if position is valid
-            if (ServerState.Chunks.TryGetTile(BuildCell, out Tile? tile))
+            if (ServerState.Chunks.TryGetCell(BuildCell, out CellRecord? cell))
             {
-                if (tile is null)
+                if (cell.Tile == TileType.Clear && cell.TileConstruction == null)
                 {   //if no tile exists at position, make one with a build status.
                     ServerState.Chunks.StartBuild(BuildCell, BuildTarget, delta);
                 }
-                else if (tile.Type == BuildTarget)
+                else if (cell.Tile == BuildTarget)
                     CancelTasks(); // already constructed, no further action
-                else if (tile.Building is BuildStatus status && status.BuildTarget == BuildTarget) 
+                else if (cell.TileConstruction is TileConstruction status && status.Target == BuildTarget) 
                 {   // If build status is not null, make progress on building status if the target is the same
-                    if (ServerState.Chunks.ProgressBuild(BuildCell, delta)) CancelTasks();
+                    var construct = ServerState.Chunks.ProgressBuild(BuildCell, delta);
+                    if (construct?.Progress >= 1) CancelTasks();
                 }
-                else if (tile.Building is null)
+                else if (cell.TileConstruction is null)
                 {   // if a tile exists, isn't the build target, and can be built, 
                     ServerState.Chunks.StartBuild(BuildCell, BuildTarget);
                 }
@@ -275,8 +276,8 @@ public class Character : IIdObject, IWorldObject
         //* Position changes
         // Drop to lower level if on ground level, but current cell is trench level
         if (Layer == WorldLayer.Ground
-            && ServerState.Chunks.TryGetTile(GetCell(), out Tile? current) 
-            && current?.Type == TileType.Trench)
+            && ServerState.Chunks.TryGetTile(GetCell(), out TileType? current) 
+            && current == TileType.Trench)
         {
             Layer = WorldLayer.Trench;
         }
@@ -359,8 +360,8 @@ public class Character : IIdObject, IWorldObject
     /// <returns></returns>
     public WorldLayer GetTargetLayer()
     {
-        if (ServerState.Chunks.TryGetTile((int)Direction.X, (int)Direction.Y, out Tile? tile))
-            return TileLayerConversion.LayerOf(tile?.Type);
+        if (ServerState.Chunks.TryGetTile((int)Direction.X, (int)Direction.Y, out TileType? tile))
+            return TileLayerConversion.LayerOf(tile);
         
         return WorldLayer.Ground;
     }

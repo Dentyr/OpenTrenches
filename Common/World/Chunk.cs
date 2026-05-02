@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO;
+using OpenTrenches.Common.Contracts.DTO.DataModel;
 
 namespace OpenTrenches.Common.World;
 
@@ -12,8 +15,8 @@ namespace OpenTrenches.Common.World;
 /// </summary>
 public class Chunk : IChunk
 {
-    private Grid2D<Tile?> Tiles { get; }
-    public Tile? this[int x, int y]
+    private Grid2D<TileType> Tiles { get; }
+    public TileType this[int x, int y]
     {
         get => Tiles[x, y];
         set 
@@ -31,20 +34,42 @@ public class Chunk : IChunk
     private HashSet<int> _structures = [];
     public IReadOnlySet<int> Structures => _structures;
 
-    public Tile?[][] CopyTiles() => Tiles.CopyTiles();
-    public T[][] Select<T>(Func<Tile?, T> selector) => Tiles.CopySelect(selector);
+    /// <summary>
+    /// Tiles being updated
+    /// </summary>
+    private Dictionary<Vector2I, TileConstruction> _tileConstructions = [];
+    public IReadOnlyDictionary<Vector2I, TileConstruction> TileConstructions => _tileConstructions;
+
+    public TileType[][] CopyTiles() => Tiles.CopyTiles();
+    public T[][] Select<T>(Func<TileType, T> selector) => Tiles.CopySelect(selector);
 
 
     /// <summary>
     /// Called when terrin is set at (x, y)
     /// </summary>
-    public event Action<Tile?, int, int>? TerrainChangeEvent;
+    public event Action<TileType, int, int>? TerrainChangeEvent;
 
-    public Chunk(Tile[][] tiles)
+    /// <summary>
+    /// Called when the tile construction at the local position (x, y) is set or removed
+    /// </summary>
+    public event Action<TileConstruction?, int, int>? TileConstructionSet;
+
+    public Chunk(TileType[][] tiles, IEnumerable<TileConstructionRecord> constructions)
     {
-        Tiles = new(CommonDefines.ChunkSize, CommonDefines.ChunkSize);
+        if (tiles.Length < CommonDefines.ChunkSize || tiles.Any(arr => arr.Length < CommonDefines.ChunkSize))
+            throw new Exception("Provided tile grid too small");
+
+        Tiles = new(CommonDefines.ChunkSize, CommonDefines.ChunkSize, (x, y) => tiles[x][y]);
+
+        // convert records to a dictionary
+        _tileConstructions = new(constructions.Select(
+            construct => new KeyValuePair<Vector2I, TileConstruction>(
+                key: new(construct.X, construct.Y), 
+                value: construct.Status
+            )
+        ));
     }
-    public Chunk(Func<int, int, Tile?> Initializer)
+    public Chunk(Func<int, int, TileType> Initializer)
     {
         Tiles = new(CommonDefines.ChunkSize, CommonDefines.ChunkSize, Initializer);
     }
@@ -52,6 +77,18 @@ public class Chunk : IChunk
     {
         Tiles = new(CommonDefines.ChunkSize, CommonDefines.ChunkSize);
     }
+    public TileConstruction? GetTileConstructionStatus(int x, int y)
+    {
+        return _tileConstructions.TryGetValue(new(x, y), out var status) ? status : null;
+    }
+
+    public void SetTileConstructionStatus(int x, int y, TileConstruction construction)
+    {
+        _tileConstructions[new(x, y)] = construction;
+        TileConstructionSet?.Invoke(construction, x, y);
+    }
+
+
 
     public void AddStructureId(int structureId)
     {
@@ -61,17 +98,23 @@ public class Chunk : IChunk
     {
         _structures.Remove(structureId);
     }
+
+
+
+    public IEnumerable<TileConstructionRecord> GetActiveEarthworks()
+    {
+        return _tileConstructions.Select(
+            kvp => new TileConstructionRecord(kvp.Key.X, kvp.Key.Y, kvp.Value)
+        );
+    }
 }
 public interface IChunk
 {
-    public Tile? this[int x, int y]
-    {
-        get;
-    }
+    public TileType this[int x, int y] { get; }
 
     public IReadOnlySet<int> Structures { get; }
 
-    public event Action<Tile?, int, int> TerrainChangeEvent;
+    public event Action<TileType, int, int> TerrainChangeEvent;
 }
 
 

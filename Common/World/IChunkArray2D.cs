@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
@@ -15,8 +16,16 @@ public interface IChunkArray2D
 
 
     /// <summary>
-    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>. Tile may be null (default tile).
+    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
     /// </summary>
-    public bool TryGetTile(int x, int y, out Tile? tile);
-    public bool TryGetTile(Vector2I cell, out Tile? tile) => TryGetTile(cell.X, cell.Y, out tile);
+    public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile);
+    public bool TryGetTile(Vector2I cell, [NotNullWhen(true)] out TileType? tile) => TryGetTile(cell.X, cell.Y, out tile);
+
+    public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell);
+    public bool TryGetCell(Vector2I position, [NotNullWhen(true)] out CellRecord? cell) => TryGetCell(position.X, position.Y, out cell);
 }
+
+public record class CellRecord(
+    TileType? Tile,
+    TileConstruction? TileConstruction
+);

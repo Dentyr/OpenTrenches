@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
@@ -36,10 +37,10 @@ public class ClientChunkArray : IChunkArray2D
 
     public ClientChunkArray() { }
 
-    public bool TryGetTile(int x, int y, out Tile? tile) => _chunkArray.TryGetTile(x, y, out tile);
-    public bool TryGetTile(Vector2I cell, out Tile? tile) => TryGetTile(cell.X, cell.Y, out tile);
+    public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile) => _chunkArray.TryGetTile(x, y, out tile);
+    public bool TryGetTile(Vector2I cell, [NotNullWhen(true)] out TileType? tile) => TryGetTile(cell.X, cell.Y, out tile);
 
-    public bool TrySetTile(int x, int y, Tile? tile) => _chunkArray.TrySetTile(x, y, tile);
+    public bool TrySetTile(int x, int y, TileType tile) => _chunkArray.TrySetTile(x, y, tile);
 
     //* Networking changes interface
     //*
@@ -52,7 +53,10 @@ public class ClientChunkArray : IChunkArray2D
 
     public void Execute(SetCellCommand setCell)
     {
-        TrySetTile(setCell.CellRecord.X, setCell.CellRecord.Y, setCell.CellRecord.TileRecord is null ? null : CommonFromDTO.Convert(setCell.CellRecord.TileRecord));
+        TrySetTile(setCell.X, setCell.Y, setCell.Tile);
     }
     public void SetChunk(ChunkRecord record) => _chunkArray.SetChunk(record);
+
+    public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell)
+        => _chunkArray.TryGetCell(x, y, out cell);
 }

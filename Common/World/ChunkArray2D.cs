@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Godot;
 using OpenTrenches.Common.Collections;
@@ -15,12 +16,12 @@ public class ChunkArray2D : IChunkArray2D
     public int CellSizeX => CommonDefines.ChunkSize * ChunkSizeX;
     public int CellSizeY => CommonDefines.ChunkSize * ChunkSizeY;
 
+    public event Action<ChunkRecord>? ChunkChangedEvent;
+
     public Chunk this[int x, int y] => Chunks[x, y];
 
     public ChunkArray2D() {}
 
-
-    public event Action<ChunkRecord>? ChunkChangedEvent;
 
     /// <returns>True if all points in <paramref name="area"/> are within this chunk array</returns>
     public bool IsAreaInBounds(int minx, int miny, int maxx, int maxy)
@@ -55,29 +56,83 @@ public class ChunkArray2D : IChunkArray2D
     //*
 
     /// <summary>
-    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>. Tile may be null (default tile).
+    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
     /// </summary>
-    public bool TryGetTile(int x, int y, out Tile? tile)
+    public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile)
     {
         if (TryGetChunkContaining(x, y, out Chunk? chunk)) 
         {
-            tile = chunk[x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize];
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            tile = chunk[chunkx, chunky];
             return true;
         }
-        tile = default;
+        tile = null!;
         return false;
     }
 
     /// <summary>
     /// Sets <paramref name="cell"/> to <paramref name="tile"/>, if <paramref name="cell"/> exists.
     /// </summary>
-    public bool TrySetTile(int x, int y, Tile? tile)
+    public bool TrySetTile(int x, int y, TileType tile)
     {
         if (TryGetChunkContaining(x, y, out Chunk? chunk))
         {
             chunk[x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize] = tile;
             return true;
         }
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
+    /// </summary>
+    public bool TryGetTileConstruction(int x, int y, [NotNullWhen(true)] out TileConstruction? tile)
+    {
+        if (TryGetChunkContaining(x, y, out Chunk? chunk)) 
+        {
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            if (chunk.GetTileConstructionStatus(chunkx, chunky) is TileConstruction construction)
+            {
+                tile = construction;
+                return true;
+            }
+            tile = null;
+            return false;
+        }
+        tile = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Sets <paramref name="cell"/> to <paramref name="tile"/>, if <paramref name="cell"/> exists.
+    /// </summary>
+    public bool TrySetTileConstruction(int x, int y, TileConstruction construct)
+    {
+        if (TryGetChunkContaining(x, y, out Chunk? chunk))
+        {
+            chunk.SetTileConstructionStatus(x, y, construct);
+            return true;
+        }
+        return false;
+    }
+
+
+
+    public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell)
+    {
+        if (TryGetChunkContaining(x, y, out Chunk? chunk)) 
+        {
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            cell = new(
+                chunk[chunkx, chunky],
+                chunk.GetTileConstructionStatus(chunkx, chunky)
+            );
+            return true;
+        }
+        cell = null;
         return false;
     }
 
