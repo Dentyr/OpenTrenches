@@ -18,6 +18,9 @@ public class Grid2D<T> : IGrid2D<T>
     public int SizeX { get; }
     public int SizeY { get; }
 
+    /// <summary>
+    /// Creates a <paramref name="SizeX"/> by <paramref name="SizeY"/> grid, optionally with an <paramref name="Initializer"/> that takes in the initializing position and returns the type. If no initializer exists, grids are set to the default value
+    /// </summary>
     public Grid2D(int SizeX, int SizeY, Func<int, int, T>? Initializer = null)
     {
         this.SizeX = SizeX;

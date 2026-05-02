@@ -7,11 +7,12 @@ using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scene.World;
 using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
 
-public interface IServerChunkArray : IChunkArray2D<Chunk>
+public interface IServerChunkArray : IChunkArray2D<ServerChunk>
 {
     IReadOnlyDictionary<int, ServerStructure> StructureDict { get; }
 
@@ -33,11 +34,11 @@ public interface IServerChunkArray : IChunkArray2D<Chunk>
     public bool TryGetCell(Vector2I position, [NotNullWhen(true)] out CellRecord? cell) => TryGetCell(position.X, position.Y, out cell);
 }
 
-public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
+public class ServerChunkArray : IChunkArray2D<ServerChunk>, IServerChunkArray
 {
     //* Chunk array wrap
     //* 
-    private ChunkArray2D<Chunk> _chunkArray = new();
+    private ChunkArray2D<ServerChunk> _chunkArray = new((_, _) => new());
 
     public int ChunkSizeX => _chunkArray.ChunkSizeX;
     public int ChunkSizeY => _chunkArray.ChunkSizeY;
@@ -46,9 +47,9 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
     public int CellSizeX => _chunkArray.CellSizeX;
     public int CellSizeY => _chunkArray.CellSizeY;
 
-    public Chunk this[int x, int y] => _chunkArray[x, y];
+    public ServerChunk this[int x, int y] => _chunkArray[x, y];
 
-    public event Action<ChunkRecord<Chunk>>? ChunkChangedEvent
+    public event Action<ChunkRecord<ServerChunk>>? ChunkChangedEvent
     {
         add => _chunkArray.ChunkChangedEvent += value;
         remove => _chunkArray.ChunkChangedEvent -= value;
@@ -91,7 +92,7 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
     /// </summary>
     public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile)
     {
-        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk)) 
+        if (_chunkArray.TryGetChunkContaining(x, y, out ServerChunk? chunk)) 
         {
             int chunkx = x % CommonDefines.ChunkSize;
             int chunky = y % CommonDefines.ChunkSize;
@@ -107,7 +108,7 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
     /// </summary>
     public bool TrySetTile(int x, int y, TileType tile)
     {
-        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk))
+        if (_chunkArray.TryGetChunkContaining(x, y, out ServerChunk? chunk))
         {
             chunk[x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize] = tile;
             TileChanges.Enqueue(new SetCellCommand(x, y, tile));
@@ -121,7 +122,7 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
     /// </summary>
     public bool TryGetTileConstruction(int x, int y, [NotNullWhen(true)] out TileConstruction? tile)
     {
-        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk)) 
+        if (_chunkArray.TryGetChunkContaining(x, y, out ServerChunk? chunk)) 
         {
             int chunkx = x % CommonDefines.ChunkSize;
             int chunky = y % CommonDefines.ChunkSize;
@@ -142,9 +143,11 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
     /// </summary>
     public bool TrySetTileConstruction(int x, int y, TileConstruction construct)
     {
-        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk))
+        if (_chunkArray.TryGetChunkContaining(x, y, out ServerChunk? chunk))
         {
-            chunk.SetTileConstructionStatus(x, y, construct);
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            chunk.SetTileConstructionStatus(chunkx, chunky, construct);
             return true;
         }
         return false;
@@ -154,7 +157,7 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
 
     public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell)
     {
-        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk)) 
+        if (_chunkArray.TryGetChunkContaining(x, y, out ServerChunk? chunk)) 
         {
             int chunkx = x % CommonDefines.ChunkSize;
             int chunky = y % CommonDefines.ChunkSize;
@@ -170,9 +173,9 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
 
     //*
 
-    public IEnumerable<ChunkRecord<Chunk>> GetChunks()
+    public IEnumerable<ChunkRecord<ServerChunk>> GetChunks()
     {
-        for (byte x = 0; x < ChunkSizeX; x ++) for (byte y = 0; y < ChunkSizeY; y ++) yield return new ChunkRecord<Chunk>(this[x, y], x, y);
+        for (byte x = 0; x < ChunkSizeX; x ++) for (byte y = 0; y < ChunkSizeY; y ++) yield return new ChunkRecord<ServerChunk>(this[x, y], x, y);
     }
 
     private bool IsAreaInBounds(Rect2I area) 
@@ -212,7 +215,7 @@ public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
     /// <param name="initialProgress"></param>
     public void SetBuildTarget(int x, int y, TileType buildTarget, float initialProgress)
     {
-        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk))
+        if (_chunkArray.TryGetChunkContaining(x, y, out ServerChunk? chunk))
         {
             chunk.SetTileConstructionStatus(x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize, new(buildTarget, initialProgress, 0));
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
-using OpenTrenches.Common.Scene.World;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
 using OpenTrenches.Server.Scripting.World;
@@ -21,7 +20,7 @@ public partial class WorldNode : Node3D
     private Node3D StructureLayer { get; }
 
     //* gridmap
-    private ChunkLayer<Chunk>? ChunkLayer { get; set; } 
+    private ServerChunkLayer? ChunkLayer { get; set; } 
 
     public WorldNode(ServerState serverState)
     {

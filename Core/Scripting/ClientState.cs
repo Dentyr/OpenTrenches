@@ -79,6 +79,7 @@ public sealed class ClientState : IClientState
     private void AddStructure(ClientStructure structure)
     {
         Chunks.AddStructure(structure);
+        StructureAddedEvent?.Invoke(structure);
     }
 
     private readonly Dictionary<int, ClientTeam> _teams = [];

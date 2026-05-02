@@ -3,13 +3,8 @@ using Godot;
 using OpenTrenches.Core.Scripting.Player;
 using OpenTrenches.Core.Scene.Combat;
 using OpenTrenches.Common.World;
-using OpenTrenches.Server.Scene.World;
 using OpenTrenches.Core.Scripting;
-using OpenTrenches.Common.Scene.World;
 using OpenTrenches.Core.Scripting.World;
-using System;
-using OpenTrenches.Server.Scripting.World;
-using System.IO;
 
 namespace OpenTrenches.Core.Scene.World;
 
@@ -25,7 +20,7 @@ public partial class WorldView : Node2D
     private Node2D _structureLayer { get; }
 
     //* tiles
-    private ChunkLayer<Chunk> ChunkLayer { get; set; } = null!;
+    private ClientChunkLayer ChunkLayer { get; set; } = null!;
 
     //* UI floats
     private Node CharacterUILayer { get; }

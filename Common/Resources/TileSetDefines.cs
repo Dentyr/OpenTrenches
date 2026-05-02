@@ -14,7 +14,6 @@ public static class TileSetDefines
     /// <summary>
     /// The atlas position of the tile that is continugous (set, and surrounded on all sides by similarly set tiles)
     /// </summary>
-    /// <returns></returns>
     public static Vector2I FillAtlasPosition = new(1, 1);
 
     /// <summary>

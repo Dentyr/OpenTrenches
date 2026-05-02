@@ -2,12 +2,14 @@ using System.Linq;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Common.World;
+using OpenTrenches.Core.Scene.World;
+using OpenTrenches.Server.Scene.World;
 
 namespace OpenTrenches.Common.Contracts;
 
 public static class CommonToDTO
 {
-    public static WorldChunkDTO Convert(ChunkRecord<Chunk> record)
+    public static WorldChunkDTO Convert(ChunkRecord<ServerChunk> record)
         => new(
             record.Chunk.CopyTiles(), 
             record.Chunk.GetActiveEarthworks()
@@ -27,9 +29,9 @@ public static class CommonToDTO
 
 public static class CommonFromDTO
 {
-    public static ChunkRecord<Chunk> Convert(WorldChunkDTO record)
+    public static ChunkRecord<ClientChunk> Convert(WorldChunkDTO record)
         => new(
-            new Chunk(record.Gridmap, 
+            new ClientChunk(record.Gridmap, 
                 record.Builds.Select(
                     // TODO Decay is only needed serverside, so it is given 0 here. Maybe split chunk into serverchunk and clientchunk if more differences emerge
                     dto => new TileConstructionRecord(dto.X, dto.Y, new(dto.Tile, dto.Progress, 0))

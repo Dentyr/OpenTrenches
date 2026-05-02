@@ -7,9 +7,9 @@ using OpenTrenches.Common.Contracts.Defines;
 
 namespace OpenTrenches.Common.World;
 
-public class ChunkArray2D<TChunk> where TChunk : new()
+public class ChunkArray2D<TChunk>
 {
-    private readonly Grid2D<TChunk> Chunks = new(CommonDefines.WorldSize, CommonDefines.WorldSize, (_, _) => new TChunk());
+    private readonly Grid2D<TChunk> Chunks;
 
     public int ChunkSizeX => Chunks.SizeX;
     public int ChunkSizeY => Chunks.SizeY;
@@ -28,7 +28,10 @@ public class ChunkArray2D<TChunk> where TChunk : new()
         }
     }
 
-    public ChunkArray2D() {}
+    public ChunkArray2D(Func<int, int, TChunk>? Initializer = null)
+    {
+        Chunks = new(CommonDefines.WorldSize, CommonDefines.WorldSize, Initializer);
+    }
 
 
     /// <returns>True if all points in <paramref name="area"/> are within this chunk array</returns>
@@ -48,12 +51,12 @@ public class ChunkArray2D<TChunk> where TChunk : new()
     public bool IsPositionInBounds(int x, int y)
     {
         return x >= 0 && y >= 0 && 
-            x <= CellSizeX && y <= CellSizeY;
+            x < CellSizeX && y < CellSizeY;
     }
     public bool IsChunkInBounds(int x, int y)
     {
         return x >= 0 && y >= 0 && 
-            x <= ChunkSizeX && y <= ChunkSizeY;
+            x < ChunkSizeX && y < ChunkSizeY;
     }
 
     /// <summary>
@@ -62,6 +65,11 @@ public class ChunkArray2D<TChunk> where TChunk : new()
     /// <returns>True if found</returns>
     public bool TryGetChunkContaining(int x, int y, [NotNullWhen(true)] out TChunk? chunk)
     {
+        if (x < 0 || y < 0)
+        {
+            chunk = default;
+            return false;
+        }
         return Chunks.TryGet(x / CommonDefines.ChunkSize, y / CommonDefines.ChunkSize, out chunk);
     }
 

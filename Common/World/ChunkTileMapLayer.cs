@@ -1,14 +1,15 @@
-using System;
 using System.Collections.Generic;
 using Godot;
+using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Resources;
-using OpenTrenches.Common.World;
 
-namespace OpenTrenches.Common.Scene.World;
+namespace OpenTrenches.Common.World;
 
-//TODO split into server and client, where server doesn't use tilesets
-public partial class ChunkLayer<TChunk> : Node2D where TChunk : IChunk
+/// <summary>
+/// Transfers the <see cref="TileType"/>s in a grid of <typeparamref name="TChunk"/>s into tilemaps that represent them
+/// </summary>
+public partial class ChunkTileMapLayer<TChunk> : Node2D where TChunk : ITileChunk
 {
     private readonly TileMapLayer GrassLayer;
     private readonly TileMapLayer TrenchLayer;
@@ -17,10 +18,10 @@ public partial class ChunkLayer<TChunk> : Node2D where TChunk : IChunk
 
     protected IChunkArray2D<TChunk> Source { get; }
 
-    public ChunkLayer(IChunkArray2D<TChunk> ChunkGrid)
+    public ChunkTileMapLayer(IChunkArray2D<TChunk> ChunkGrid)
     {
         Source = ChunkGrid;
-        Source.ChunkChangedEvent += SetChunk;
+        Source.ChunkChangedEvent += SetChunkTiles;
 
 
         // set chunks 
@@ -103,19 +104,8 @@ public partial class ChunkLayer<TChunk> : Node2D where TChunk : IChunk
             for (int y = 0; y < chunks.ChunkSizeY; y ++) 
             {
                 TChunk chunk = chunks[x, y];
-                int xoffset = x * CommonDefines.ChunkSize;
-                int yoffset = y * CommonDefines.ChunkSize;
 
                 LoadChunk(x, y, chunk);
-                // Watch events
-                chunk.TerrainChangeEvent += 
-                    (tile, cellX, cellY) => 
-                    UpdateTile(
-                        tile, 
-                        new(
-                            cellX + xoffset, 
-                            cellY + yoffset)
-                    );
             }
         }
     }
@@ -136,6 +126,7 @@ public partial class ChunkLayer<TChunk> : Node2D where TChunk : IChunk
 
         // Batch terrain setting for efficiency
         List<Vector2I> TrenchTerrain = [];
+        List<Vector2I> GrassTerrain = [];
         for (int cellx = 0; cellx < CommonDefines.ChunkSize; cellx ++)
         {
             int x = xoffset + cellx;
@@ -145,14 +136,31 @@ public partial class ChunkLayer<TChunk> : Node2D where TChunk : IChunk
 
 
                 // For each cell in the chunk, add it to its respective terrain list
-                if (chunk[cellx, celly] == TileType.Trench)
+                switch (chunk[cellx, celly])
                 {
-                    TrenchTerrain.Add(new(x, y));
+                    case TileType.Clear:
+                        GrassTerrain.Add(new(x, y));
+                        break;
+                    case TileType.Trench:
+                        TrenchTerrain.Add(new(x, y));
+                        break;
                 }
+
             }
         }
         SetTerrain([..TrenchTerrain], TileType.Trench);
-        // GrassLayer.SetCellsTerrainConnect([..Terrains[terrainset]], 0, terrainset);
+        SetTerrain([..GrassTerrain], TileType.Clear);
+
+        // Watch updates
+        chunk.TerrainChangeEvent += 
+            (tile, cellX, cellY) => 
+            UpdateTile(
+                tile, 
+                new(
+                    cellX + xoffset, 
+                    cellY + yoffset)
+            );
+
     }
 
     private void SetTerrain(Godot.Collections.Array<Vector2I> points, TileType? type)
@@ -172,17 +180,8 @@ public partial class ChunkLayer<TChunk> : Node2D where TChunk : IChunk
     }
 
 
-    private void SetChunk(ChunkRecord<TChunk> record)
+    private void SetChunkTiles(ChunkRecord<TChunk> record)
     {
-        SetChunk(record.X, record.Y, record.Chunk);
+        LoadChunk(record.X, record.Y, record.Chunk);
     }
-    private void SetChunk(int x, int y, TChunk chunk)
-    {
-        LoadChunk(x, y, chunk);
-    }
-
-    private record struct TerrainSetRecord(
-        int Set,
-        int Terrain
-    ) {}
 }
