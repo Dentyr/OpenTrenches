@@ -112,10 +112,8 @@ public interface IChunk
 {
     public TileType this[int x, int y] { get; }
 
-    public IReadOnlySet<int> Structures { get; }
-
     public event Action<TileType, int, int> TerrainChangeEvent;
 }
 
 
-public record ChunkRecord(Chunk Chunk, byte X, byte Y);
+public record ChunkRecord<TChunk>(TChunk Chunk, int X, int Y);

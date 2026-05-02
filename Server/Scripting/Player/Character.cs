@@ -310,7 +310,6 @@ public class Character : IIdObject, IWorldObject
                 {
                     fireLayer = WorldLayer.Ground;
                 }
-                GD.Print("shootin from " + fireLayer);
                 
                 FireHitResult result = adapter.AdaptFire(fireLayer, Position + kineticTarget);
                 if (result is FireHitResult.HitCharacter hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);

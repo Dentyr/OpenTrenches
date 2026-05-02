@@ -25,7 +25,7 @@ public partial class WorldView : Node2D
     private Node2D _structureLayer { get; }
 
     //* tiles
-    private ChunkLayer ChunkLayer { get; set; } = null!;
+    private ChunkLayer<Chunk> ChunkLayer { get; set; } = null!;
 
     //* UI floats
     private Node CharacterUILayer { get; }

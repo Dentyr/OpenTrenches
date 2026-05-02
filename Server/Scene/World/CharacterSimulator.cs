@@ -103,7 +103,6 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
                 }
                 else if (hitObject is StructureSimulator structSim)
                 {
-                    GD.Print("STRUC SIM");
                     return new FireHitResult.HitStructure(hitPos, structSim.Structure);
                 }
                 // hit something else

@@ -7,7 +7,7 @@ namespace OpenTrenches.Common.Contracts;
 
 public static class CommonToDTO
 {
-    public static WorldChunkDTO Convert(ChunkRecord record)
+    public static WorldChunkDTO Convert(ChunkRecord<Chunk> record)
         => new(
             record.Chunk.CopyTiles(), 
             record.Chunk.GetActiveEarthworks()
@@ -27,7 +27,7 @@ public static class CommonToDTO
 
 public static class CommonFromDTO
 {
-    public static ChunkRecord Convert(WorldChunkDTO record)
+    public static ChunkRecord<Chunk> Convert(WorldChunkDTO record)
         => new(
             new Chunk(record.Gridmap, 
                 record.Builds.Select(

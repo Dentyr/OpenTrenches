@@ -11,7 +11,7 @@ using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
 
-public interface IServerChunkArray : IChunkArray2D
+public interface IServerChunkArray : IChunkArray2D<Chunk>
 {
     IReadOnlyDictionary<int, ServerStructure> StructureDict { get; }
 
@@ -21,13 +21,23 @@ public interface IServerChunkArray : IChunkArray2D
     bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure, out ServerStructure? result);
     
     public event Action<ServerStructure>? NewStructureEvent;
+
+
+    /// <summary>
+    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
+    /// </summary>
+    public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile);
+    public bool TryGetTile(Vector2I cell, [NotNullWhen(true)] out TileType? tile) => TryGetTile(cell.X, cell.Y, out tile);
+
+    public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell);
+    public bool TryGetCell(Vector2I position, [NotNullWhen(true)] out CellRecord? cell) => TryGetCell(position.X, position.Y, out cell);
 }
 
-public class ServerChunkArray : IChunkArray2D, IServerChunkArray
+public class ServerChunkArray : IChunkArray2D<Chunk>, IServerChunkArray
 {
     //* Chunk array wrap
     //* 
-    private ChunkArray2D _chunkArray = new();
+    private ChunkArray2D<Chunk> _chunkArray = new();
 
     public int ChunkSizeX => _chunkArray.ChunkSizeX;
     public int ChunkSizeY => _chunkArray.ChunkSizeY;
@@ -38,7 +48,7 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
 
     public Chunk this[int x, int y] => _chunkArray[x, y];
 
-    public event Action<ChunkRecord>? ChunkChangedEvent
+    public event Action<ChunkRecord<Chunk>>? ChunkChangedEvent
     {
         add => _chunkArray.ChunkChangedEvent += value;
         remove => _chunkArray.ChunkChangedEvent -= value;
@@ -73,14 +83,68 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
     
     public ServerChunkArray() {}
 
-    public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile) => _chunkArray.TryGetTile(x, y, out tile);
-    public bool TryGetTile(Vector2I cell, [NotNullWhen(true)] out TileType? tile) => TryGetTile(cell.X, cell.Y, out tile);
+    //* Tile changes
+    //*
 
-    public bool TrySetTile(int x, int y, TileType tile) 
+    /// <summary>
+    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
+    /// </summary>
+    public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile)
     {
-        if (_chunkArray.TrySetTile(x, y, tile))
+        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk)) 
         {
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            tile = chunk[chunkx, chunky];
+            return true;
+        }
+        tile = null!;
+        return false;
+    }
+
+    /// <summary>
+    /// Sets <paramref name="cell"/> to <paramref name="tile"/>, if <paramref name="cell"/> exists.
+    /// </summary>
+    public bool TrySetTile(int x, int y, TileType tile)
+    {
+        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk))
+        {
+            chunk[x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize] = tile;
             TileChanges.Enqueue(new SetCellCommand(x, y, tile));
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
+    /// </summary>
+    public bool TryGetTileConstruction(int x, int y, [NotNullWhen(true)] out TileConstruction? tile)
+    {
+        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk)) 
+        {
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            if (chunk.GetTileConstructionStatus(chunkx, chunky) is TileConstruction construction)
+            {
+                tile = construction;
+                return true;
+            }
+            tile = null;
+            return false;
+        }
+        tile = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Sets <paramref name="cell"/> to <paramref name="tile"/>, if <paramref name="cell"/> exists.
+    /// </summary>
+    public bool TrySetTileConstruction(int x, int y, TileConstruction construct)
+    {
+        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk))
+        {
+            chunk.SetTileConstructionStatus(x, y, construct);
             return true;
         }
         return false;
@@ -88,15 +152,27 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
 
 
 
-    public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell) 
-        => _chunkArray.TryGetCell(x, y, out cell);
-
-    public bool TryGetCell(Vector2I position, [NotNullWhen(true)] out CellRecord? cell)
-        => TryGetCell(position.X, position.Y, out cell);
-
-    public IEnumerable<ChunkRecord> GetChunks()
+    public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell)
     {
-        for (byte x = 0; x < ChunkSizeX; x ++) for (byte y = 0; y < ChunkSizeY; y ++) yield return new ChunkRecord(this[x, y], x, y);
+        if (_chunkArray.TryGetChunkContaining(x, y, out Chunk? chunk)) 
+        {
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            cell = new(
+                chunk[chunkx, chunky],
+                chunk.GetTileConstructionStatus(chunkx, chunky)
+            );
+            return true;
+        }
+        cell = null;
+        return false;
+    }
+
+    //*
+
+    public IEnumerable<ChunkRecord<Chunk>> GetChunks()
+    {
+        for (byte x = 0; x < ChunkSizeX; x ++) for (byte y = 0; y < ChunkSizeY; y ++) yield return new ChunkRecord<Chunk>(this[x, y], x, y);
     }
 
     private bool IsAreaInBounds(Rect2I area) 
@@ -110,7 +186,7 @@ public class ServerChunkArray : IChunkArray2D, IServerChunkArray
     /// </summary>
     public TileConstruction? ProgressBuild(int x, int y, float progress)
     {
-        if (_chunkArray.TryGetTileConstruction(x, y, out var status))
+        if (TryGetTileConstruction(x, y, out var status))
         {
             // throw new Exception();
             status.Progress += progress;

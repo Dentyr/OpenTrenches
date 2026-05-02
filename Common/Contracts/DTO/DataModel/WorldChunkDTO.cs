@@ -9,6 +9,6 @@ namespace OpenTrenches.Common.Contracts.DTO.DataModel;
 public record class WorldChunkDTO(
     [property: Key(0)] TileType[][] Gridmap,
     [property: Key(1)] TileConstructDTO[] Builds,
-    [property: Key(2)] byte X,
-    [property: Key(3)] byte Y
+    [property: Key(2)] int X,
+    [property: Key(3)] int Y
 ) : AbstractCreateDTO;

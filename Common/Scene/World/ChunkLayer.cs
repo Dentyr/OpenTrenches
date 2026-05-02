@@ -8,16 +8,16 @@ using OpenTrenches.Common.World;
 namespace OpenTrenches.Common.Scene.World;
 
 //TODO split into server and client, where server doesn't use tilesets
-public partial class ChunkLayer : Node2D
+public partial class ChunkLayer<TChunk> : Node2D where TChunk : IChunk
 {
     private readonly TileMapLayer GrassLayer;
     private readonly TileMapLayer TrenchLayer;
 
     private readonly TileMapLayer WallLayer;
 
-    protected IChunkArray2D Source { get; }
+    protected IChunkArray2D<TChunk> Source { get; }
 
-    public ChunkLayer(IChunkArray2D ChunkGrid)
+    public ChunkLayer(IChunkArray2D<TChunk> ChunkGrid)
     {
         Source = ChunkGrid;
         Source.ChunkChangedEvent += SetChunk;
@@ -95,14 +95,14 @@ public partial class ChunkLayer : Node2D
     /// <summary>
     /// Initializes the additional constructions from <paramref name="chunks"/>, such as trenches, and implements.
     /// </summary>
-    private void InitializeChunks(IChunkArray2D chunks)
+    private void InitializeChunks(IChunkArray2D<TChunk> chunks)
     {
         // Load chunk states
         for (int x = 0; x < chunks.ChunkSizeX; x ++) 
         {
             for (int y = 0; y < chunks.ChunkSizeY; y ++) 
             {
-                IChunk chunk = chunks[x, y];
+                TChunk chunk = chunks[x, y];
                 int xoffset = x * CommonDefines.ChunkSize;
                 int yoffset = y * CommonDefines.ChunkSize;
 
@@ -128,7 +128,7 @@ public partial class ChunkLayer : Node2D
         SetTerrain([position], tile);
     }
 
-    private void LoadChunk(int chunkx, int chunky, IChunk chunk)
+    private void LoadChunk(int chunkx, int chunky, TChunk chunk)
     {
 
         int xoffset = chunkx * CommonDefines.ChunkSize;
@@ -172,11 +172,11 @@ public partial class ChunkLayer : Node2D
     }
 
 
-    private void SetChunk(ChunkRecord record)
+    private void SetChunk(ChunkRecord<TChunk> record)
     {
         SetChunk(record.X, record.Y, record.Chunk);
     }
-    private void SetChunk(int x, int y, Chunk chunk)
+    private void SetChunk(int x, int y, TChunk chunk)
     {
         LoadChunk(x, y, chunk);
     }
