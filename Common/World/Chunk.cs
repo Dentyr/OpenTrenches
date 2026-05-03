@@ -7,7 +7,7 @@ namespace OpenTrenches.Common.World;
 /// </summary>
 public interface ITileChunk
 {
-    public TileType this[int x, int y] { get; }
+    public TileType this[int x, int y] { get; set; }
 
     public event Action<TileType, int, int> TerrainChangeEvent;
 }

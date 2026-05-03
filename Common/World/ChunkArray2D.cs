@@ -7,7 +7,7 @@ using OpenTrenches.Common.Contracts.Defines;
 
 namespace OpenTrenches.Common.World;
 
-public class ChunkArray2D<TChunk>
+public abstract class ChunkArray2D<TChunk> where TChunk : ITileChunk
 {
     private readonly Grid2D<TChunk> Chunks;
 
@@ -72,6 +72,43 @@ public class ChunkArray2D<TChunk>
         }
         return Chunks.TryGet(x / CommonDefines.ChunkSize, y / CommonDefines.ChunkSize, out chunk);
     }
+
+
+    //* Tile changes
+    //*
+
+    /// <summary>
+    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
+    /// </summary>
+    public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile)
+    {
+        if (TryGetChunkContaining(x, y, out TChunk? chunk)) 
+        {
+            int chunkx = x % CommonDefines.ChunkSize;
+            int chunky = y % CommonDefines.ChunkSize;
+            tile = chunk[chunkx, chunky];
+            return true;
+        }
+        tile = null!;
+        return false;
+    }
+
+    /// <summary>
+    /// Sets <paramref name="cell"/> to <paramref name="tile"/>, if <paramref name="cell"/> exists.
+    /// </summary>
+    public bool TrySetTile(int x, int y, TileType tile)
+    {
+        if (TryGetChunkContaining(x, y, out TChunk? chunk))
+        {
+            chunk[x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize] = tile;
+            _OnTileSet(x, y, tile);
+            return true;
+        }
+        return false;
+    }
+    protected virtual void _OnTileSet(int x, int y, TileType tile) {}
+
+
 
 
     //* Networking changes interface
