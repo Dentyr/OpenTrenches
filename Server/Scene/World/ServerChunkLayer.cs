@@ -8,11 +8,11 @@ namespace OpenTrenches.Server.Scene.World;
 
 public partial class ServerChunkLayer : Node2D
 {
-    private ChunkTileMapLayer<ServerChunk> TileMaps;
+    private ChunkTileMapLayer TileMaps;
 
-    protected IChunkArray2D<ServerChunk> Source { get; }
+    protected ITileArray2D Source { get; }
 
-    public ServerChunkLayer(IChunkArray2D<ServerChunk> ChunkGrid)
+    public ServerChunkLayer(ITileArray2D ChunkGrid)
     {
         Source = ChunkGrid;
 

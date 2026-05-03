@@ -8,7 +8,7 @@ using OpenTrenches.Core.Scene.World;
 
 namespace OpenTrenches.Core.Scripting.World;
 
-public class ClientChunkArray : ChunkArray2D<ClientChunk>, IChunkArray2D<ClientChunk>
+public class ClientChunkArray : ChunkArray2D, ITileArray2D
 {
 
     //* Structures
@@ -20,28 +20,10 @@ public class ClientChunkArray : ChunkArray2D<ClientChunk>, IChunkArray2D<ClientC
 
     public event Action<ClientStructure>? NewStructureEvent;
 
-    public ClientChunkArray() : base((_, _) => new()) 
+    public ClientChunkArray()
     { }
 
 
-    //* Tile changes
-    //*
-
-    public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell)
-    {
-        if (TryGetChunkContaining(x, y, out ClientChunk? chunk)) 
-        {
-            int chunkx = x % CommonDefines.ChunkSize;
-            int chunky = y % CommonDefines.ChunkSize;
-            cell = new(
-                chunk[chunkx, chunky],
-                chunk.GetTileConstructionStatus(chunkx, chunky)
-            );
-            return true;
-        }
-        cell = null;
-        return false;
-    }
 
     //* Networking changes interface
     //*
@@ -57,18 +39,21 @@ public class ClientChunkArray : ChunkArray2D<ClientChunk>, IChunkArray2D<ClientC
         TrySetTile(setCell.X, setCell.Y, setCell.Tile);
     }
 
-
     /// <summary>
-    /// Updates the chunk described by <paramref name="record"/>
+    /// Bulk sets <paramref name="gridmap"/> tiles at <paramref name="xOffset"/> <paramref name="yOffset"/>
     /// </summary>
-    /// <returns>true if successful</returns>
-    public bool TrySetChunk(ChunkRecord<ClientChunk> record)
+    /// <param name="gridmap"></param>
+    /// <param name="xOffset"></param>
+    /// <param name="yOffset"></param>
+    public void Set(TileType[][] gridmap, int xOffset, int yOffset)
     {
-        if (IsChunkInBounds(record.X, record.Y)) 
+        // int maxX = Math.Min(gridmap.Length + xOffset, SizeX);
+        for (int x = 0; x < gridmap.Length; x ++)
         {
-            this[record.X, record.Y] = record.Chunk;
-            return true;
+            for (int y = 0; y < gridmap.Length; y ++)
+            {
+                this[x + xOffset, y + yOffset] = gridmap[x][y];
+            }
         }
-        return false;
     }
 }

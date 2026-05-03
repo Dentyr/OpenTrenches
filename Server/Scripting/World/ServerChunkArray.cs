@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.Defines;
+using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scene.World;
@@ -12,7 +14,7 @@ using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
 
-public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
+public class ServerChunkArray : ChunkArray2D, IServerChunkArray
 {
 
     //* Structures
@@ -26,6 +28,17 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
 
     public event Action<ServerStructure>? NewStructureEvent;
 
+
+    /// <summary>
+    /// Tiles being updated
+    /// </summary>
+    private Dictionary<Vector2I, TileConstruction> _tileConstructions = [];
+    public IReadOnlyDictionary<Vector2I, TileConstruction> TileConstructions => _tileConstructions;
+
+    /// <summary>
+    /// Called when the tile construction at the local position (x, y) is set or removed
+    /// </summary>
+    public event Action<TileConstruction?, int, int>? TileConstructionSet;
 
     //* Updates
     //* 
@@ -45,7 +58,7 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
     /// <summary>
     /// Initializes empty chunks
     /// </summary>
-    public ServerChunkArray() : base((_, _) => new())
+    public ServerChunkArray()
     {}
 
     //* Tile changes
@@ -61,52 +74,50 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
 
 
     /// <summary>
-    /// Returns true if <paramref name="cell"/> exists, returning the tile in <paramref name="tile"/>.
+    /// Returns true if <paramref name="cell"/> exists with ongoing construction, returning it in <paramref name="construct"/>.
     /// </summary>
-    public bool TryGetTileConstruction(int x, int y, [NotNullWhen(true)] out TileConstruction? tile)
+    public bool TryGetTileConstruction(int x, int y, [NotNullWhen(true)] out TileConstruction? construct)
     {
-        if (TryGetChunkContaining(x, y, out ServerChunk? chunk)) 
-        {
-            int chunkx = x % CommonDefines.ChunkSize;
-            int chunky = y % CommonDefines.ChunkSize;
-            if (chunk.GetTileConstructionStatus(chunkx, chunky) is TileConstruction construction)
-            {
-                tile = construction;
-                return true;
-            }
-            tile = null;
-            return false;
-        }
-        tile = null;
-        return false;
+        return TileConstructions.TryGetValue(new(x, y), out construct);
     }
+    /// <summary>
+    /// Returns construction in <paramref name="cell"/> or null if it doesn't exist
+    /// </summary>
+    public TileConstruction? GetTileConstructionOrDefault(int x, int y)
+    {
+        return TileConstructions.GetValueOrDefault(new(x, y));
+    }
+
 
     /// <summary>
     /// Sets <paramref name="cell"/> to <paramref name="tile"/>, if <paramref name="cell"/> exists.
     /// </summary>
     public bool TrySetTileConstruction(int x, int y, TileConstruction construct)
     {
-        if (TryGetChunkContaining(x, y, out ServerChunk? chunk))
+        if (IsPositionInBounds(x, y))
         {
-            int chunkx = x % CommonDefines.ChunkSize;
-            int chunky = y % CommonDefines.ChunkSize;
-            chunk.SetTileConstructionStatus(chunkx, chunky, construct);
+            _tileConstructions[new(x, y)] = construct;
+            TileConstructionSet?.Invoke(construct, x, y);
             return true;
         }
         return false;
     }
 
+    public IEnumerable<TileConstructionRecord> GetActiveTileConstruction()
+    {
+        return _tileConstructions.Select(
+            kvp => new TileConstructionRecord(kvp.Key.X, kvp.Key.Y, kvp.Value)
+        );
+    }
 
 
     public bool TryGetCell(int x, int y, [NotNullWhen(true)] out CellRecord? cell)
     {
-        if (TryGetChunkContaining(x, y, out ServerChunk? chunk)) 
+        if (IsPositionInBounds(x, y)) 
         {
-            int chunkx = x % CommonDefines.ChunkSize;
-            int chunky = y % CommonDefines.ChunkSize;
             cell = new(
-                chunk[chunkx, chunky],
-                chunk.GetTileConstructionStatus(chunkx, chunky)
+                this[x, y],
+                GetTileConstructionOrDefault(x, y)
             );
             return true;
         }
@@ -114,17 +125,9 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
         return false;
     }
 
-    //*
 
-    public IEnumerable<ChunkRecord<ServerChunk>> GetChunks()
-    {
-        for (byte x = 0; x < ChunkSizeX; x ++) for (byte y = 0; y < ChunkSizeY; y ++) yield return new ChunkRecord<ServerChunk>(this[x, y], x, y);
-    }
 
-    private bool IsAreaInBounds(Rect2I area) 
-        => IsAreaInBounds(area.Position.X, area.Position.Y, area.End.X, area.End.Y);
-
-    //* Server functions
+    //* Server tile build
     //*
 
     /// <summary>
@@ -158,13 +161,12 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
     /// <param name="initialProgress"></param>
     public void SetBuildTarget(int x, int y, TileType buildTarget, float initialProgress)
     {
-        if (TryGetChunkContaining(x, y, out ServerChunk? chunk))
-        {
-            chunk.SetTileConstructionStatus(x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize, new(buildTarget, initialProgress, 0));
-
-        }
+        if (IsPositionInBounds(x, y))
+            _tileConstructions[new(x, y)] = new(buildTarget, initialProgress, 0);
     }
-    public void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0) => SetBuildTarget(buildCell.X, buildCell.Y, buildTarget, initialProgress);
+    public void StartBuild(Vector2I buildCell, TileType buildTarget, float initialProgress = 0) 
+        => SetBuildTarget(buildCell.X, buildCell.Y, buildTarget, initialProgress);
+
 
     //* server structure build
     //*
@@ -174,14 +176,9 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
         ServerStructure structure = new(RequestNextStructureId(), team, type, position);
         _structuresDictionary.Add(structure.Id, structure);
 
-        // note id in chunk if exists
-        if (TryGetChunkContaining(position.X, position.Y, out var chunk))
-            chunk.AddStructureId(structure.Id);
-
         NewStructureEvent?.Invoke(structure);
         return structure;
     }
-
 
     public bool TryBuild(Vector2I buildCell, Team team, StructureEnum structure, out ServerStructure? buildResult)
     {
@@ -196,6 +193,11 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
         buildResult = null;
         return false;
     }
+
+    //* geometry
+
+    private bool IsAreaInBounds(Rect2I area) 
+        => IsAreaInBounds(area.Position.X, area.Position.Y, area.End.X, area.End.Y);
 
     /// <summary>
     /// Checks if the spaces in the rect2I overlap with any structure
@@ -219,20 +221,14 @@ public class ServerChunkArray : ChunkArray2D<ServerChunk>, IServerChunkArray
     }
 
 
-
+    //* processing
 
     public void Process()
     {
-        for (int x = 0; x < ChunkSizeX; x ++)
+        foreach (var construct in TileConstructions)
         {
-            for (int y = 0; y < ChunkSizeY; y ++)
-            {
-                var chunk = this[x, y];
-                foreach (var construct in chunk.TileConstructions)
-                {
-                    //TODO convert constructions into tiles
-                }
-            }
+            //TODO convert constructions into tiles
         }
     }
+
 }

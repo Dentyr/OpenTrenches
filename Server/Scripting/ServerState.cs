@@ -103,9 +103,9 @@ public class ServerState : IServerState
             int xoffset = i == 1 ? 20 : 10;
 
             int x1 = xoffset;
-            int x2 = _chunks.CellSizeX - xoffset;
+            int x2 = _chunks.SizeX - xoffset;
 
-            int y = _chunks.CellSizeY * ((i * 2) + 1) / 6;
+            int y = _chunks.SizeY * ((i * 2) + 1) / 6;
             if (!_chunks.TryBuild(new(x1, y), Teams[0], StructureEnum.Camp, out var camp1))
                 throw new Exception("Initiializing camp failed at " + x1 + ", " + y);
             if (!_chunks.TryBuild(new(x2, y), Teams[1], StructureEnum.Camp, out var camp2))
@@ -154,7 +154,7 @@ public class ServerState : IServerState
 
     public IEnumerable<AbstractCreateDTO> GetInitDTOs()
         => _characters.Values.Select(ObjectToDTO.Convert).Cast<AbstractCreateDTO>()
-            .Concat(_chunks.GetChunks().Select(CommonToDTO.Convert))
+            .Append(new WorldChunkDTO(_chunks.CopyTiles(), 0, 0))
             .Concat(Teams.Values.Select(ObjectToDTO.Convert))
             .Concat(_chunks.StructureDict.Values.Select(ObjectToDTO.Convert));
             // .Concat(Chunks.GetChunks().Select(chunk => CommonToDTO.Convert(chunk)));

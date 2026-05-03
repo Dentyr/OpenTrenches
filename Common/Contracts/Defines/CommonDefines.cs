@@ -4,10 +4,9 @@ namespace OpenTrenches.Common.Contracts.Defines;
 public static class CommonDefines
 {
     /// <summary>
-    /// Cells a chunk spans
+    /// Cells the world spans
     /// </summary>
-    public const byte ChunkSize = 32; 
-    public const byte WorldSize = 4;
+    public const byte WorldSize = 128;
 
     /// <summary>
     /// Pixels a cell spans

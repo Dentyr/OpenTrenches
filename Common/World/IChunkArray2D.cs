@@ -5,14 +5,14 @@ using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 namespace OpenTrenches.Common.World;
 
-public interface IChunkArray2D<TChunk>
+public interface ITileArray2D
 {
-    public TChunk this[int x, int y] { get; }
+    public TileType this[int x, int y] { get; }
 
-    public int ChunkSizeX { get; }
-    public int ChunkSizeY { get; }
-
-    public event Action<ChunkRecord<TChunk>>? ChunkChangedEvent;
+    public int SizeX { get; }
+    public int SizeY { get; }
+    
+    public event Action<TileType, int, int>? TerrainChangeEvent;
 }
 
 public record class CellRecord(

@@ -8,7 +8,7 @@ using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
 
-public interface IServerChunkArray : IChunkArray2D<ServerChunk>
+public interface IServerChunkArray : ITileArray2D
 {
     IReadOnlyDictionary<int, ServerStructure> StructureDict { get; }
 

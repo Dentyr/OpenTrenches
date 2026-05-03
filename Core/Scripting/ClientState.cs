@@ -115,7 +115,7 @@ public sealed class ClientState : IClientState
     public void Create(AbstractCreateDTO dTO)
     {
         if (dTO is CharacterDTO character) AddCharacter(FromDTO.Convert(character, this));
-        else if (dTO is WorldChunkDTO chunk) Chunks.TrySetChunk(CommonFromDTO.Convert(chunk));
+        else if (dTO is WorldChunkDTO chunk) Chunks.Set(chunk.Gridmap, chunk.XOffset, chunk.YOffset);
         else if (dTO is TeamDTO team) AddTeam(FromDTO.Convert(team));
         else if (dTO is StructureDTO structure) AddStructure(FromDTO.Convert(structure));
     }

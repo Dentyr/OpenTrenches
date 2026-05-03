@@ -1,37 +1,54 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Godot;
 using OpenTrenches.Common.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 
 namespace OpenTrenches.Common.World;
 
-public abstract class ChunkArray2D<TChunk> where TChunk : ITileChunk
+public abstract class ChunkArray2D
 {
-    private readonly Grid2D<TChunk> Chunks;
-
-    public int ChunkSizeX => Chunks.SizeX;
-    public int ChunkSizeY => Chunks.SizeY;
-    public int CellSizeX => CommonDefines.ChunkSize * ChunkSizeX;
-    public int CellSizeY => CommonDefines.ChunkSize * ChunkSizeY;
-
-    public event Action<ChunkRecord<TChunk>>? ChunkChangedEvent;
-
-    public TChunk this[int x, int y]
+    private Grid2D<TileType> Tiles { get; }
+    public TileType this[int x, int y]
     {
-        get => Chunks[x, y];
-        set
+        get => Tiles[x, y];
+        set 
         {
-            Chunks[x, y] = value;
-            ChunkChangedEvent?.Invoke(new(value, x, y));
+            if (x < 0 || y < 0 || x > SizeX || y > SizeY) 
+                throw new IndexOutOfRangeException();
+
+            if (Tiles[x, y] != value)
+            {
+                Tiles[x, y] = value;
+                TerrainChangeEvent?.Invoke(value, x, y);
+            }
         }
     }
 
-    public ChunkArray2D(Func<int, int, TChunk>? Initializer = null)
+    public int SizeX => CommonDefines.WorldSize;
+    public int SizeY => CommonDefines.WorldSize;
+
+
+    public TileType[][] CopyTiles() => Tiles.CopyTiles();
+    public T[][] Select<T>(Func<TileType, T> selector) => Tiles.CopySelect(selector);
+
+    /// <summary>
+    /// Called when terrin is set at (x, y)
+    /// </summary>
+    public event Action<TileType, int, int>? TerrainChangeEvent;
+
+
+    //* original
+
+    public ChunkArray2D()
     {
-        Chunks = new(CommonDefines.WorldSize, CommonDefines.WorldSize, Initializer);
+        Tiles = new(CommonDefines.WorldSize, CommonDefines.WorldSize, (_, _) => TileType.Clear);
     }
+
+
 
 
     /// <returns>True if all points in <paramref name="area"/> are within this chunk array</returns>
@@ -45,32 +62,13 @@ public abstract class ChunkArray2D<TChunk> where TChunk : ITileChunk
         // within borderse if minimum values are greater than or equal to (0,0) and maxmimum values are within the borders
         return minx >= 0 &&
             miny >= 0 &&
-            maxx <= CellSizeX &&
-            maxy <= CellSizeY;
+            maxx <= SizeX &&
+            maxy <= SizeY;
     }
     public bool IsPositionInBounds(int x, int y)
     {
         return x >= 0 && y >= 0 && 
-            x < CellSizeX && y < CellSizeY;
-    }
-    public bool IsChunkInBounds(int x, int y)
-    {
-        return x >= 0 && y >= 0 && 
-            x < ChunkSizeX && y < ChunkSizeY;
-    }
-
-    /// <summary>
-    /// Tries to get the chunk that contains the cell <paramref name="x"/>, <paramref name="y"/>>
-    /// </summary>
-    /// <returns>True if found</returns>
-    public bool TryGetChunkContaining(int x, int y, [NotNullWhen(true)] out TChunk? chunk)
-    {
-        if (x < 0 || y < 0)
-        {
-            chunk = default;
-            return false;
-        }
-        return Chunks.TryGet(x / CommonDefines.ChunkSize, y / CommonDefines.ChunkSize, out chunk);
+            x < SizeX && y < SizeY;
     }
 
 
@@ -82,14 +80,12 @@ public abstract class ChunkArray2D<TChunk> where TChunk : ITileChunk
     /// </summary>
     public bool TryGetTile(int x, int y, [NotNullWhen(true)] out TileType? tile)
     {
-        if (TryGetChunkContaining(x, y, out TChunk? chunk)) 
+        if (IsPositionInBounds(x, y))
         {
-            int chunkx = x % CommonDefines.ChunkSize;
-            int chunky = y % CommonDefines.ChunkSize;
-            tile = chunk[chunkx, chunky];
+            tile = this[x, y];
             return true;
         }
-        tile = null!;
+        tile = null;
         return false;
     }
 
@@ -98,9 +94,9 @@ public abstract class ChunkArray2D<TChunk> where TChunk : ITileChunk
     /// </summary>
     public bool TrySetTile(int x, int y, TileType tile)
     {
-        if (TryGetChunkContaining(x, y, out TChunk? chunk))
+        if (IsPositionInBounds(x, y))
         {
-            chunk[x % CommonDefines.ChunkSize, y % CommonDefines.ChunkSize] = tile;
+            this[x, y] = tile;
             _OnTileSet(x, y, tile);
             return true;
         }
