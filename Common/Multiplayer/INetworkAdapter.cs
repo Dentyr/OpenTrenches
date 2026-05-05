@@ -26,4 +26,9 @@ public interface INetworkConnectionAdapter
     public void Send(AbstractCreateDTO dTO) =>  Send(new CreateDatagram(dTO));
     public void Send(AbstractCommandDTO dTO) =>  Send(new CommandDatagram(dTO));
     public void Send(AbstractStreamDTO dTO) =>  Send(new StreamDatagram(dTO));
+
+    /// <summary>
+    /// Stop receiving incoming requests
+    /// </summary>
+    public void Disconnect();
 }

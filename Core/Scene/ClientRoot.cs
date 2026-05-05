@@ -41,7 +41,11 @@ public partial class ClientRoot : Node
         MainMenuRoot.Hide();
         ClientGameRoot?.SetState(state);
     }
-
+    private void ExitGame()
+    {
+        ClientNetworkManager?.Disconnect();
+        NavigateMainMenu();
+    }
     private void NavigateMainMenu()
     {
         MainMenuRoot.Show();
@@ -59,7 +63,7 @@ public partial class ClientRoot : Node
         ClientGameRoot.OutgoingCommandEvent += ClientNetworkManager.Send;
         ClientGameRoot.OutgoingStreamEvent += ClientNetworkManager.Send;
 
-        ClientGameRoot.ExitGameEvent += NavigateMainMenu;
+        ClientGameRoot.ExitGameEvent += ExitGame;
 
 
         MainMenuRoot = GetNode<MainMenuLayer>("MainMenu");

@@ -13,7 +13,7 @@ namespace OpenTrenches.Common.Multiplayer;
 
 
 /// <summary>
-/// Seeks
+/// Seeks active servers from the master server
 /// </summary>
 public class ConnectionAgent
 {
@@ -81,6 +81,4 @@ public class ConnectionAgent
             _polling = 0;
         }
     }
-
-    // void IDisposable.Dispose() => NetManager.Stop();
 }

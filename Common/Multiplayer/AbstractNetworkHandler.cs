@@ -25,4 +25,9 @@ public abstract class AbstractNetworkHandler
     protected abstract void _DeserializeStream(StreamDatagram stream);
     protected abstract void _DeserializeUpdate(UpdateDatagram update);
     protected abstract void _DeserializeMessage(CommandDatagram message);
+
+    public void Disconnect()
+    {
+        Adapter.Disconnect();
+    }
 }

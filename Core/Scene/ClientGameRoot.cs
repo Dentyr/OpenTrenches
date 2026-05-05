@@ -14,6 +14,9 @@ using OpenTrenches.Core.Scene.World;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Adapter;
 
+/// <summary>
+/// Coordinates interaction with a game state
+/// </summary>
 public partial class ClientGameRoot : Node
 {
     private ClientState? State { get; set; }
@@ -35,6 +38,9 @@ public partial class ClientGameRoot : Node
     public event Action<AbstractCommandDTO>? OutgoingCommandEvent;
     public event Action<AbstractStreamDTO>? OutgoingStreamEvent;
 
+    /// <summary>
+    /// Notifies when the user exits the game root
+    /// </summary>
     public event Action? ExitGameEvent;
     
     public ClientGameRoot()
@@ -103,7 +109,8 @@ public partial class ClientGameRoot : Node
         State.GameEndEvent += victor => _gameEndScreen.ShowEnd(victor, State);
 
         //* Initialize values
-        if (State.PlayerCharacterId is uint notnull && State.TryGetCharacter(notnull, out var player)) SetPlayer(new LocalPlayerView(player, State.PlayerState));
+        if (State.PlayerCharacterId is uint notnull && State.TryGetCharacter(notnull, out var player)) 
+            SetPlayer(new LocalPlayerView(player, State.PlayerState));
         _characterUI.SetLogistics(State.PlayerState.Logistics);
         
     }
@@ -115,7 +122,7 @@ public partial class ClientGameRoot : Node
     /// </summary>
     public void HandleRespawnAttempt() => OutgoingCommandEvent?.Invoke(new RespawnCommandRequest());
 
-    public void HandleReturnAttempt() => GD.Print(" not yet implemented "); //TODO implement main menu screen
+    public void HandleReturnAttempt() => ExitGameEvent?.Invoke();
 
 
     //* Changing state

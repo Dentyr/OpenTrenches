@@ -4,6 +4,7 @@ using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO;
 using OpenTrenches.Common.Contracts.DTO.DataModel;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Core.Scripting.Adapter;
@@ -59,5 +60,17 @@ public class ClientNetworkManager
     public void Poll()
     {
         NetworkAdapter.Poll();
+    }
+
+    /// <summary>
+    /// Terminates the network handler's connection
+    /// </summary>
+    public void Disconnect()
+    {
+        if (ClientNetworkHandler is not null)
+        {
+            ClientNetworkHandler.Disconnect();
+            ClientNetworkHandler = null;
+        }
     }
 }

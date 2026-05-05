@@ -1,7 +1,6 @@
 
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Common.Contracts;
-using OpenTrenches.Common.Contracts.DTO;
 using System;
 using System.Threading.Tasks;
 

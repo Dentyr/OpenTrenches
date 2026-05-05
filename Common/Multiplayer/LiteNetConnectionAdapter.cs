@@ -42,4 +42,9 @@ public class LiteNetConnectionAdapter : INetworkConnectionAdapter
         if (datagram.Streamed) Stream(Serialization.Serialize<Datagram>(datagram));
         else Message(Serialization.Serialize<Datagram>(datagram));
     }
+
+    public void Disconnect()
+    {
+        Peer.Disconnect();
+    }
 }
