@@ -12,6 +12,9 @@ using OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 namespace OpenTrenches.Server.Scripting.Adapter;
 
+/// <summary>
+/// Represents a player's connected profile, client communications, and client information
+/// </summary>
 public class PlayerNetworkHandler : AbstractNetworkHandler
 {
     private ServerState GameState { get; }

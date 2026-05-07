@@ -7,17 +7,27 @@ using System.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using OpenTrenches.Common.Contracts;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 namespace OpenTrenches.Common.Multiplayer;
 
+/// <summary>
+/// Manages a server's connections and requests
+/// </summary>
 public class LiteNetServerAdapter : IServerNetworkAdapter
 {
+    /// <summary>
+    /// True if adapter should be accepting connections
+    /// </summary>
+    private bool _open = true;
+
     private NetManager Server { get; }
     private EventBasedNetListener Listener { get; }
 
     private Dictionary<NetPeer, LiteNetConnectionAdapter> _adapterDictionary = [];
 
     public event Action<INetworkConnectionAdapter>? ConnectedEvent;
+    public event Action<INetworkConnectionAdapter>? DisconnectedEvent;
     
     public LiteNetServerAdapter()
     {
@@ -27,9 +37,10 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
 
         Listener.ConnectionRequestEvent += HandleRequest;
         Listener.PeerConnectedEvent += HandleConnect;
+        Listener.PeerDisconnectedEvent += HandleDisconnect;
         Listener.NetworkReceiveEvent += HandleReceive;
-
     }
+
 
     /// <summary>
     /// Directs an incoming packet to the adapter associated with <paramref name="peer"/>
@@ -51,29 +62,49 @@ public class LiteNetServerAdapter : IServerNetworkAdapter
         ConnectedEvent?.Invoke(connection);
     }
 
+
+    /// <summary>
+    /// Handles <paramref name="peer"/> disconnecting
+    /// </summary>
+    private void HandleDisconnect(NetPeer peer, DisconnectInfo disconnectInfo)
+    {
+        if (_adapterDictionary.Remove(peer, out LiteNetConnectionAdapter? adapter))
+        {
+            DisconnectedEvent?.Invoke(adapter);
+        }
+    }
     /// <summary>
     /// handles in incoming <paramref name="request"/>
     /// </summary>
     private void HandleRequest(ConnectionRequest request)
     {
-        if(Server.ConnectedPeersCount < 30 /* max connections */)
-            request.AcceptIfKey(NetworkDefines.Key);
-        else
+        // Reject if past max connections or shutdown initited
+        if (!_open || Server.ConnectedPeersCount >= 30)
             request.Reject();
+        else
+            request.AcceptIfKey(NetworkDefines.Key);
     }
 
     public void Poll() => Server.PollEvents();
     public void Start(int port) => Server.Start(port);
     public void Stop() => Server.Stop();
 
+    /// <summary>
+    /// Stop accepting connections
+    /// </summary>
+    public void Close() => _open = false;
 
-    void IServerNetworkAdapter.Send(Datagram datagram)
+
+    public void Send(Datagram datagram)
     {
         if (datagram.Streamed) foreach (var connecttion in _adapterDictionary.Values) connecttion.Stream(Serialization.Serialize<Datagram>(datagram));
         else foreach (var connecttion in _adapterDictionary.Values) connecttion.Message(Serialization.Serialize<Datagram>(datagram));
     }
 }
 
+/// <summary>
+/// Manages connecting to and communication with a server
+/// </summary>
 public class LiteNetClientAdapter : IClientNetworkAdapter
 {
     private EventBasedNetListener Listener { get; }
@@ -117,10 +148,4 @@ public class LiteNetClientAdapter : IClientNetworkAdapter
     public void Poll() => Client.PollEvents();
     public void Start() => Client.Start();
     public void Stop() => Client.Stop();
-}
-
-
-public interface IDiscoveryAdapter
-{
-    
 }

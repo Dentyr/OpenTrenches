@@ -22,7 +22,7 @@ public interface IHostNetworkAdapter
 
 
     /// <summary>
-    /// Disables services;
+    /// Immediate termination of service
     /// </summary>
     void Stop();
 }
@@ -50,11 +50,17 @@ public interface IClientNetworkAdapter : IHostNetworkAdapter
 public interface IServerNetworkAdapter : IHostNetworkAdapter
 {
     public event Action<INetworkConnectionAdapter> ConnectedEvent;
+    public event Action<INetworkConnectionAdapter> DisconnectedEvent;
 
     /// <summary>
     /// Enables services and listening on the specified port
     /// </summary>
     public void Start(int port);
+
+    /// <summary>
+    /// Stop accepting connections
+    /// </summary>
+    public void Close();
 
     public void Send(Datagram datagram);
     
@@ -62,12 +68,4 @@ public interface IServerNetworkAdapter : IHostNetworkAdapter
     public void Send(AbstractCreateDTO dTO) =>  Send(new CreateDatagram(dTO));
     public void Send(AbstractCommandDTO dTO) =>  Send(new CommandDatagram(dTO));
     public void Send(AbstractStreamDTO dTO) =>  Send(new StreamDatagram(dTO));
-}
-
-public interface INetworkSender
-{
-    public void Send(AbstractUpdateDTO dTO);
-    public void Send(AbstractCreateDTO dTO);
-    public void Send(AbstractCommandDTO dTO);
-    public void Send(AbstractStreamDTO dTO);
 }

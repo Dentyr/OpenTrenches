@@ -3,6 +3,7 @@ using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Common.Contracts;
 using System;
 using System.Threading.Tasks;
+using OpenTrenches.Common.Contracts.DTO.ServerComands;
 
 namespace OpenTrenches.Core.Scripting.Adapter;
 
@@ -23,7 +24,14 @@ public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractN
 
     protected override void _DeserializeUpdate(UpdateDatagram datagram) => State?.Update(datagram.Update);
 
-    protected override void _DeserializeMessage(CommandDatagram message) => State?.Receive(message.DTO);
+    protected override void _DeserializeMessage(CommandDatagram message)
+    {
+        State?.Receive(message.DTO);
+        if (message.DTO is GameEndNotificationCommand)
+        {
+            Disconnect();
+        }
+    }
 
     internal async Task<bool> WaitUntilConnect(int attempts = 10)
     {

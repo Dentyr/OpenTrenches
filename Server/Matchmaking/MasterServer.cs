@@ -11,6 +11,7 @@ using OpenTrenches.Common.Contracts;
 using OpenTrenches.Common.Contracts.DTO.Discovery;
 using OpenTrenches.Common.Multiplayer;
 using OpenTrenches.Core.Scene;
+using OpenTrenches.Server.Matchmaking;
 
 namespace OpenTrenches.Matchmaking;
 
@@ -21,7 +22,11 @@ namespace OpenTrenches.Matchmaking;
 /// </summary>
 public partial class MasterServer : Node
 {
-    private readonly List<ServerProcessRecord> _servers = [];
+    /// <summary>
+    /// Maps PIDs to their servers
+    /// </summary>
+    private readonly Dictionary<int, ServerProcessRecord> _servers = [];
+
     private ProcessStartInfo GetProcessStartInfo(ushort port)
     {
         string[] args = OS.GetCmdlineArgs();
@@ -60,8 +65,18 @@ public partial class MasterServer : Node
     }
 
 
+    /// <summary>
+    /// Returns a list of active servers
+    /// </summary>
     private IEnumerable<ServerRecord> GetServerRecords()
-        => _servers.Select(server => new ServerRecord(server.EndPoint));
+    {
+        lock(_servers)
+        {
+            return [.. _servers.Values
+                .Where(server => server.Active)
+                .Select(server => new ServerRecord(server.EndPoint))];
+        }
+    }
 
     private void HandleReceive(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
     {
@@ -77,9 +92,23 @@ public partial class MasterServer : Node
             StartInfo = GetProcessStartInfo(port),
             EnableRaisingEvents = true
         };
+
         process.OutputDataReceived += (_, output) =>
         {
-            if (output.Data != null) Console.WriteLine($"[Godot {port}] {output.Data}");
+            if (output.Data != null) 
+            {
+                switch(output.Data)
+                {
+                    // When match is ended, stop advertising server as available
+                    case Lifecycle.MatchEnd:
+                        Console.WriteLine($"match ended for port {port}");
+                        SetActivity(process.Id, false);
+                        break;
+                    default:
+                        Console.WriteLine($"[Godot {port}] {output.Data}");
+                        break;
+                }
+            }
         };
 
         process.ErrorDataReceived += (_, output) =>
@@ -87,16 +116,46 @@ public partial class MasterServer : Node
             if (output.Data != null) Console.WriteLine($"[Godot ERR {port}] {output.Data}");
         };
 
+        process.Exited += (_, args) => RemoveServer(process.Id);
+
         process.Start();
+        int pid = process.Id;
+
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
 
         ServerProcessRecord serverRecord = new(new IPEndPoint(IPAddress.Loopback, port), process);
+        lock (_servers)
+        {
+            if (_servers.ContainsKey(pid))
+            {
+                if (!_servers[pid].Process.HasExited) throw new Exception("Duplicate keys found");
 
-        _servers.Add(serverRecord);
+            }
+            _servers[pid] = serverRecord;
+        }
         return serverRecord;
     }
+    private void SetActivity(int pid, bool active)
+    {
+        lock (_servers)
+        {
+            if (_servers.TryGetValue(pid, out var value))
+                value.Active = active;
+        }
+    }
+    /// <summary>
+    /// Removes <paramref name="pid"/> process when able to lock the server list
+    /// </summary>
+    private void RemoveServer(int pid)
+    {
+        lock (_servers)
+        {
+            _servers.Remove(pid);
+        }
+    }
+
     public override void _Ready()
     {
         //TODO fix magic number document somewhere
@@ -109,23 +168,30 @@ public partial class MasterServer : Node
 
     public override void _Notification(int what)
     {
-        if (what == NotificationWMCloseRequest) Shutdown();
+        if (what == NotificationWMCloseRequest) 
+            Shutdown();
     }
 
     private void Shutdown()
     {
-        _netManager.Stop();
-        foreach (Process? process in _servers.Select(x => x.Process))
+        lock (_servers)
         {
-            try
+            _netManager.Stop();
+            foreach (Process process in 
+                _servers.Values
+                .Select(record => record.Process)
+                .ToArray()
+            )
             {
-                if (!process.HasExited)
+                try
                 {
-                    process.Kill(entireProcessTree: true);
-                    process.WaitForExit(5000);
+                    if (!process.HasExited)
+                    {
+                        process.Kill(entireProcessTree: true);
+                    }
                 }
+                catch { }
             }
-            catch { }
         }
     }
 
@@ -138,7 +204,13 @@ public partial class MasterServer : Node
 public record class ServerProcessRecord(
     IPEndPoint EndPoint,
     Process Process
-) {}
+)
+{
+    /// <summary>
+    /// Whether or not the server is still accepting new connections
+    /// </summary>
+    public bool Active { get; set; } = true;
+}
 
 
 public record class ServerInfo(

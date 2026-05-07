@@ -12,6 +12,8 @@ public class LiteNetConnectionAdapter : INetworkConnectionAdapter
     public IPAddress Address => Peer.Address;
     public ushort Port => (ushort)Peer.Port;
 
+    public int Id => Peer.Id;
+
     public bool Active => Peer.ConnectionState == ConnectionState.Connected;
 
     public event Action<ReadOnlyMemory<byte>>? ReceiveEvent;

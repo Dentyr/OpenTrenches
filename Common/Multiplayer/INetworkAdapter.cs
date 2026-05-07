@@ -9,7 +9,7 @@ using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 namespace OpenTrenches.Common.Multiplayer;
 
 /// <summary>
-/// Represents an alive connection to an endpoint, and the necessary functions for <see cref="OpenTrenches"/>
+/// Represents an alive connection to an endpoint, and the necessary functions for communications
 /// </summary>
 public interface INetworkConnectionAdapter
 {
@@ -17,6 +17,8 @@ public interface INetworkConnectionAdapter
     public ushort Port { get; }
 
     public bool Active { get; }
+
+    public int Id { get; }
     
     public event Action<ReadOnlyMemory<byte>>? ReceiveEvent;
 

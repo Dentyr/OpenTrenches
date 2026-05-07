@@ -178,7 +178,8 @@ public sealed class ClientState : IClientState
         }
         else if (dto is GameEndNotificationCommand gameend)
         {
-            if (_teams.TryGetValue(gameend.VictorTeam, out var winner)) GameEndEvent?.Invoke(winner);
+            if (_teams.TryGetValue(gameend.VictorTeam, out var winner)) 
+                GameEndEvent?.Invoke(winner);
         }
     }
 }
