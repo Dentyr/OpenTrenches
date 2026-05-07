@@ -21,6 +21,9 @@ public interface ICharacterAdapter
     /// <returns>null if failed to jump, the position if successful and unoccupied</returns>
     Vector2? AdaptJump(Vector2 direction);
 
-
+    /// <summary>
+    /// Uses <paramref name="query"/> to search for certain objects in the world such as characters and structures
+    /// </summary>
+    /// <param name="query"></param>
     WorldQueryResult Query(WorldQuery query);
 }
