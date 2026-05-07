@@ -73,6 +73,8 @@ public partial class ClientGameRoot : Node
     /// </summary>
     public void SetState(ClientState state) //TODO load when server decides on new game
     {
+        _gameEndScreen.Visible = false;
+        
         State = state;
         State.LoadedEvent += LoadState;
         if (State.Loaded) LoadState();

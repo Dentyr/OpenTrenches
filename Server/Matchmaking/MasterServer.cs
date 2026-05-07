@@ -27,7 +27,7 @@ public partial class MasterServer : Node
     /// </summary>
     private readonly Dictionary<int, ServerProcessRecord> _servers = [];
 
-    private ProcessStartInfo GetProcessStartInfo(ushort port)
+    private ProcessStartInfo GetProcessStartInfo(int port)
     {
         string[] args = OS.GetCmdlineArgs();
         string gdArgs = $"Server/Scene/GameRoot.tscn --headless --port {port}";
@@ -85,7 +85,7 @@ public partial class MasterServer : Node
         }
     }
 
-    private ServerProcessRecord NewServer(ushort port)
+    private ServerProcessRecord NewServer(int port)
     {
         var process = new Process
         {
@@ -116,7 +116,7 @@ public partial class MasterServer : Node
             if (output.Data != null) Console.WriteLine($"[Godot ERR {port}] {output.Data}");
         };
 
-        process.Exited += (_, args) => RemoveServer(process.Id);
+        process.Exited += (_, args) => HandleServerExited(process.Id);
 
         process.Start();
         int pid = process.Id;
@@ -146,13 +146,16 @@ public partial class MasterServer : Node
         }
     }
     /// <summary>
-    /// Removes <paramref name="pid"/> process when able to lock the server list
+    /// Removes the process from the server list and recycles the port
     /// </summary>
-    private void RemoveServer(int pid)
+    private void HandleServerExited(int pid)
     {
         lock (_servers)
         {
-            _servers.Remove(pid);
+            if (_servers.Remove(pid, out ServerProcessRecord? record))
+            {
+                NewServer(record.EndPoint.Port);
+            }
         }
     }
 
@@ -161,7 +164,7 @@ public partial class MasterServer : Node
         //TODO fix magic number document somewhere
         NewServer(3030);
 
-        Console.CancelKeyPress += (_, e) => Shutdown();
+        Console.CancelKeyPress += (_, _) => Shutdown();
         AppDomain.CurrentDomain.ProcessExit += (_, _) => Shutdown();
 
     }
