@@ -1,6 +1,7 @@
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
@@ -16,15 +17,15 @@ public class HoldTask : AbstractAgentTask
         _currentTarget = Target;
     }
 
-    public override AbstractAgentTask Reason(Character character, ICharacterAdapter adapter)
+    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService)
     {
-        _currentTarget = TaskServices.FindTarget(character, adapter);
+        _currentTarget = TaskServices.FindTarget(character, queryService);
         TaskServices.ReasonAttack(character);
 
         return this;
     }
 
-    public override void Process(Character character, ICharacterAdapter adapter)
+    public override bool Process(Character character, IWorld2DQueryService queryService)
     {
         if (TaskServices.EnemyValid(character, _currentTarget, 20)) 
         {
@@ -37,6 +38,6 @@ public class HoldTask : AbstractAgentTask
             character.TryClear(CharacterState.Shooting);
         }
 
-        
+        return false;
     }
 }

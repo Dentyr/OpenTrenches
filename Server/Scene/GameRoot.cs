@@ -32,7 +32,8 @@ public partial class GameRoot : Node
     /// A dictionary of peer ID to player network handlers. 
     /// </summary>
     private readonly Dictionary<int, PlayerNetworkHandler> _players = [];
-    private readonly List<Character> _npcs = [];
+
+    private readonly AgentManager _npcManager = new();
 
     private ServerState GameState { get; }
 
@@ -74,8 +75,7 @@ public partial class GameRoot : Node
         for (int i = 0; i < 100; i ++)
         {
             var chara = GameState.CreateCharacter();
-            _npcs.Add(chara);
-            chara.NewAgent();
+            _npcManager.AddCharacter(chara);
         }
     }
 
@@ -170,6 +170,7 @@ public partial class GameRoot : Node
     {
         NetworkAdapter.Poll();
 
+        _npcManager.Process(World.CreateQueryService());
         //* player updates
 
         // outgoing messages

@@ -111,52 +111,10 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             }
         }
     }
-    
-    WorldQueryResult ICharacterAdapter.Query(WorldQuery query)
-    {
-        // get correct shape
-        var hits = GetViewport().World2D.DirectSpaceState.IntersectShape(new PhysicsShapeQueryParameters2D()
-        {
-            Transform = GeometryServices.MakeTranslate(Position),
-            Shape = WorldQueryInterpreter.GetIntersectShape(query),
-            CollisionMask = WorldQueryInterpreter.GetMask(query)
-        });
-        // Get intersect
-        List<Character> characters = [];
-        List<ServerStructure> structures = [];
-
-        foreach(var hit in hits)
-        {
-            GodotObject hitobj = hit[SceneDefines.PhysicsKey.Collider].AsGodotObject();
-            // hit valid
-            if (hitobj is CharacterSimulator charaSim)
-            {
-                if ((charaSim.Character.Team == Character.Team && query.IncludeAlly) ||
-                    (charaSim.Character.Team != Character.Team && query.IncludeEnemy)
-                ) {
-                    characters.Add(charaSim.Character);
-                }
-            }
-            else if (hitobj is StructureSimulator structSim)
-            {
-                if ((structSim.Structure.Team == Character.Team && query.IncludeAlly) ||
-                    (structSim.Structure.Team != Character.Team && query.IncludeEnemy)
-                ) {
-                    structures.Add(structSim.Structure);
-                }
-            }
-        }
-
-        return new WorldQueryResult(
-            characters,
-            structures
-        );
-    }
 
     /// <summary>
     /// Checks for a ground tile nearby in <paramref name="direction"/>, and if unoccupied, returns the position in game position
     /// </summary>
-    /// <returns></returns>
     public Vector2? AdaptJump(Vector2 direction)
     {
         direction = direction.Normalized();

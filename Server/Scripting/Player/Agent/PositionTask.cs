@@ -1,5 +1,5 @@
 using Godot;
-using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
@@ -13,6 +13,7 @@ public class PositionTask : AbstractAgentTask
     /// </summary>
     private Vector2 _position;
 
+    private bool _entrech;
 
     /// <summary>
     /// 
@@ -22,16 +23,21 @@ public class PositionTask : AbstractAgentTask
     public PositionTask(Vector2 position, bool entrench)
     {
         _position = position;
-        
+        _entrech = entrench;
     }
 
-    public override void Process(Character character, ICharacterAdapter adapter)
+    public override bool Process(Character character, IWorld2DQueryService queryService)
     {
+        if (character.Position.DistanceSquaredTo(_position) < 60f)
+        {
+            return true;
+        }
+        return false;
     }
 
-    public override AbstractAgentTask Reason(Character character, ICharacterAdapter adapter)
+    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService)
     {
-        if (character.Position.DistanceSquaredTo(_position) > 3f)
+        if (character.Position.DistanceSquaredTo(_position) > 100f)
         {
             //TODO pathfind
             // check for trench

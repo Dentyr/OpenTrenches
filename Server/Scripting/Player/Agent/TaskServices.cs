@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Godot;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
@@ -17,9 +19,9 @@ public static class TaskServices
     /// <summary>
     /// Searches nearby units for the nearest enemy structure or character
     /// </summary>
-    public static IWorldObject? FindTarget(Character character, ICharacterAdapter adapter)
+    public static IWorldObject? FindTarget(Character character, IWorld2DQueryService queryService)
     {
-        WorldQueryResult possible = adapter.Query(_threatQuery);
+        WorldQueryResult possible = queryService.Query(QueryContext.MakeContext(character), _threatQuery);
         if (possible.Characters.Count > 0 &&
             possible.Characters.MinBy(target => target.Position.DistanceSquaredTo(character.Position)) is IWorldObject target)
         {

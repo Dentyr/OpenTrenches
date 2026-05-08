@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
@@ -16,18 +17,17 @@ public enum AgentStance
 
 public class IdleTask : AbstractAgentTask
 {
-    public override AbstractAgentTask Reason(Character character, ICharacterAdapter adapter)
+    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService)
     {
-        
-        if (TaskServices.FindTarget(character, adapter) is IWorldObject target)
+        if (TaskServices.FindTarget(character, queryService) is IWorldObject target)
             return new HoldTask(target);
         
         return this;
     }
 
-    public override void Process(Character character, ICharacterAdapter adapter)
+    public override bool Process(Character character, IWorld2DQueryService queryService)
     {
-        
+        return false;
     }
 }
 
@@ -41,11 +41,12 @@ public abstract class AbstractAgentTask
     /// Reasons about the task to execute, returning itself if incomplete or a new task if task is changed.
     /// Intended to be called infrequently
     /// </summary>
-    public abstract AbstractAgentTask Reason(Character character, ICharacterAdapter adapter);
+    public abstract AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService);
 
     /// <summary>
     /// Performs fast paced reactions to the task. 
     /// Intended to be called frequently
     /// </summary>
-    public abstract void Process(Character character, ICharacterAdapter adapter);
+    /// <returns>True if it should re-reason</returns>
+    public abstract bool Process(Character character, IWorld2DQueryService queryService);
 }

@@ -14,7 +14,6 @@ using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Ability;
 using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Server.Scripting.Combat;
-using OpenTrenches.Server.Scripting.Player.Agent;
 using OpenTrenches.Server.Scripting.Teams;
 namespace OpenTrenches.Server.Scripting.Player;
 
@@ -24,14 +23,6 @@ public class Character : IIdObject, IWorldObject
     private IServerState ServerState { get; }
     public ushort ID { get; }
     public Team Team { get; }
-
-    //* AI
-    public CharacterAgent? Agent { get; private set; }
-
-    public void NewAgent()
-    {
-        Agent = new CharacterAgent();
-    }
 
     //* State in World
     
@@ -202,9 +193,6 @@ public class Character : IIdObject, IWorldObject
     /// <param name="adapter"></param>
     public void AdapterSimulate(float delta, ICharacterAdapter adapter)
     {
-        // If has AI, decide what to do
-        Agent?.Think(this, adapter);
-
         //* logistics
         _logisticsProgress += delta / 3;
         if (_logisticsProgress >= 1)

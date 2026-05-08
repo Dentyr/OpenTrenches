@@ -9,15 +9,15 @@ using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scene.World;
 
-public partial class WorldNode : Node3D
+public partial class WorldNode : Node2D
 {
     //* Characters
     private Dictionary<ushort, CharacterSimulator> _characters = [];
-    private Node3D CharacterLayer { get; }
+    private Node2D CharacterLayer { get; }
 
     //* Structures
     private Dictionary<int, StructureSimulator> _structures = [];
-    private Node3D StructureLayer { get; }
+    private Node2D StructureLayer { get; }
 
     //* gridmap
     private ServerChunkLayer? ChunkLayer { get; set; } 
@@ -65,5 +65,13 @@ public partial class WorldNode : Node3D
             StructureSimulator node = _structures[structure.Id];
             StructureLayer.AddChild(node);
         }
+    }
+
+    /// <summary>
+    /// Creates an object to handle queries against the world
+    /// </summary>
+    public World2DQueryService CreateQueryService()
+    {
+        return new World2DQueryService(GetViewport().World2D.DirectSpaceState);
     }
 }
