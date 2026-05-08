@@ -20,8 +20,6 @@ public class CharacterAgent
 
     private AbstractAgentTask _task;
 
-    private int _planCounter = Random.Shared.Next(1000);
-
     public CharacterAgent(Character character)
     {
         _character = character;
@@ -33,27 +31,25 @@ public class CharacterAgent
     /// </summary>
     public void Think(World2DQueryService queryService)
     {
-        _planCounter --;
-        if (_planCounter <= 0)
-            Plan(queryService);
 
         if (GD.Randf() > 0.975f)
         {
             _task = _task.Reason(_character, queryService);
-            // DecideMovementTarget(character, adapter);
         }
-
-        // if (character.Position.DistanceSquaredTo(_movementTarget.Position) > 0.3f) 
-        //     character.MoveIn(_movementTarget.Position - character.Position);
-        // else 
-        //     character.MoveIn(Vector2.Zero);
 
         _task.Process(_character, queryService);
     }
 
     public void Plan(World2DQueryService adapter)
     {
-        
+        if (_character.Hp <= 0)
+            _character.RequestRespawn();
+
+        // charge
+        if (GD.Randf() > 0.95)
+        {
+            _task = new PositionTask(new(64, 64), true);
+        }
     }
 
     // private void DecideMovementTarget(Character character, ICharacterAdapter adapter)
