@@ -33,7 +33,7 @@ public partial class GameRoot : Node
     /// </summary>
     private readonly Dictionary<int, PlayerNetworkHandler> _players = [];
 
-    private readonly AgentManager _npcManager = new();
+    private readonly AgentManager _npcManager;
 
     private ServerState GameState { get; }
 
@@ -51,6 +51,8 @@ public partial class GameRoot : Node
         
         //* model and adapter
         GameState = new();
+        _npcManager = new([..GameState.Teams.Values]);
+
         World = new(GameState);
         World.AddChild(new WorldEnvironment() {Environment = Core.Scene.SceneDefines.IlluminatedEnvironment});
         AddChild(World);

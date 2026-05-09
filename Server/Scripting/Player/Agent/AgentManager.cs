@@ -2,53 +2,42 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using OpenTrenches.Server.Scene.World;
+using OpenTrenches.Server.Scripting.Teams;
+using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
 /// <summary>
-/// Agent Manager controls a number of AIs 
+/// Agent Manager organizes all the AI components of two teams
 /// </summary>
 public class AgentManager
 {
-    private readonly Dictionary<ushort, CharacterAgent> _agent = [];
-    private List<CharacterAgent> _agentList = [];
-    private int _strategyCounter = 0;
+    public TeamStrategizer _team1;
+    public TeamStrategizer _team2;
 
     
-
+    public AgentManager(params Team[] teams)
+    {
+        _team1 = new(teams[0]);
+        _team2 = new(teams[1]);
+    }
 
     public void AddCharacter(Character character)
     {
-        CharacterAgent agent = new(character);
-        if (_agent.TryAdd(character.ID, agent))
-        {
-            _agentList.Add(agent);
-        }
+        if      (character.Team == _team1.Team) _team1.AddCharacter(character);
+        else if (character.Team == _team2.Team) _team2.AddCharacter(character);
     }
 
     public bool RemoveCharacter(Character character)
     {
-        if (_agent.Remove(character.ID, out var item))
-        {
-            _agentList.Remove(item);
-            return true;
-        }
+        if      (character.Team == _team1.Team) return _team1.RemoveCharacter(character);
+        else if (character.Team == _team2.Team) return _team2.RemoveCharacter(character);
         return false;
     }
 
-    public void Process(World2DQueryService world)
+    public void Process(IWorld2DQueryService world)
     {
-        foreach(var agent in _agent.Values)
-        {
-            agent.Think(world);
-        }
-
-
-        if (_agentList.Count > 0)
-        {
-            _strategyCounter ++;
-            if (_strategyCounter >= _agentList.Count) _strategyCounter = 0;
-            _agentList[_strategyCounter].Plan(world);
-        }
+        _team1.Calculate(world);
+        _team2.Calculate(world);
     }
 }
