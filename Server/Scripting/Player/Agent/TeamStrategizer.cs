@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Godot.NativeInterop;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Server.Scene.World;
 using OpenTrenches.Server.Scripting.Teams;
@@ -40,7 +41,7 @@ public class TeamStrategizer
             {
                 Position = new(
                     CommonDefines.WorldSize / 2 + offset, 
-                    CommonDefines.WorldSize * ((i + 0.5f) / (PointCount))
+                    CommonDefines.WorldSize * ((i + 0.5f) / PointCount)
                 )
             };
         }
@@ -54,11 +55,10 @@ public class TeamStrategizer
             _agentList.Add(agent);
 
             // Assign to least defended point
-            var point = _defensePoints.MinBy(pt => pt.AssignedDefenders.Count);
+            var point = _defensePoints.MinBy(pt => pt.AssignedAgents.Count);
             point ??= _defensePoints[0];
 
-            point.AssignedDefenders.Add(agent);
-            agent.Task(new PositionTask(point.Position, true));
+            point.Assign(agent);
         }
     }
 
@@ -72,31 +72,25 @@ public class TeamStrategizer
         return false;
     }
 
-    public void Organize(IWorld2DQueryService queryService)
-    {
-        
-    }
-
-    internal void Calculate(IWorld2DQueryService world)
+    public void Calculate(IWorld2DQueryService world, IServerChunkArray chunkArray)
     {
         foreach(var agent in _agent.Values)
         {
-            agent.Think(world);
+            agent.Think(world, chunkArray);
         }
 
 
         if (_agentList.Count > 0)
         {
-            _strategyCounter ++;
-            if (_strategyCounter >= _agentList.Count) _strategyCounter = 0;
-            _agentList[_strategyCounter].Plan(world);
+            for (int i = 0; i < 10; i ++)
+            {
+                _strategyCounter = (_strategyCounter + 1) % _agentList.Count;
+                _agentList[_strategyCounter].Plan(world, chunkArray);
+            }
+        }
+        if (_defensePoints.Length > 0 && GD.Randf() > 0.9f)
+        {
+            _defensePoints[Random.Shared.Next(_defensePoints.Length)].Strategize(world, chunkArray);
         }
     }
-}
-
-public class DefensivePoint
-{
-    public Vector2 Position;
-    public List<CharacterAgent> AssignedDefenders = [];
-
 }

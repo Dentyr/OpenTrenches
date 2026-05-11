@@ -13,20 +13,17 @@ public class PositionTask : AbstractAgentTask
     /// </summary>
     private Vector2 _position;
 
-    private bool _entrech;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="position">Where to go</param>
-    /// <param name="entrench">If it should look for a trench to jump into</param>
-    public PositionTask(Vector2 position, bool entrench)
+    public PositionTask(Vector2 position)
     {
         _position = position;
-        _entrech = entrench;
     }
 
-    public override bool Process(Character character, IWorld2DQueryService queryService)
+    public override bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         if (character.Position.DistanceSquaredTo(_position) < 60f)
         {
@@ -35,21 +32,12 @@ public class PositionTask : AbstractAgentTask
         return false;
     }
 
-    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService)
+    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
-        if (character.Position.DistanceSquaredTo(_position) > 100f)
-        {
-            //TODO pathfind
-            // check for trench
-            // adapter.Query()
-            // if trench exists, then check occupancy, and then jump in 
-            // if full, extend
-            // if no trench make new trench
-            character.MoveIn(_position - character.Position);
-            return this;
-        }
-        // once reached destination, hold
-        character.MoveIn(Vector2.Zero);
-        return new HoldTask();
+        if (TaskServices.Navigate(
+            character, _position, queryService, 
+            error: 10
+        )) return new HoldTask();
+        return this;
     }
 }

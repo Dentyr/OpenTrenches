@@ -71,6 +71,7 @@ public class Character : IIdObject, IWorldObject
     {
         MovementVelocity = direction.Normalized() * 7f;
     }
+    public void StopMoving() => MovementVelocity = Vector2.Zero;
 
     private UpdateableProperty<CharacterState> _state; 
     public CharacterState State

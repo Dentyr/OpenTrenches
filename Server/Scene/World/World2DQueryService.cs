@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Util;
+using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
 using OpenTrenches.Server.Scripting.World;
 

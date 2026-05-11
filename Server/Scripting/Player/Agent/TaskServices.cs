@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Godot;
@@ -56,5 +57,20 @@ public static class TaskServices
         return enemy is not null &&
             enemy.Hp > 0 &&
             enemy.Position.DistanceSquaredTo(character.Position) < (maxDist * maxDist);
+    }
+
+    /// <summary>
+    /// Navigates <paramref name="character"/> to <paramref name="error"/> distance within <paramref name="position"/> using <paramref name="queryService"/> with a max algorithmic depth of <paramref name="maxDepth"/>
+    /// </summary>
+    /// <returns>True if destination has been reached</returns>
+    public static bool Navigate(Character character, Vector2 position, IWorld2DQueryService queryService, int maxDepth = 5, float error = 1f)
+    {
+        if (character.Position.DistanceTo(position) <= error)
+        {
+            character.MoveIn(Vector2.Zero);
+            return true;
+        }
+        character.MoveIn(position - character.Position);
+        return false;
     }
 }

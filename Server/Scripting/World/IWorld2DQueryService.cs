@@ -1,3 +1,5 @@
+using Godot;
+using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Player;
 
 namespace OpenTrenches.Server.Scripting.World;

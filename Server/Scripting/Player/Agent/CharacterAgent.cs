@@ -11,39 +11,58 @@ namespace OpenTrenches.Server.Scripting.Player.Agent;
 /// </summary>
 public class CharacterAgent
 {
-    private readonly Character _character;
-    public Team Team => _character.Team;
+    public readonly Character Character;
+    public Team Team => Character.Team;
+    public ushort CharacterId => Character.ID;
 
-    private AbstractAgentTask _task;
+    public AbstractAgentTask Task { get; private set; }
 
     public CharacterAgent(Character character)
     {
-        _character = character;
-        _task = new IdleTask();
+        Character = character;
+        Task = new IdleTask();
     }
 
     /// <summary>
     /// Called on each tick, thinks about what the character should do next
     /// </summary>
-    public void Think(IWorld2DQueryService queryService)
+    public void Think(IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
-        if (GD.Randf() > 0.975f)
-        {
-            _task = _task.Reason(_character, queryService);
-        }
-
-        _task.Process(_character, queryService);
+        Task.Process(Character, queryService, chunks);
     }
 
-    public void Plan(IWorld2DQueryService adapter)
+    public void Plan(IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
-        if (_character.Hp <= 0)
-            _character.RequestRespawn();
+        if (Character.Hp <= 0)
+            Character.RequestRespawn();
 
+        Task = Task.Reason(Character, queryService, chunks);
+        
     }
 
-    public void Task(AbstractAgentTask task)
+    public void AssignTask(AbstractAgentTask task)
     {
-        _task = task;
+        Task = task;
     }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+}
+
+public enum AgentRole
+{
+    /// <summary>
+    /// Sappers expanded trenches. When the trench system is complete, they become holders
+    /// </summary>
+    Sapper,
+    /// <summary>
+    /// Holders defend a position
+    /// </summary>
+    Holder,
+    /// <summary>
+    /// Assaults move around and gather for charges
+    /// </summary>
+    Assaulter,
 }

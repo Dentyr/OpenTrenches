@@ -172,7 +172,7 @@ public partial class GameRoot : Node
     {
         NetworkAdapter.Poll();
 
-        _npcManager.Process(World.CreateQueryService());
+        _npcManager.Process(World.CreateQueryService(), GameState.Chunks);
         //* player updates
 
         // outgoing messages

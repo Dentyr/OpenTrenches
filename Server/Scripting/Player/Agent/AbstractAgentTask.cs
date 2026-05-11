@@ -17,7 +17,7 @@ public enum AgentStance
 
 public class IdleTask : AbstractAgentTask
 {
-    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService)
+    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         if (TaskServices.FindTarget(character, queryService) is IWorldObject target)
             return new HoldTask(target);
@@ -25,7 +25,7 @@ public class IdleTask : AbstractAgentTask
         return this;
     }
 
-    public override bool Process(Character character, IWorld2DQueryService queryService)
+    public override bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         return false;
     }
@@ -41,12 +41,12 @@ public abstract class AbstractAgentTask
     /// Reasons about the task to execute, returning itself if incomplete or a new task if task is changed.
     /// Intended to be called infrequently
     /// </summary>
-    public abstract AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService);
+    public abstract AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks);
 
     /// <summary>
     /// Performs fast paced reactions to the task. 
     /// Intended to be called frequently
     /// </summary>
     /// <returns>True if it should re-reason</returns>
-    public abstract bool Process(Character character, IWorld2DQueryService queryService);
+    public abstract bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks);
 }

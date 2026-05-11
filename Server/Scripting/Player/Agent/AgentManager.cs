@@ -35,9 +35,9 @@ public class AgentManager
         return false;
     }
 
-    public void Process(IWorld2DQueryService world)
+    public void Process(IWorld2DQueryService world, IServerChunkArray serverChunk)
     {
-        _team1.Calculate(world);
-        _team2.Calculate(world);
+        _team1.Calculate(world, serverChunk);
+        _team2.Calculate(world, serverChunk);
     }
 }

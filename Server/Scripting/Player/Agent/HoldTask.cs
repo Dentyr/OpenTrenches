@@ -17,20 +17,19 @@ public class HoldTask : AbstractAgentTask
         _currentTarget = Target;
     }
 
-    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService)
+    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         _currentTarget = TaskServices.FindTarget(character, queryService);
-        TaskServices.ReasonAttack(character);
 
         return this;
     }
 
-    public override bool Process(Character character, IWorld2DQueryService queryService)
+    public override bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         if (TaskServices.EnemyValid(character, _currentTarget, 20)) 
         {
             character.Direction = _currentTarget.Position;
-            character.TrySet(CharacterState.Shooting);
+            TaskServices.ReasonAttack(character);
         }
         else
         {
