@@ -251,7 +251,7 @@ public class Character : IIdObject, IWorldObject
             //Must be in trench
             if (Layer == WorldLayer.Trench)
             {
-                Vector2? target = adapter.AdaptJump(Direction - Position);
+                Vector2? target = adapter.AdaptJump(MovementVelocity);
 
                 // can't move up because blocked or no ledge
                 if (target is not null)

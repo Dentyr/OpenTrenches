@@ -25,8 +25,9 @@ public class PositionTask : AbstractAgentTask
 
     public override bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
-        if (character.Position.DistanceSquaredTo(_position) < 60f)
-        {
+        if (TaskServices.Step(character, _position, chunks, 
+            error: 1)
+        ) {
             return true;
         }
         return false;

@@ -16,9 +16,16 @@ namespace OpenTrenches.Server.Scripting.Player.Agent;
 public class TeamStrategizer
 {
     private const int PointCount = 12;
+
+    /// <summary>
+    /// How many ticks should occur before a defense point should strategize
+    /// </summary>
+    private const int StrategizationIntermittency = 10;
+
     public readonly Team Team;
 
     private DefensivePoint[] _defensePoints;
+    private int _nextDefensePointCalculation = 0;
 
     private readonly Dictionary<ushort, CharacterAgent> _agent = [];
 
@@ -88,9 +95,12 @@ public class TeamStrategizer
                 _agentList[_strategyCounter].Plan(world, chunkArray);
             }
         }
-        if (_defensePoints.Length > 0 && GD.Randf() > 0.9f)
+        if (_defensePoints.Length > 0)
         {
-            _defensePoints[Random.Shared.Next(_defensePoints.Length)].Strategize(world, chunkArray);
+            _nextDefensePointCalculation = (_nextDefensePointCalculation + 1) % (_defensePoints.Length * StrategizationIntermittency);
+            if (_nextDefensePointCalculation % StrategizationIntermittency == 0)
+                _defensePoints[_nextDefensePointCalculation / StrategizationIntermittency].Strategize(world, chunkArray);
+            // GD.Print(_nextDefensePointCalculation);
         }
     }
 }

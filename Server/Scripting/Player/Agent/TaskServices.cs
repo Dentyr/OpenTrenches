@@ -12,6 +12,13 @@ namespace OpenTrenches.Server.Scripting.Player.Agent;
 /// </summary>
 public static class TaskServices
 {
+    /// <summary>
+    /// If the normalized absolute value of the x/y is greater than direction threashold, then they are considered to be moving in this direction.
+    /// </summary>
+    /// <remarks>If the character is moving with a velocity of (7f, 0.1f), this can be used to stop movement calculations from thinking the character's next cell with be close to (1, 1) </remarks>
+    private const float DirectionThreshold = 0.2f;
+
+    
     private static WorldQuery _threatQuery = new()
     {
         IncludeAlly = false,
@@ -71,6 +78,37 @@ public static class TaskServices
             return true;
         }
         character.MoveIn(position - character.Position);
+        return false;
+    }
+
+    /// <summary>
+    /// Reasons about the immediate next step for <paramref name="character"/> to move towards <paramref name="checkpoint"/>. Jumps out of trenches if necessary.
+    /// Returns true if within <paramref name="error"/> of <paramref name="checkpoint"/>.
+    /// </summary>
+    /// <remarks>Meant to be used frequently, close to several times a second for best fluidity </remarks>
+    public static bool Step(Character character, Vector2 checkpoint, IServerChunkArray chunkarray, float error = 1f)
+    {
+        if (character.Position.DistanceSquaredTo(checkpoint) < error * error)
+            return true;
+        switch (character.Layer)
+        {
+            case WorldLayer.Ground:
+                break;
+            case WorldLayer.Trench:
+                Vector2 movementDirection = character.MovementVelocity.Normalized();
+                Vector2I cellMovement = new(
+                    x: Math.Abs(character.MovementVelocity.X) < DirectionThreshold ? 0 : Math.Sign(character.MovementVelocity.X),
+                    y: Math.Abs(character.MovementVelocity.Y) < DirectionThreshold ? 0 : Math.Sign(character.MovementVelocity.Y)
+                );
+                if (chunkarray.TryGetTile(character.GetCell() + cellMovement, out var tile))
+                {
+                    if (tile == TileType.Clear)
+                    {
+                        character.TryExitTrench();
+                    }
+                }
+                break;
+        }
         return false;
     }
 }

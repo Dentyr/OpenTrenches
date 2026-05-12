@@ -95,32 +95,31 @@ public class DefensivePoint
     public void Strategize(IWorld2DQueryService service, IServerChunkArray chunkArray)
     {
         // Get all the agents doing trench digging
-        IEnumerable<CharacterAgent> _sappers = AssignedAgents
-            .Where(record => record.Role == AgentRole.Sapper)
+        IEnumerable<CharacterAgent> _freeSappers = AssignedAgents
+            .Where(record => 
+                record.Role == AgentRole.Sapper && 
+                record.Agent.Task is not EntrenchTask)
             .Select(record => record.Agent);
 
         // Make them dig out the remaining of the defensive pattern
         Vector2I cellPosition = (Vector2I)Position;
         Vector2I[] _plannedDigging = [.. 
-            _entrenchPosition.Select(position => position + cellPosition).Where(
-                position => chunkArray[position.X, position.Y] != TileType.Trench
-            )
+            _entrenchPosition.Select(position => position + cellPosition)
+            .Where(position => chunkArray[position.X, position.Y] != TileType.Trench)
         ];
         if (_plannedDigging.Length > 0)
         {
             // start of next build range
             int buildStartIndex = 0;
-            foreach(CharacterAgent sapper in _sappers)
+            foreach(CharacterAgent sapper in _freeSappers)
             {
-                if (sapper.Task is not EntrenchTask)
-                {
+            GD.Print($"tryna sap {_plannedDigging.Length}");
                     // end of next build range, either 3 next or until last
                     int buildEndIndex = Math.Min(buildStartIndex + 3, _plannedDigging.Length);
                     Vector2I[] agentTasked = _plannedDigging[buildStartIndex .. buildEndIndex];
                     sapper.AssignTask(new EntrenchTask(agentTasked));
 
                     buildStartIndex = buildEndIndex;
-                }
             }
         }
 
