@@ -11,6 +11,7 @@ using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Contracts.DTO.PlayerCommands;
 using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
+using OpenTrenches.Core.Scripting.World;
 using OpenTrenches.Server.Scripting.Ability;
 using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Server.Scripting.Combat;
@@ -215,7 +216,7 @@ public class Character : IIdObject, IWorldObject
         }
         if (State.HasFlag(CharacterState.Building))
         {
-            if (GetCell().DistanceTo(BuildCell) > 1f) 
+            if (Position.DistanceTo(BuildCell.CellToPosition()) > 1f) 
             {
                 CancelTasks();
                 return;
