@@ -74,7 +74,7 @@ public partial class GameRoot : Node
         foreach (ServerStructure structure in GameState.Chunks.StructureDict.Values) HandleNewStructure(structure);
 
         //* Initialization
-        for (int i = 0; i < 100; i ++)
+        for (int i = 0; i < 150; i ++)
         {
             var chara = GameState.CreateCharacter();
             _npcManager.AddCharacter(chara);

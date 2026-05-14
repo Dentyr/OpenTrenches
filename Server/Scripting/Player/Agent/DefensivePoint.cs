@@ -10,7 +10,7 @@ namespace OpenTrenches.Server.Scripting.Player.Agent;
 /// <summary>
 /// Defensive points represent a position and the strategy around fortifying the position
 /// </summary>
-public class DefensivePoint
+public class DefensivePoint : AbstractObjective
 {
     /// <summary>
     /// A list of positions relative to the defensive point, which the AI will attempt to dig out.
@@ -92,7 +92,7 @@ public class DefensivePoint
         _assignedAgents.RemoveAll(record => record.Agent == agent);
     }
 
-    public void Strategize(IWorld2DQueryService service, IServerChunkArray chunkArray)
+    public override void Strategize(IWorld2DQueryService service, IServerChunkArray chunkArray)
     {
         // Get all the agents doing trench digging
         IEnumerable<CharacterAgent> _freeSappers = AssignedAgents
