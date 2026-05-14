@@ -25,30 +25,26 @@ public class EntrenchTask : AbstractAgentTask
             _next = _positions[^1];
     }
 
-    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
+    public override bool Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
-        if (_positions.Count == 0) return new HoldTask();
+        if (_positions.Count == 0) return true;
 
         _next = _positions[^1];
         while (chunks[_next.X, _next.Y] == TileType.Trench)
         {
             _positions.RemoveAt(_positions.Count - 1);
-            if (_positions.Count == 0) return new HoldTask();
+            if (_positions.Count == 0) return true;
             _next = _positions[^1];
         }
         if (TaskServices.Navigate(character, _next.CellToPosition(), queryService))
         {
             character.SetBuildTarget(_next.X, _next.Y, TileType.Trench);
         }
-        return this;
+        return false;
     }
 
-    public override bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
+    public override void Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         TaskServices.Step(character, _next.CellToPosition(), chunks, error: 0.3f);
-
-        if (_positions.Count == 0) 
-            return true;
-        return false;
     }
 }

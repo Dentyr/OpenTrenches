@@ -20,7 +20,7 @@ public class CharacterAgent
     public CharacterAgent(Character character)
     {
         Character = character;
-        Task = new IdleTask();
+        Task = new HoldTask(Character.Position);
     }
 
     /// <summary>
@@ -36,7 +36,10 @@ public class CharacterAgent
         if (Character.Hp <= 0)
             Character.RequestRespawn();
 
-        Task = Task.Reason(Character, queryService, chunks);
+        if (Task.Reason(Character, queryService, chunks))
+        {
+            Task = new IdleTask();
+        }
         
     }
 

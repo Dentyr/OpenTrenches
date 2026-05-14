@@ -128,7 +128,7 @@ public class DefensivePoint : AbstractObjective
             if (record.Role == AgentRole.Holder)
             {
                 if (record.Agent.Character.Position.DistanceTo(Position) > 15)
-                    record.Agent.AssignTask(new PositionTask(Position));
+                    record.Agent.AssignTask(new HoldTask(Position));
             }
         }
 

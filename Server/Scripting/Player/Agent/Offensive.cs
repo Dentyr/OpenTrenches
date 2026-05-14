@@ -20,10 +20,8 @@ public class Offensive : AbstractObjective
     private List<CharacterAgent> _assignedAgents = [];
     public IReadOnlyList<CharacterAgent> AssignedAgents => _assignedAgents;
 
-    /// <summary>
-    /// 
-    /// </summary>
     private Phase _combatPhase = Phase.Gathering;
+
 
     public Offensive(Vector2 gathering, Vector2 target)
     {
@@ -38,10 +36,10 @@ public class Offensive : AbstractObjective
         switch (_combatPhase)
         {
             case Phase.Gathering:
-                agent.AssignTask(new PositionTask(Gathering));
+                agent.AssignTask(new HoldTask(Gathering));
                 break;
             case Phase.Assaulting:
-                agent.AssignTask(new PositionTask(Gathering));
+                agent.AssignTask(new HoldTask(Gathering));
                 break;
             case Phase.Consolidating:
                 break;
@@ -57,7 +55,7 @@ public class Offensive : AbstractObjective
         _combatPhase = Phase.Assaulting;
         foreach (CharacterAgent agent in _assignedAgents)
         {
-            agent.AssignTask(new PositionTask(Target));
+            agent.AssignTask(new HoldTask(Target));
         }
     }
 
@@ -92,9 +90,9 @@ public class Offensive : AbstractObjective
                 }
                 else
                 {
-                    foreach (CharacterAgent unassinged in farAgents.Where(agent => agent.Task is not PositionTask task))
+                    foreach (CharacterAgent agent in farAgents.Where(agent => agent.Task is not HoldTask task))
                     {
-                        unassinged.AssignTask(new PositionTask(Gathering));
+                        agent.AssignTask(new HoldTask(Gathering));
                     }
                 }
                 break;
@@ -105,7 +103,6 @@ public class Offensive : AbstractObjective
                 break;
         }
     }
-
     public enum Phase
     {
         /// <summary>

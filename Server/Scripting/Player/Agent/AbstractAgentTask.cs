@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.World;
 
@@ -17,17 +18,28 @@ public enum AgentStance
 
 public class IdleTask : AbstractAgentTask
 {
-    public override AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
+    private IWorldObject? _currentTarget;
+
+    public override bool Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         if (TaskServices.FindTarget(character, queryService) is IWorldObject target)
-            return new HoldTask(target);
+            _currentTarget = target;
         
-        return this;
+        return false;
     }
 
-    public override bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
+    public override void Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
-        return false;
+        if (TaskServices.EnemyValid(character, _currentTarget, 20)) 
+        {
+            character.Direction = _currentTarget.Position;
+            TaskServices.ReasonAttack(character);
+        }
+        else
+        {
+            _currentTarget = null;
+            character.TryClear(CharacterState.Shooting);
+        }
     }
 }
 
@@ -38,15 +50,18 @@ public class IdleTask : AbstractAgentTask
 public abstract class AbstractAgentTask
 {
     /// <summary>
-    /// Reasons about the task to execute, returning itself if incomplete or a new task if task is changed.
-    /// Intended to be called infrequently
+    /// Reasons about the task to execute, return true if the task has been completed
     /// </summary>
-    public abstract AbstractAgentTask Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks);
+    /// <remarks>
+    /// Intended to be called infrequently
+    /// </remarks>
+    public abstract bool Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks);
 
     /// <summary>
     /// Performs fast paced reactions to the task. 
-    /// Intended to be called frequently
     /// </summary>
-    /// <returns>True if it should re-reason</returns>
-    public abstract bool Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks);
+    /// <remarks>
+    /// Intended to be called frequently
+    /// </remarks>
+    public abstract void Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks);
 }
