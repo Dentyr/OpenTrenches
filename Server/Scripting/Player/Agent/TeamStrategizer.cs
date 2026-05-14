@@ -110,6 +110,7 @@ public class TeamStrategizer
 
     public void AddCharacter(Character character)
     {
+
         CharacterAgent agent = new(character);
         if (_agent.TryAdd(character.ID, agent))
         {
@@ -120,7 +121,7 @@ public class TeamStrategizer
             point ??= _defensePoints[0];
 
             // If defensive points already have enough defenders, place them into an offensive group
-            if (point.AssignedAgents.Count > DesiredDefenders)
+            if (point.AssignedAgents.Count >= DesiredDefenders)
             {
                 Offensive? offensive;
 

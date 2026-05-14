@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
@@ -10,10 +11,16 @@ namespace OpenTrenches.Server.Scripting.Player.Agent;
 /// </summary>
 public class HoldTask : AbstractAgentTask
 {
+    private const float DefaultRange = 5f;
+
     /// <summary>
     /// Moves to secure the area around this position and seeks a good place to entrench
     /// </summary>
     private readonly Vector2 _area;
+    /// <summary>
+    /// Radius around area to secure
+    /// </summary>
+    private readonly float _range;
 
     /// <summary>
     /// The specific position to secure within the area
@@ -27,11 +34,15 @@ public class HoldTask : AbstractAgentTask
 
     private IWorldObject? _currentTarget;
 
-    public HoldTask(Vector2 position, IWorldObject? Target = null)
+    /// <summary>
+    /// Creates a task to hold <paramref name="range"/> around <paramref name="position"/>
+    /// </summary>
+    public HoldTask(Vector2 position, float range = DefaultRange)
     {
         _area = position;
-        _targetPosition = position;
-        _currentTarget = Target;
+        _range = range;
+
+        _targetPosition = _area + new Vector2((GD.Randf() - 0.5f) * 2 * range, (GD.Randf() - 0.5f) * 2 * range);
     }
 
     /// <remarks>
