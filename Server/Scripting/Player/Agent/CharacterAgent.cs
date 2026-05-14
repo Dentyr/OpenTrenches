@@ -53,19 +53,3 @@ public class CharacterAgent
         return base.GetHashCode();
     }
 }
-
-public enum AgentRole
-{
-    /// <summary>
-    /// Sappers expanded trenches. When the trench system is complete, they become holders
-    /// </summary>
-    Sapper,
-    /// <summary>
-    /// Holders defend a position
-    /// </summary>
-    Holder,
-    /// <summary>
-    /// Assaults move around and gather for charges
-    /// </summary>
-    Assaulter,
-}

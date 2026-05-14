@@ -98,13 +98,13 @@ public class TeamStrategizer
         // makes a defensive line along the map
         for (int i = 0; i < _defensePoints.Length; i ++)
         {
-            _defensePoints[i] = new()
-            {
-                Position = new(
+            _defensePoints[i] = new(
+                position: new(
                     CommonDefines.WorldSize / 2 + initialDefensivePointOffset, 
                     CommonDefines.WorldSize * ((i + 0.5f) / PointCount)
-                )
-            };
+                ),
+                _direction
+            );
         }
     }
 

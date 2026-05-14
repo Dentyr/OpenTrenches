@@ -62,28 +62,59 @@ public class DefensivePoint : AbstractObjective
     private const float SapperPercent = 0.3f;
     private const int MaxSappers = 3;
 
-    public Vector2 Position;
+
+    private const float TestChance = 0.2f;
+
+    private const float PushDistance = 15f;
+
+    private readonly Vector2 _initialPosition;
+    public Vector2 Position { get; private set; }
+
+    /// <summary>
+    /// Direction to advance in with testers
+    /// </summary>
+    private readonly Vector2 _direction;
+
+    /// <summary>
+    /// Location to send testers to to check if coast is clear
+    /// </summary>
+    public Vector2 ForwardPosition => Position + _direction * PushDistance;
+
     /// <summary>
     /// Whether or not this position is sufficiently entrenched
     /// </summary>
     /// <value></value>
     public bool Entrenched { get; private set; } = false;
 
-    private List<AgentAssignmentRecord> _assignedAgents = [];
-    public IReadOnlyList<AgentAssignmentRecord> AssignedAgents => _assignedAgents;
+    private List<DefensivePointAssignmentRecord> _assignedAgents = [];
+    public IReadOnlyList<DefensivePointAssignmentRecord> AssignedAgents => _assignedAgents;
+
+
+    public DefensivePoint(Vector2 position, Vector2 direction)
+    {
+        _initialPosition = position;
+        Position = position;
+
+        _direction = direction.Normalized();
+    }
+
 
     public void Assign(CharacterAgent agent)
     {
-        AgentRole wanted = AgentRole.Holder;
+        DefensivePointAgentRole wanted;
         // if not entrenched and wanting more sappers, add as a sapper
-        if (!Entrenched && 
-            (
-                _assignedAgents.Count(assigned => assigned.Role == AgentRole.Sapper)
-                < Math.Min(_assignedAgents.Count, MaxSappers)
-            )
-        ) {
-            wanted = AgentRole.Sapper;
+        int numSappers = _assignedAgents.Count(assigned => assigned.Role == DefensivePointAgentRole.Sapper);
+        int wantedSappers = Math.Min((int)Math.Ceiling((double)_assignedAgents.Count * SapperPercent), MaxSappers);
+
+        // if there is already a tester, add as sapper if wanted or add as holder if not
+        if (_assignedAgents.Any(agent => agent.Role == DefensivePointAgentRole.Tester))
+        {
+            if (!Entrenched && numSappers < wantedSappers) {
+                wanted = DefensivePointAgentRole.Sapper;
+            }
+            else wanted = DefensivePointAgentRole.Holder;
         }
+        else wanted = DefensivePointAgentRole.Tester; 
 
         _assignedAgents.Add(new(agent, wanted));
     }
@@ -97,9 +128,11 @@ public class DefensivePoint : AbstractObjective
         // Get all the agents doing trench digging
         IEnumerable<CharacterAgent> _freeSappers = AssignedAgents
             .Where(record => 
-                record.Role == AgentRole.Sapper && 
+                record.Role == DefensivePointAgentRole.Sapper && 
                 record.Agent.Task is not EntrenchTask)
             .Select(record => record.Agent);
+        
+
 
         // Make them dig out the remaining of the defensive pattern
         Vector2I cellPosition = (Vector2I)Position;
@@ -125,10 +158,23 @@ public class DefensivePoint : AbstractObjective
         // gathers far away units
         foreach (var record in _assignedAgents)
         {
-            if (record.Role == AgentRole.Holder)
+            if (record.Role == DefensivePointAgentRole.Holder)
             {
                 if (record.Agent.Character.Position.DistanceTo(Position) > 15)
                     record.Agent.AssignTask(new HoldTask(Position));
+            }
+        }
+
+        //test enemy
+        if (TestChance >= GD.Randf())
+        {
+            IEnumerable<CharacterAgent> _testers = AssignedAgents
+                .Where(record => record.Role == DefensivePointAgentRole.Tester)
+                .Select(record => record.Agent);
+            
+            foreach (CharacterAgent tester in _testers)
+            {
+                tester.AssignTask(new HoldTask(ForwardPosition, 1f));
             }
         }
 
