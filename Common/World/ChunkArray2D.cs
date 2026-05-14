@@ -28,8 +28,8 @@ public abstract class ChunkArray2D
         }
     }
 
-    public int SizeX => CommonDefines.WorldSize;
-    public int SizeY => CommonDefines.WorldSize;
+    public int SizeX => CommonDefines.WorldLength;
+    public int SizeY => CommonDefines.WorldHeight;
 
 
     public TileType[][] CopyTiles() => Tiles.CopyTiles();
@@ -45,7 +45,7 @@ public abstract class ChunkArray2D
 
     public ChunkArray2D()
     {
-        Tiles = new(CommonDefines.WorldSize, CommonDefines.WorldSize, (_, _) => TileType.Clear);
+        Tiles = new(SizeX, SizeY, (_, _) => TileType.Clear);
     }
 
 

@@ -100,8 +100,8 @@ public class TeamStrategizer
         {
             _defensePoints[i] = new(
                 position: new(
-                    CommonDefines.WorldSize / 2 + initialDefensivePointOffset, 
-                    CommonDefines.WorldSize * ((i + 0.5f) / PointCount)
+                    CommonDefines.WorldLength / 2 + initialDefensivePointOffset, 
+                    CommonDefines.WorldHeight * ((i + 0.5f) / PointCount)
                 ),
                 _direction
             );
