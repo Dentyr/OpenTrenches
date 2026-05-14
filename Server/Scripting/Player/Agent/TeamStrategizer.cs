@@ -54,7 +54,7 @@ public class TeamStrategizer
 
     //* strategy
 
-    private readonly DefensivePoint[] _defensePoints = new DefensivePoint[PointCount];
+    private readonly StrategicLane[] _defensePoints = new StrategicLane[PointCount];
     private int _objectiveStrategizationCounter = 0;
 
     private readonly List<Offensive> _offensives = [];

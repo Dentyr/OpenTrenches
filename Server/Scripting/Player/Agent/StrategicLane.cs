@@ -8,16 +8,16 @@ using OpenTrenches.Server.Scripting.World;
 namespace OpenTrenches.Server.Scripting.Player.Agent;
 
 /// <summary>
-/// Defensive points represent a position and the strategy around fortifying the position
+/// Strategic lanes represent a horizontal slice of the map, and the strategy around fortifying the positions in that lane
 /// </summary>
-public class DefensivePoint : AbstractObjective
+public class StrategicLane : AbstractObjective
 {
     /// <summary>
     /// A list of positions relative to the defensive point, which the AI will attempt to dig out.
     /// </summary>
     private static readonly IReadOnlyList<Vector2I> _entrenchPosition;
 
-    static DefensivePoint()
+    static StrategicLane()
     {
         _entrenchPosition = [
             // normal line
@@ -67,8 +67,18 @@ public class DefensivePoint : AbstractObjective
 
     private const float PushDistance = 15f;
 
-    private readonly Vector2 _initialPosition;
     public Vector2 Position { get; private set; }
+
+    /// <summary>
+    /// The height area this defensive point is in charge of 
+    /// </summary>
+    /// <value></value>
+    public int Lane { get; private set; }
+    /// <summary>
+    /// How far along 
+    /// </summary>
+    /// <value></value>
+    public int Advancement { get; private set; }
 
     /// <summary>
     /// Direction to advance in with testers
@@ -83,16 +93,14 @@ public class DefensivePoint : AbstractObjective
     /// <summary>
     /// Whether or not this position is sufficiently entrenched
     /// </summary>
-    /// <value></value>
     public bool Entrenched { get; private set; } = false;
 
     private List<DefensivePointAssignmentRecord> _assignedAgents = [];
     public IReadOnlyList<DefensivePointAssignmentRecord> AssignedAgents => _assignedAgents;
 
 
-    public DefensivePoint(Vector2 position, Vector2 direction)
+    public StrategicLane(Vector2 position, Vector2 direction)
     {
-        _initialPosition = position;
         Position = position;
 
         _direction = direction.Normalized();
