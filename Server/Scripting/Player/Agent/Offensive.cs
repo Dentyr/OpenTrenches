@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Godot;
+using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
@@ -9,13 +11,30 @@ namespace OpenTrenches.Server.Scripting.Player.Agent;
 public class Offensive : AbstractObjective
 {
     private const float GatheringRadius = 6f;
+    private const float GatheringReadinesError = 3f;
+    private const float GatheringReadinesRadius = GatheringRadius + GatheringReadinesError;
     /// <remarks>
     /// math helper
     /// </remarks>
-    private const float GatheringRadiusSquared = GatheringRadius * GatheringRadius;
+    private const float GatheringReadinessSquared = GatheringReadinesRadius * GatheringReadinesRadius;
 
-    public Vector2 Gathering { get; private set; }
-    public Vector2 Target { get; private set; }
+    /// <summary>
+    /// % of troops needed to be positioned for the assault to begin
+    /// </summary>
+    private const float GatheredRatio = 0.8f;
+
+
+    public StrategicLane SupportingLane { get; private set; }
+
+    /// <summary>
+    /// The area units gather in
+    /// </summary>
+    public Vector2 Gathering => SupportingLane.Position;
+
+    /// <summary>
+    /// The area units will try to take
+    /// </summary>
+    public Vector2 Target => SupportingLane.ForwardPosition;
 
     private List<CharacterAgent> _assignedAgents = [];
     public IReadOnlyList<CharacterAgent> AssignedAgents => _assignedAgents;
@@ -23,27 +42,21 @@ public class Offensive : AbstractObjective
     private Phase _combatPhase = Phase.Gathering;
 
 
-    public Offensive(Vector2 gathering, Vector2 target)
+    public Offensive(StrategicLane lane)
     {
-        Gathering = gathering;
-        Target = target;
+        Support(lane);
+    }
+    [MemberNotNull(nameof(SupportingLane))]
+    public void Support(StrategicLane lane)
+    {
+        SupportingLane = lane;
     }
 
     public void Assign(CharacterAgent agent)
     {
         _assignedAgents.Add(agent);
 
-        switch (_combatPhase)
-        {
-            case Phase.Gathering:
-                agent.AssignTask(new HoldTask(Gathering));
-                break;
-            case Phase.Assaulting:
-                agent.AssignTask(new HoldTask(Gathering));
-                break;
-            case Phase.Consolidating:
-                break;
-        }
+        agent.AssignTask(GetPhaseTask());
     }
     public void Unassign(CharacterAgent agent)
     {
@@ -55,7 +68,7 @@ public class Offensive : AbstractObjective
         _combatPhase = Phase.Assaulting;
         foreach (CharacterAgent agent in _assignedAgents)
         {
-            agent.AssignTask(new HoldTask(Target));
+            agent.AssignTask(GetPhaseTask());
         }
     }
 
@@ -82,17 +95,19 @@ public class Offensive : AbstractObjective
         switch (_combatPhase)
         {
             case Phase.Gathering:
-                IEnumerable<CharacterAgent> farAgents = _assignedAgents.Where(agent => agent.Character.Position.DistanceSquaredTo(Target) < GatheringRadiusSquared);
-                // If all agents are close enough and no longer repositioning, procede to next phase. Any agent not moving to location is set to move to location
-                if (!farAgents.Any())
+                // If all agents are close enough, procede to next phase. Any agent not moving to location is set to move to location
+                int gathered = _assignedAgents.Count(agent => agent.Character.Position.DistanceSquaredTo(Gathering) <= GatheringReadinessSquared);
+                GD.Print(gathered);
+                if (gathered > _assignedAgents.Count * GatheredRatio)
                 {
                     StartAssault(service, chunkArray);
                 }
+                // units not in position to charge are fixed
                 else
                 {
-                    foreach (CharacterAgent agent in farAgents.Where(agent => agent.Task is not HoldTask task))
+                    foreach (CharacterAgent agent in _assignedAgents.Where(agent => agent.Task is not HoldTask task || task.TargetArea != Gathering))
                     {
-                        agent.AssignTask(new HoldTask(Gathering));
+                        agent.AssignTask(GetPhaseTask());
                     }
                 }
                 break;
@@ -103,6 +118,27 @@ public class Offensive : AbstractObjective
                 break;
         }
     }
+
+    /// <summary>
+    /// Gets a unit's default task for the combat phase
+    /// </summary>
+    /// <returns></returns>
+    private AbstractAgentTask GetPhaseTask()
+    {
+        switch (_combatPhase)
+        {
+            case Phase.Gathering:
+            default:
+                return new HoldTask(Gathering, GatheringRadius);
+            case Phase.Assaulting:
+            case Phase.Consolidating:
+            case Phase.Routed:
+                return new HoldTask(Target, GatheringRadius);
+        }
+    }
+
+
+
     public enum Phase
     {
         /// <summary>

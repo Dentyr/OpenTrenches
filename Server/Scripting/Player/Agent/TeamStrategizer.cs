@@ -18,7 +18,7 @@ public class TeamStrategizer
     /// <summary>
     /// Desired defensive points
     /// </summary>
-    private const int PointCount = 12;
+    private const int PointCount = CommonDefines.WorldHeightArea;
     /// <summary>
     /// Desired defender count per defensive point
     /// </summary>
@@ -49,12 +49,12 @@ public class TeamStrategizer
     /// <summary>
     /// The general direction that units should move towards to advance. Intended for a 2 team setup
     /// </summary>
-    private readonly Vector2I _direction;
+    private readonly int _direction;
 
 
     //* strategy
 
-    private readonly StrategicLane[] _defensePoints = new StrategicLane[PointCount];
+    private readonly StrategicLane[] _strategicLanes = new StrategicLane[PointCount];
     private int _objectiveStrategizationCounter = 0;
 
     private readonly List<Offensive> _offensives = [];
@@ -80,29 +80,27 @@ public class TeamStrategizer
         /// <summary>
         /// From the center of the field, where the initial trench lines are
         /// </summary>
-        float initialDefensivePointOffset;
+        int initialDefensivePointOffset;
         //TODO think of a better way to differentiate teams
         // Currently only works for a two team setup
         // right team
         if (team.ID % 2 == 0)
         {
-            _direction = Vector2I.Right;
-            initialDefensivePointOffset = -30;
+            _direction = 1;
+            initialDefensivePointOffset = -2;
         }
         else
         {
-            _direction = Vector2I.Left;
-            initialDefensivePointOffset = 30;
+            _direction = -1;
+            initialDefensivePointOffset = 2;
         }
 
         // makes a defensive line along the map
-        for (int i = 0; i < _defensePoints.Length; i ++)
+        for (int i = 0; i < _strategicLanes.Length; i ++)
         {
-            _defensePoints[i] = new(
-                position: new(
-                    CommonDefines.WorldLength / 2 + initialDefensivePointOffset, 
-                    CommonDefines.WorldHeight * ((i + 0.5f) / PointCount)
-                ),
+            _strategicLanes[i] = new(
+                lane: i, 
+                advancement: CommonDefines.WorldLengthArea / 2 + initialDefensivePointOffset,
                 _direction
             );
         }
@@ -117,8 +115,8 @@ public class TeamStrategizer
             _agentList.Add(agent);
 
             // Assign to least defended point
-            var point = _defensePoints.MinBy(pt => pt.AssignedAgents.Count);
-            point ??= _defensePoints[0];
+            var point = _strategicLanes.MinBy(pt => pt.AssignedAgents.Count);
+            point ??= _strategicLanes[0];
 
             // If defensive points already have enough defenders, place them into an offensive group
             if (point.AssignedAgents.Count >= DesiredDefenders)
@@ -143,8 +141,7 @@ public class TeamStrategizer
     /// </summary>
     private Offensive NewOffensive()
     {
-
-        Offensive offensive = new(_defensePoints[0].Position, _defensePoints[0].Position + (_direction * TargetAssaultLength));
+        Offensive offensive = new(_strategicLanes[0]);
         _offensives.Add(offensive);
         return offensive;
     }
@@ -161,7 +158,7 @@ public class TeamStrategizer
 
     private IEnumerable<AbstractObjective> GetAllObejctives()
     {
-        return _defensePoints.Concat<AbstractObjective>(_offensives);
+        return _strategicLanes.Concat<AbstractObjective>(_offensives);
     }
 
     public void Calculate(IWorld2DQueryService world, IServerChunkArray chunkArray)

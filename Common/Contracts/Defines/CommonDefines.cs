@@ -6,7 +6,7 @@ public static class CommonDefines
     /// <summary>
     /// Areas are higher level divisions containing cells used for AI behavior
     /// </summary>
-    public const byte AreaSize = 16;
+    public const byte AreaSize = 12;
 
     /// <summary>
     /// Number of areas the map has horizontally
@@ -15,7 +15,7 @@ public static class CommonDefines
     /// <summary>
     /// Number of areas the map has vertically
     /// </summary>
-    public const byte WorldHeightArea = 8;
+    public const byte WorldHeightArea = 10;
 
     /// <summary>
     /// Number of cells the map has horizontally

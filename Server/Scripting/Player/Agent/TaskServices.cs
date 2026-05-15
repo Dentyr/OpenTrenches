@@ -89,7 +89,10 @@ public static class TaskServices
     public static bool Step(Character character, Vector2 checkpoint, IServerChunkArray chunkarray, float error = 1f)
     {
         if (character.Position.DistanceSquaredTo(checkpoint) < error * error)
+        {
+            character.StopMoving();
             return true;
+        }
         switch (character.Layer)
         {
             case WorldLayer.Ground:

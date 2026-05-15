@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Godot;
+using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.World;
 
@@ -13,46 +15,58 @@ namespace OpenTrenches.Server.Scripting.Player.Agent;
 public class StrategicLane : AbstractObjective
 {
     /// <summary>
-    /// A list of positions relative to the defensive point, which the AI will attempt to dig out.
+    /// A list of positions within an area, which the AI will attempt to dig out.
     /// </summary>
-    private static readonly IReadOnlyList<Vector2I> _entrenchPosition;
+    private static readonly IReadOnlyList<Vector2I> AreaEntrenchmentPattern;
 
     static StrategicLane()
     {
-        _entrenchPosition = [
-            // normal line
-            new (0, -4),
-            new (0, -3),
-            new (0, -2),
-            new (0, -1),
-            new (0, 0),
-            new (0, 1),
-            new (0, 2),
-            new (0, 3),
-            new (0, 4),
+        AreaEntrenchmentPattern = [
+            // * right line
+            new(7, 0),
+            new(7, 1),
+            new(7, 2),
 
-            // connecting paths
-            new (-1, 3),
-            new (-2, 3),
-            new (-3, 3),
-            new (-4, 3),
+            new(7, 3),
+            new(8, 3),
+            new(9, 3),
 
-            new (-1, -3),
-            new (-2, -3),
-            new (-3, -3),
-            new (-4, -3),
+            new(9, 4),
+            new(9, 5),
+            new(9, 6),
+            new(9, 7),
+
+            new(9, 8),
+            new(8, 8),
+            new(7, 8),
+
+            new(7, 9),
+            new(7, 10),
+            new(7, 11),
+
+            // * left line
 
 
-            // rear line
-            new (-5, -4),
-            new (-5, -3),
-            new (-5, -2),
-            new (-5, -1),
-            new (-5, 0),
-            new (-5, 1),
-            new (-5, 2),
-            new (-5, 3),
-            new (-5, 4),
+            new(3, 0),
+            new(3, 1),
+            new(3, 2),
+
+            new(3, 3),
+            new(4, 3),
+            new(5, 3),
+
+            new(5, 4),
+            new(5, 5),
+            new(5, 6),
+            new(5, 7),
+
+            new(5, 8),
+            new(4, 8),
+            new(3, 8),
+
+            new(3, 9),
+            new(3, 10),
+            new(3, 11),
         ];
     }
 
@@ -67,7 +81,12 @@ public class StrategicLane : AbstractObjective
 
     private const float PushDistance = 15f;
 
-    public Vector2 Position { get; private set; }
+    /// <summary>
+    /// Cells this lane is currently trying to entrench
+    /// </summary>
+    private List<Vector2I> _entrenchmentPattern;
+
+    public Vector2 Position => new((Advancement + 0.5f) * CommonDefines.AreaSize, (Lane + 0.5f) * CommonDefines.AreaSize);
 
     /// <summary>
     /// The height area this defensive point is in charge of 
@@ -83,12 +102,12 @@ public class StrategicLane : AbstractObjective
     /// <summary>
     /// Direction to advance in with testers
     /// </summary>
-    private readonly Vector2 _direction;
+    private readonly int _direction;
 
     /// <summary>
     /// Location to send testers to to check if coast is clear
     /// </summary>
-    public Vector2 ForwardPosition => Position + _direction * PushDistance;
+    public Vector2 ForwardPosition => Position + new Vector2(_direction * PushDistance,  0);
 
     /// <summary>
     /// Whether or not this position is sufficiently entrenched
@@ -99,11 +118,21 @@ public class StrategicLane : AbstractObjective
     public IReadOnlyList<DefensivePointAssignmentRecord> AssignedAgents => _assignedAgents;
 
 
-    public StrategicLane(Vector2 position, Vector2 direction)
+    public StrategicLane(int lane, int advancement, int direction)
     {
-        Position = position;
+        Lane = lane;
+        Advancement = advancement;
+        
+        _direction = Math.Sign(direction);
+        if (_direction == 0) throw new ArgumentException("direction must be a nonzero integer");
 
-        _direction = direction.Normalized();
+        SetEntrenchmentPattern(new(Advancement * CommonDefines.AreaSize, Lane * CommonDefines.AreaSize));
+    }
+
+    [MemberNotNull(nameof(_entrenchmentPattern))]
+    private void SetEntrenchmentPattern(Vector2I offset)
+    {
+        _entrenchmentPattern = [..AreaEntrenchmentPattern.Select(position => position + offset)];
     }
 
 
@@ -145,7 +174,7 @@ public class StrategicLane : AbstractObjective
         // Make them dig out the remaining of the defensive pattern
         Vector2I cellPosition = (Vector2I)Position;
         Vector2I[] _plannedDigging = [.. 
-            _entrenchPosition.Select(position => position + cellPosition)
+            _entrenchmentPattern
             .Where(position => chunkArray[position.X, position.Y] != TileType.Trench)
         ];
         if (_plannedDigging.Length > 0)
