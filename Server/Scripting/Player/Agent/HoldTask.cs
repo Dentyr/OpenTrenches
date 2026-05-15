@@ -16,7 +16,7 @@ public class HoldTask : AbstractAgentTask
     /// <summary>
     /// Moves to secure the area around this position and seeks a good place to entrench
     /// </summary>
-    private readonly Vector2 _area;
+    public readonly Vector2 TargetArea;
     /// <summary>
     /// Radius around area to secure
     /// </summary>
@@ -30,7 +30,7 @@ public class HoldTask : AbstractAgentTask
     /// <summary>
     /// Marker to check if the character is in a stable location
     /// </summary>
-    private bool _positioned;
+    public bool Positioned { get; private set; }
 
     private IWorldObject? _currentTarget;
 
@@ -39,10 +39,13 @@ public class HoldTask : AbstractAgentTask
     /// </summary>
     public HoldTask(Vector2 position, float range = DefaultRange)
     {
-        _area = position;
+        TargetArea = position;
         _range = range;
 
-        _targetPosition = _area + new Vector2((GD.Randf() - 0.5f) * 2 * range, (GD.Randf() - 0.5f) * 2 * range);
+        float angle = GD.Randf() * Mathf.Tau;
+        float radius = Mathf.Sqrt(GD.Randf()) * _range;
+
+        _targetPosition = TargetArea + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
     }
 
     /// <remarks>
@@ -50,9 +53,9 @@ public class HoldTask : AbstractAgentTask
     /// </remarks>
     public override bool Reason(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
-        _positioned = TaskServices.Navigate(
+        Positioned = TaskServices.Navigate(
             character, _targetPosition, queryService, 
-            error: 10
+            error: 1
         );
 
         _currentTarget = TaskServices.FindTarget(character, queryService);
@@ -63,12 +66,14 @@ public class HoldTask : AbstractAgentTask
     public override void Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         // If not yet positioned, keep stepping until they are.
-        if (!_positioned)
+        if(character.Position.DistanceTo(TargetArea) == 0) GD.Print(character.Position + ", " + TargetArea);
+        if (!Positioned)
         {
             if (TaskServices.Step(character, _targetPosition, chunks, 
                 error: 1)
-            ) {            
-                _positioned = true;
+            ) {
+                character.StopMoving();
+                Positioned = true;
             }
         }
         
