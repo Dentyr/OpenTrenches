@@ -11,8 +11,24 @@ public class Grid2D<T> : IGrid2D<T>
 
     public T this[int x, int y]
     {
-        get => Grid[x][y];
-        set => Grid[x][y] = value;
+        #if DEBUG
+            get
+            {
+                if (x >= 0 && y >= 0 && x < Grid.Length && y < Grid[x].Length)
+                    return Grid[x][y];
+                throw new IndexOutOfRangeException($"({x}, {y}) is out of range for array size ({SizeX}, {SizeY})");
+            }
+            set
+            {
+                if (x >= 0 && y >= 0 && x < Grid.Length && y < Grid[x].Length)
+                    Grid[x][y] = value;
+                else
+                    throw new IndexOutOfRangeException($"({x}, {y}) is out of range for array size ({SizeX}, {SizeY})");
+            }
+        #else
+            get => Grid[x][y];
+            set => Grid[x][y] = value;
+        #endif
     }
 
     public int SizeX { get; }
