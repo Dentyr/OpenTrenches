@@ -20,7 +20,7 @@ public class CharacterAgent
     public CharacterAgent(Character character)
     {
         Character = character;
-        Task = new HoldTask(Character.Position);
+        Task = new IdleTask();
     }
 
     /// <summary>
