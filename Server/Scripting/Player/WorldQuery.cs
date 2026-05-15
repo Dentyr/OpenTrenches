@@ -1,4 +1,3 @@
-using Godot;
 
 namespace OpenTrenches.Server.Scripting.Player;
 
@@ -31,5 +30,9 @@ public class WorldQuery
         /// Loner range threats focused on direction
         /// </summary>
         Distance,
+        /// <summary>
+        /// A square area the size of a world Area
+        /// </summary>
+        Area
     }
 }

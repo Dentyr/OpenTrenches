@@ -5,6 +5,7 @@ using System.Linq;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Teams;
 using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
@@ -70,6 +71,14 @@ public class StrategicLane : AbstractObjective
         ];
     }
 
+    private static Vector2I ConvertToArea(int direction, int lane, int forward)
+    {
+        if (direction > 0)
+            return new(forward, lane);
+        else
+            return new(CommonDefines.WorldLengthArea - 1 - forward, lane);
+    }
+
     /// <summary>
     /// If the % of sappers is less that this, will add a new defender as a sapper
     /// </summary>
@@ -81,23 +90,33 @@ public class StrategicLane : AbstractObjective
 
     private const float PushDistance = 15f;
 
+    private readonly Team _team;
+
     /// <summary>
     /// Cells this lane is currently trying to entrench
     /// </summary>
     private List<Vector2I> _entrenchmentPattern;
 
-    public Vector2 Position => new((Advancement + 0.5f) * CommonDefines.AreaSize, (Lane + 0.5f) * CommonDefines.AreaSize);
+    public Vector2 Position => AreaTranslationService.GetAreaCenter(GetArea());
 
     /// <summary>
     /// The height area this defensive point is in charge of 
     /// </summary>
-    /// <value></value>
     public int Lane { get; private set; }
     /// <summary>
-    /// How far along 
+    /// How far along the lane this team is
     /// </summary>
-    /// <value></value>
-    public int Advancement { get; private set; }
+    public int Forward { get; private set; }
+
+    /// <summary>
+    /// Converts Lane, Forward, and Direction into an area on the map
+    /// </summary>
+    private Vector2I GetArea() => ConvertToArea(_direction, Lane, Forward);
+    /// <summary>
+    /// Returns the area <paramref name="offset"/> in front of vanguard position. May be negative for back of vanguard position. Clamped to valid positions
+    /// </summary>
+    private Vector2I GetArea(int offset)
+        => ConvertToArea(_direction, Lane, Math.Clamp(Forward + offset, 0, CommonDefines.WorldLengthArea - 1));
 
     /// <summary>
     /// Direction to advance in with testers
@@ -107,7 +126,7 @@ public class StrategicLane : AbstractObjective
     /// <summary>
     /// Location to send testers to to check if coast is clear
     /// </summary>
-    public Vector2 ForwardPosition => Position + new Vector2(_direction * PushDistance,  0);
+    public Vector2 ForwardPosition => AreaTranslationService.GetAreaCenter(GetArea(1));
 
     /// <summary>
     /// Whether or not this position is sufficiently entrenched
@@ -118,21 +137,37 @@ public class StrategicLane : AbstractObjective
     public IReadOnlyList<DefensivePointAssignmentRecord> AssignedAgents => _assignedAgents;
 
 
-    public StrategicLane(int lane, int advancement, int direction)
+    //*
+
+
+
+
+    public StrategicLane(int lane, int forward, int direction, Team team)
     {
+        _team = team;
+
         Lane = lane;
-        Advancement = advancement;
         
         _direction = Math.Sign(direction);
         if (_direction == 0) throw new ArgumentException("direction must be a nonzero integer");
 
-        SetEntrenchmentPattern(new(Advancement * CommonDefines.AreaSize, Lane * CommonDefines.AreaSize));
+        MarkForward(forward);
     }
 
     [MemberNotNull(nameof(_entrenchmentPattern))]
     private void SetEntrenchmentPattern(Vector2I offset)
     {
         _entrenchmentPattern = [..AreaEntrenchmentPattern.Select(position => position + offset)];
+    }
+
+    [MemberNotNull(nameof(_entrenchmentPattern))]
+    private void MarkForward(int forward)
+    {
+        if (forward >= CommonDefines.WorldLengthArea) forward = CommonDefines.WorldLengthArea - 1;
+        else if (forward < 0) forward = 0;
+
+        Forward = forward;
+        SetEntrenchmentPattern(GetArea() * CommonDefines.AreaSize);
     }
 
 
@@ -162,22 +197,51 @@ public class StrategicLane : AbstractObjective
 
     public override void Strategize(IWorld2DQueryService service, IServerChunkArray chunkArray)
     {
+        // Switch position based on targets
+
+        // Occupation status of current position
+        var vanguardOccupation = WorldAreaService.CheckOccupation(GetArea(), _team, service, chunkArray);
+        if (vanguardOccupation == Occupation.Hostile)
+        {
+            // find farthest neutral/friendly area
+            int farthestSafe;
+            for (farthestSafe = 0; farthestSafe < CommonDefines.WorldLengthArea; farthestSafe ++)
+            {
+                Occupation occupation = WorldAreaService.CheckOccupation(
+                    ConvertToArea(_direction, Lane, farthestSafe),
+                    _team, service, chunkArray
+                );
+                if (occupation == Occupation.Hostile || occupation == Occupation.Contested)
+                    break;
+            }
+            farthestSafe --;
+
+            // If there are no safe cells in this lane, nothing for now, just try to retake the last cell
+            if (farthestSafe < 0)
+            {
+                farthestSafe = 0;
+                // TODO implement
+            }
+
+            MarkForward(farthestSafe);
+        }
+
+        // Make sappers dig out the remaining of the defensive pattern
+        Vector2I[] _plannedDigging = [..
+            _entrenchmentPattern
+            .Where(position => chunkArray[position.X, position.Y] != TileType.Trench)
+        ];
+
+
         // Get all the agents doing trench digging
         IEnumerable<CharacterAgent> _freeSappers = AssignedAgents
             .Where(record => 
                 record.Role == DefensivePointAgentRole.Sapper && 
                 record.Agent.Task is not EntrenchTask)
             .Select(record => record.Agent);
-        
 
-
-        // Make them dig out the remaining of the defensive pattern
-        Vector2I cellPosition = (Vector2I)Position;
-        Vector2I[] _plannedDigging = [.. 
-            _entrenchmentPattern
-            .Where(position => chunkArray[position.X, position.Y] != TileType.Trench)
-        ];
-        if (_plannedDigging.Length > 0)
+        bool anyPlannedDigging = _plannedDigging.Length > 0;
+        if (anyPlannedDigging)
         {
             // start of next build range
             int buildStartIndex = 0;
@@ -190,6 +254,14 @@ public class StrategicLane : AbstractObjective
 
                 buildStartIndex = buildEndIndex;
             }
+        }
+
+        if (!anyPlannedDigging && vanguardOccupation == Occupation.Friendly && Forward < CommonDefines.WorldLengthArea - 1)
+        {
+            // If fully entrenched, secure, and the forward position is unoccupied, advance.
+            Occupation forwardOccupation = WorldAreaService.CheckOccupation(GetArea(1), _team, service, chunkArray);
+            if (forwardOccupation == Occupation.Friendly || forwardOccupation == Occupation.Neutral)
+                MarkForward(Forward + 1);
         }
 
         // gathers far away units
@@ -214,6 +286,5 @@ public class StrategicLane : AbstractObjective
                 tester.AssignTask(new HoldTask(ForwardPosition, 1f));
             }
         }
-
     }
 }

@@ -38,6 +38,13 @@ public static class WorldQueryInterpreter
                 Radius = 5 * CommonDefines.CellSize,
             }
         },
+        {
+            WorldQuery.Shape.Area,
+            new RectangleShape2D()
+            {
+                Size = new Vector2(CommonDefines.AreaSize, CommonDefines.AreaSize) * CommonDefines.CellSize
+            }
+        },
     };
     public static Shape2D GetIntersectShape(WorldQuery query)
     {
@@ -47,6 +54,7 @@ public static class WorldQueryInterpreter
 
     public static uint GetMask(WorldQuery query)
     {
+        //TODO take into account structures if wanted
         return SceneDefines.Map.CharacterLayer;
     }
 }

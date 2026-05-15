@@ -77,31 +77,19 @@ public class TeamStrategizer
     {
         Team = team;
 
-        /// <summary>
-        /// From the center of the field, where the initial trench lines are
-        /// </summary>
-        int initialDefensivePointOffset;
         //TODO think of a better way to differentiate teams
         // Currently only works for a two team setup
         // right team
-        if (team.ID % 2 == 0)
-        {
-            _direction = 1;
-            initialDefensivePointOffset = -2;
-        }
-        else
-        {
-            _direction = -1;
-            initialDefensivePointOffset = 2;
-        }
+        _direction = team.ID % 2 == 0 ? 1 : -1;
 
         // makes a defensive line along the map
         for (int i = 0; i < _strategicLanes.Length; i ++)
         {
             _strategicLanes[i] = new(
                 lane: i, 
-                advancement: CommonDefines.WorldLengthArea / 2 + initialDefensivePointOffset,
-                _direction
+                forward: 2,
+                _direction,
+                Team
             );
         }
     }
