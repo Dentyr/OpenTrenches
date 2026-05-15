@@ -97,7 +97,6 @@ public class Offensive : AbstractObjective
             case Phase.Gathering:
                 // If all agents are close enough, procede to next phase. Any agent not moving to location is set to move to location
                 int gathered = _assignedAgents.Count(agent => agent.Character.Position.DistanceSquaredTo(Gathering) <= GatheringReadinessSquared);
-                GD.Print(gathered);
                 if (gathered > _assignedAgents.Count * GatheredRatio)
                 {
                     StartAssault(service, chunkArray);

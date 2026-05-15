@@ -66,13 +66,11 @@ public class HoldTask : AbstractAgentTask
     public override void Process(Character character, IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         // If not yet positioned, keep stepping until they are.
-        if(character.Position.DistanceTo(TargetArea) == 0) GD.Print(character.Position + ", " + TargetArea);
         if (!Positioned)
         {
             if (TaskServices.Step(character, _targetPosition, chunks, 
                 error: 1)
             ) {
-                character.StopMoving();
                 Positioned = true;
             }
         }
