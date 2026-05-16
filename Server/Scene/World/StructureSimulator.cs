@@ -22,7 +22,10 @@ public partial class StructureSimulator : StaticBody2D
                 Shape = new RectangleShape2D()
                 {
                     Size = ((Vector2)type.Profile.Size) * CommonDefines.CellSize
-                }
+                },
+                #if DEBUG
+                DebugColor = DebugColoring.GetColor(Structure.Team),
+                #endif
             }
         );
 

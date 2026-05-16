@@ -46,7 +46,10 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             Shape = new CircleShape2D()
             {
                 Radius = CommonDefines.CharacterRadius,
-            }
+            },
+            #if DEBUG
+            DebugColor = DebugColoring.GetColor(Character.Team),
+            #endif
         });
         Activate();
     }

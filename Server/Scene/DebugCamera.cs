@@ -23,10 +23,10 @@ public partial class DebugCamera : Camera2D
         {
             switch(keyEvent.Keycode)
             {
-                case Key.Q:
+                case Key.E:
                     UpdateZoom(_zoomLevel + 1);
                     break;
-                case Key.E:
+                case Key.Q:
                     UpdateZoom(_zoomLevel - 1);
                     break;
             }
