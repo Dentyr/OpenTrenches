@@ -39,6 +39,10 @@ public partial class GameRoot : Node
 
     public GameRoot()
     {
+        #if DEBUG
+        DebugCamera camera = new();
+        AddChild(camera);
+        #endif
         //* network setup
         Console.WriteLine($"PID {Process.GetCurrentProcess().ProcessName}");
 
