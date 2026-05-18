@@ -129,7 +129,7 @@ public class TeamStrategizer
     /// </summary>
     private Offensive NewOffensive()
     {
-        Offensive offensive = new(_strategicLanes[0]);
+        Offensive offensive = new(Team, GetRandomWeakLane(8));
         _offensives.Add(offensive);
         return offensive;
     }
@@ -147,6 +147,22 @@ public class TeamStrategizer
     private IEnumerable<AbstractObjective> GetAllObejctives()
     {
         return _strategicLanes.Concat<AbstractObjective>(_offensives);
+    }
+
+    /// <summary>
+    /// Radonmly picks a lane from the <paramref name="number"/> furthest back lanes
+    /// </summary>
+    private StrategicLane GetRandomWeakLane(int number)
+    {
+        int count = Math.Clamp(number, 1, _strategicLanes.Length);
+
+        StrategicLane[] weakLanes = [..
+            _strategicLanes
+                .OrderBy(lane => lane.Forward)
+                .Take(count)
+        ];
+
+        return weakLanes[Random.Shared.Next(weakLanes.Length)];
     }
 
     public void Calculate(IWorld2DQueryService world, IServerChunkArray chunkArray)
@@ -176,7 +192,28 @@ public class TeamStrategizer
             int numObjectives = objectives.Count();
             _objectiveStrategizationCounter = (_objectiveStrategizationCounter + 1) % (numObjectives * StrategizationIntermittency);
             if (_objectiveStrategizationCounter % StrategizationIntermittency == 0)
-                objectives.ElementAt(_objectiveStrategizationCounter / StrategizationIntermittency).Strategize(world, chunkArray);
+            {
+                AbstractObjective objective = objectives.ElementAt(_objectiveStrategizationCounter / StrategizationIntermittency);
+
+                if (objective is Offensive offensive)
+                {
+                    // if defensive point already caught up or if the gathering point has been lost, choose new target
+                    if (
+                        offensive.SupportingLane.Forward >= offensive.TargetForward ||
+                        offensive.IsGatheringPointLost(world, chunkArray)
+                    ) {
+                        offensive.Support(GetRandomWeakLane(3));
+                    }
+                    
+                    // if taken target, move forward
+                    if (offensive.IsTargetSecured(world, chunkArray))
+                    {
+                        offensive.SupportingLane.AdvanceTo(offensive.TargetForward);
+                        offensive.Strategize(world, chunkArray);
+                    }
+                }
+                objective.Strategize(world, chunkArray);
+            }
         }
     }
 }

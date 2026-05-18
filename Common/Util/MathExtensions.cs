@@ -24,6 +24,15 @@ public static class MathExtensions
         return dir.Rotated(angle);
     }
 
+    /// <summary>
+    /// Returns the greater between the Y distance and X distance between <paramref name="position"/> and <paramref name="target"/>
+    /// </summary>
+    public static float ChebyshevDistanceTo(this Vector2 position, Vector2 target)
+    {
+        return Math.Max(Math.Abs(position.X - target.X), Math.Abs(position.Y - target.Y));
+    }
+
+
     public static Rect2I Translate(this Rect2I rect, Vector2I position)
     {
         return new(rect.Position + position, rect.Size);

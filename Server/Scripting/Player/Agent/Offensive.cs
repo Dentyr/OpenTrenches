@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
+using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Teams;
 using OpenTrenches.Server.Scripting.World;
 
 namespace OpenTrenches.Server.Scripting.Player.Agent;
@@ -12,29 +14,27 @@ public class Offensive : AbstractObjective
 {
     private const float GatheringRadius = 6f;
     private const float GatheringReadinesError = 3f;
-    private const float GatheringReadinesRadius = GatheringRadius + GatheringReadinesError;
-    /// <remarks>
-    /// math helper
-    /// </remarks>
-    private const float GatheringReadinessSquared = GatheringReadinesRadius * GatheringReadinesRadius;
+    private const float GatheringReadinesDistance = GatheringRadius + GatheringReadinesError;
 
     /// <summary>
     /// % of troops needed to be positioned for the assault to begin
     /// </summary>
     private const float GatheredRatio = 0.8f;
 
+    private readonly Team _team;
 
     public StrategicLane SupportingLane { get; private set; }
 
     /// <summary>
-    /// The area units gather in
+    /// How far along the lane the gathering position is
     /// </summary>
-    public Vector2 Gathering => SupportingLane.Position;
+    public int GatheringForward { get; private set; }
 
     /// <summary>
-    /// The area units will try to take
+    /// How far along the lane the target position is
     /// </summary>
-    public Vector2 Target => SupportingLane.ForwardPosition;
+    public int TargetForward { get; private set; }
+
 
     private List<CharacterAgent> _assignedAgents = [];
     public IReadOnlyList<CharacterAgent> AssignedAgents => _assignedAgents;
@@ -42,15 +42,36 @@ public class Offensive : AbstractObjective
     private Phase _combatPhase = Phase.Gathering;
 
 
-    public Offensive(StrategicLane lane)
+    public Offensive(Team team, StrategicLane lane)
     {
+        _team = team;
         Support(lane);
     }
     [MemberNotNull(nameof(SupportingLane))]
     public void Support(StrategicLane lane)
     {
         SupportingLane = lane;
+        _combatPhase = Phase.Gathering;
+
+        GatheringForward = SupportingLane.Forward;
+        TargetForward = SupportingLane.Forward + 1;
+
+        foreach (CharacterAgent agent in _assignedAgents)
+            agent.AssignTask(GetPhaseTask());
     }
+
+
+    /// <summary>
+    /// The area units gather in
+    /// </summary>
+    private Vector2I GetGatheringArea() => AreaTranslationService.GetAreaFromForward(SupportingLane.Direction, SupportingLane.Lane, GatheringForward);
+    private Vector2 GetGatheringPoint() => AreaTranslationService.GetAreaCenter(GetGatheringArea());
+
+    /// <summary>
+    /// The area units will try to take
+    /// </summary>
+    private Vector2I GetTargetingArea() => AreaTranslationService.GetAreaFromForward(SupportingLane.Direction, SupportingLane.Lane, TargetForward);
+    private Vector2 GetTargetingPoint() => AreaTranslationService.GetAreaCenter(GetTargetingArea());
 
     public void Assign(CharacterAgent agent)
     {
@@ -72,31 +93,13 @@ public class Offensive : AbstractObjective
         }
     }
 
-    /// <summary>
-    /// Returns to the gathering location to hold that position 
-    /// </summary>
-    private void Regroup(IWorld2DQueryService service, IServerChunkArray chunkArray)
-    {
-        
-    }
-
-    /// <summary>
-    /// Treats the gathering point as lost. Attempts to 
-    /// </summary>
-    /// <param name="service"></param>
-    /// <param name="chunkArray"></param>
-    private void Rout(IWorld2DQueryService service, IServerChunkArray chunkArray)
-    {
-        
-    }
-
     public override void Strategize(IWorld2DQueryService service, IServerChunkArray chunkArray)
     {
         switch (_combatPhase)
         {
             case Phase.Gathering:
                 // If all agents are close enough, procede to next phase. Any agent not moving to location is set to move to location
-                int gathered = _assignedAgents.Count(agent => agent.Character.Position.DistanceSquaredTo(Gathering) <= GatheringReadinessSquared);
+                int gathered = _assignedAgents.Count(agent => agent.Character.Position.ChebyshevDistanceTo(GetGatheringPoint()) <= GatheringReadinesDistance);
                 if (gathered > _assignedAgents.Count * GatheredRatio)
                 {
                     StartAssault(service, chunkArray);
@@ -104,7 +107,7 @@ public class Offensive : AbstractObjective
                 // units not in position to charge are fixed
                 else
                 {
-                    foreach (CharacterAgent agent in _assignedAgents.Where(agent => agent.Task is not HoldTask task || task.TargetArea != Gathering))
+                    foreach (CharacterAgent agent in _assignedAgents.Where(agent => agent.Task is not HoldTask task || task.TargetArea != GetGatheringPoint()))
                     {
                         agent.AssignTask(GetPhaseTask());
                     }
@@ -113,9 +116,26 @@ public class Offensive : AbstractObjective
             case Phase.Assaulting:
 
                 break;
-            case Phase.Consolidating:
-                break;
         }
+    }
+
+    /// <summary>
+    /// Returns true if the gathering point is not friendly or contested
+    /// </summary>
+    public bool IsGatheringPointLost(IWorld2DQueryService service, IServerChunkArray chunkArray)
+    {
+        Occupation gatheringOccupation = WorldAreaService.CheckOccupation(GetGatheringArea(), _team, service, chunkArray);
+        if (gatheringOccupation == Occupation.Hostile || gatheringOccupation == Occupation.Neutral) return true;
+        return false;
+    }
+    /// <summary>
+    /// Returns true if the target area is controlled by friendly units
+    /// </summary>
+    public bool IsTargetSecured(IWorld2DQueryService service, IServerChunkArray chunkArray)
+    {
+        Occupation targetOccupation = WorldAreaService.CheckOccupation(GetTargetingArea(), _team, service, chunkArray);
+        if (targetOccupation == Occupation.Friendly) return true;
+        return false;
     }
 
     /// <summary>
@@ -128,11 +148,9 @@ public class Offensive : AbstractObjective
         {
             case Phase.Gathering:
             default:
-                return new HoldTask(Gathering, GatheringRadius);
+                return new HoldTask(GetGatheringPoint(), GatheringRadius);
             case Phase.Assaulting:
-            case Phase.Consolidating:
-            case Phase.Routed:
-                return new HoldTask(Target, GatheringRadius);
+                return new HoldTask(GetTargetingPoint(), GatheringRadius);
         }
     }
 
@@ -148,13 +166,5 @@ public class Offensive : AbstractObjective
         /// Moved all units to the target point
         /// </summary>
         Assaulting,
-        /// <summary>
-        /// Defend the forward point to establish new offensive point
-        /// </summary>
-        Consolidating,
-        /// <summary>
-        /// When the gathering point is lost, units will hold their ground until more orders are received
-        /// </summary>
-        Routed,
     }
 }

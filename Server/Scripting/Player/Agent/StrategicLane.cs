@@ -71,14 +71,6 @@ public class StrategicLane : AbstractObjective
         ];
     }
 
-    private static Vector2I ConvertToArea(int direction, int lane, int forward)
-    {
-        if (direction > 0)
-            return new(forward, lane);
-        else
-            return new(CommonDefines.WorldLengthArea - 1 - forward, lane);
-    }
-
     /// <summary>
     /// If the % of sappers is less that this, will add a new defender as a sapper
     /// </summary>
@@ -111,27 +103,23 @@ public class StrategicLane : AbstractObjective
     /// <summary>
     /// Converts Lane, Forward, and Direction into an area on the map
     /// </summary>
-    private Vector2I GetArea() => ConvertToArea(_direction, Lane, Forward);
+    public Vector2I GetArea() => AreaTranslationService.GetAreaFromForward(Direction, Lane, Forward);
     /// <summary>
     /// Returns the area <paramref name="offset"/> in front of vanguard position. May be negative for back of vanguard position. Clamped to valid positions
     /// </summary>
-    private Vector2I GetArea(int offset)
-        => ConvertToArea(_direction, Lane, Math.Clamp(Forward + offset, 0, CommonDefines.WorldLengthArea - 1));
+    public Vector2I GetArea(int offset)
+        => AreaTranslationService.GetAreaFromForward(Direction, Lane, Math.Clamp(Forward + offset, 0, CommonDefines.WorldLengthArea - 1));
 
     /// <summary>
-    /// Direction to advance in with testers
+    /// Direction to advance in
     /// </summary>
-    private readonly int _direction;
+    public readonly int Direction;
 
     /// <summary>
     /// Location to send testers to to check if coast is clear
     /// </summary>
     public Vector2 ForwardPosition => AreaTranslationService.GetAreaCenter(GetArea(1));
 
-    /// <summary>
-    /// Whether or not this position is sufficiently entrenched
-    /// </summary>
-    public bool Entrenched { get; private set; } = false;
 
     private List<DefensivePointAssignmentRecord> _assignedAgents = [];
     public IReadOnlyList<DefensivePointAssignmentRecord> AssignedAgents => _assignedAgents;
@@ -148,8 +136,8 @@ public class StrategicLane : AbstractObjective
 
         Lane = lane;
         
-        _direction = Math.Sign(direction);
-        if (_direction == 0) throw new ArgumentException("direction must be a nonzero integer");
+        Direction = Math.Sign(direction);
+        if (Direction == 0) throw new ArgumentException("direction must be a nonzero integer");
 
         MarkForward(forward);
     }
@@ -181,10 +169,10 @@ public class StrategicLane : AbstractObjective
         // if there is already a tester, add as sapper if wanted or add as holder if not
         if (_assignedAgents.Any(agent => agent.Role == DefensivePointAgentRole.Tester))
         {
-            if (!Entrenched && numSappers < wantedSappers) {
+            if (numSappers < wantedSappers)
                 wanted = DefensivePointAgentRole.Sapper;
-            }
-            else wanted = DefensivePointAgentRole.Holder;
+            else 
+                wanted = DefensivePointAgentRole.Holder;
         }
         else wanted = DefensivePointAgentRole.Tester; 
 
@@ -208,7 +196,7 @@ public class StrategicLane : AbstractObjective
             for (farthestSafe = 0; farthestSafe < CommonDefines.WorldLengthArea; farthestSafe ++)
             {
                 Occupation occupation = WorldAreaService.CheckOccupation(
-                    ConvertToArea(_direction, Lane, farthestSafe),
+                    AreaTranslationService.GetAreaFromForward(Direction, Lane, farthestSafe),
                     _team, service, chunkArray
                 );
                 if (occupation == Occupation.Hostile || occupation == Occupation.Contested)
@@ -286,5 +274,13 @@ public class StrategicLane : AbstractObjective
                 tester.AssignTask(new HoldTask(ForwardPosition, 1f));
             }
         }
+    }
+
+    /// <summary>
+    /// Attempts to move the army to a new forward 
+    /// </summary>
+    public void AdvanceTo(int targetForward)
+    {
+        MarkForward(targetForward);
     }
 }
