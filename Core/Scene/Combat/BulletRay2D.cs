@@ -10,6 +10,12 @@ public partial class BulletRay2D : Line2D
     private double _decay = 0;
     public BulletRay2D(Vector2 begin, Vector2 end, double decayTarget = 0.05d)
     {
+        //* style
+        DefaultColor = new(1f, 1f, 0.8f, 1f);
+        Width = 2.5f;
+
+        //* transform
+
         begin += (end-begin).LimitLength(0.3f);
         begin *= CommonDefines.CellSize;
         end *= CommonDefines.CellSize;
