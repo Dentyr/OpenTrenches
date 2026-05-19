@@ -24,7 +24,7 @@ public class TeamStrategizer
     /// </summary>
     private const int DesiredDefenders = 5;
 
-    private const int MaxOffensiveTroops = 25;
+    private const int MaxOffensiveTroops = 12;
 
 
     //* Calculation frequency settings
