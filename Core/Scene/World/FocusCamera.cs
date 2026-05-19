@@ -1,4 +1,3 @@
-using System;
 using Godot;
 
 namespace OpenTrenches.Core.Scene.World;
@@ -15,19 +14,18 @@ public partial class FocusCamera : Node2D
     private Line2D _aimLine;
     private Camera2D _camera;
 
-    private Vector2 _viewVector
-    {
-        get => _camera.Position / ViewMultiplier;
-        set
-        {
-            
-            float zoom = 1f / (1f + (value.Length() / 1000f));
-            _camera.Position = value * ViewMultiplier;
-            _camera.Zoom = Vector2.One * zoom;
+    private Vector2 _viewVector;
 
-            Vector2 mouseWorldPosition = _camera.Position + (value / zoom);
-            _aimLine.Points = [Vector2.Zero, mouseWorldPosition];
-        }
+    public void SetViewVector(Vector2 vector)
+    {
+        _viewVector = vector;
+
+        float zoom = 1f / (1f + (vector.Length() / 1000f));
+        _camera.Position = vector * ViewMultiplier;
+        _camera.Zoom = Vector2.One * zoom;
+
+        Vector2 mouseWorldPosition = _camera.Position + (vector / zoom);
+        _aimLine.Points = [Vector2.Zero, mouseWorldPosition];
     }
 
     private float _moveVelocity = 0;
@@ -47,13 +45,18 @@ public partial class FocusCamera : Node2D
         // Zoom = new Vector2(0.4f, 0.4f);
     }
 
+    public override void _Ready()
+    {
+        _camera.MakeCurrent();
+    }
+
     public override void _Process(double delta)
     {
         Vector2 center = GetViewportRect().Size / 2f;
 
         if (Input.IsMouseButtonPressed(MouseButton.Right))
         {
-            _viewVector = GetViewport().GetMousePosition() - center;
+            SetViewVector(GetViewport().GetMousePosition() - center);
             if (!_aimLine.Visible) _aimLine.Visible = true;
             // _aimLine.Points = [Vector2.Zero, Position];
         }

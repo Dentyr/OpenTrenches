@@ -53,8 +53,7 @@ public partial class KeyboardListener : Node
         Viewport viewport = GetViewport();
         if (viewport.GetCamera2D() is Camera2D camera)
         {
-            var localpos = camera.GlobalPosition + viewport.GetMousePosition() - (viewport.GetVisibleRect().Size / 2f);
-            MPos = localpos / CommonDefines.CellSize;
+            MPos = camera.GetGlobalMousePosition() / CommonDefines.CellSize;
         }
     }
     /// <summary>
