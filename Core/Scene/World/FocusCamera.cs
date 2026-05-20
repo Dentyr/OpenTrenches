@@ -1,4 +1,8 @@
 using Godot;
+using OpenTrenches.Common.Contracts.Defines;
+using OpenTrenches.Common.Scene;
+using OpenTrenches.Common.World;
+using OpenTrenches.Core.Scripting.Player;
 
 namespace OpenTrenches.Core.Scene.World;
 /// <summary>
@@ -13,6 +17,7 @@ public partial class FocusCamera : Node2D
 
     private Line2D _aimLine;
     private Camera2D _camera;
+    private CharacterRenderer? _ownerRenderer;
 
     private Vector2 _viewVector;
 
@@ -25,7 +30,7 @@ public partial class FocusCamera : Node2D
         _camera.Zoom = Vector2.One * zoom;
 
         Vector2 mouseWorldPosition = _camera.Position + (vector / zoom);
-        _aimLine.Points = [Vector2.Zero, mouseWorldPosition];
+        _aimLine.SetPointPosition(1, ClipAimToCollision(mouseWorldPosition));
     }
 
     private float _moveVelocity = 0;
@@ -36,6 +41,8 @@ public partial class FocusCamera : Node2D
         {
             Width = 2f,
             DefaultColor = new(0.6f, 0.6f, 0.6f, 1f),
+            Points = [Vector2.Zero, Vector2.Zero],
+            Visible = false,
         };
         AddChild(_aimLine);
 
@@ -47,6 +54,7 @@ public partial class FocusCamera : Node2D
 
     public override void _Ready()
     {
+        _ownerRenderer = GetParent() as CharacterRenderer;
         _camera.MakeCurrent();
     }
 
@@ -64,5 +72,97 @@ public partial class FocusCamera : Node2D
         {
             if (_aimLine.Visible) _aimLine.Visible = false;
         }
+    }
+
+    private Vector2 ClipAimToCollision(Vector2 localTarget)
+    {
+        if (_ownerRenderer is null) return localTarget;
+
+        Vector2 origin = GlobalPosition;
+        Vector2 target = ToGlobal(localTarget);
+        if (origin.DistanceSquaredTo(target) < 0.01f) return localTarget;
+
+        Character owner = _ownerRenderer.Character;
+        WorldLayer fireLayer = GetFireLayer(owner, localTarget);
+        uint collisionMask = GetScanLayer(fireLayer);
+        Godot.Collections.Array<Rid> exclude = [_ownerRenderer.GetRid()];
+
+        while (true)
+        {
+            Godot.Collections.Dictionary hit = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
+            {
+                From = origin,
+                To = target,
+                CollisionMask = collisionMask,
+                Exclude = exclude,
+                CollideWithAreas = true,
+                CollideWithBodies = true,
+            });
+
+            if (hit.Count == 0) return localTarget;
+
+            GodotObject hitObject = hit[PhysicsDefines.PhysicsKey.Collider].AsGodotObject();
+            if (hitObject is CharacterRenderer characterRenderer &&
+                !CanHitCharacter(fireLayer, owner, characterRenderer.Character))
+            {
+                exclude.Add(hit[PhysicsDefines.PhysicsKey.Rid].AsRid());
+                continue;
+            }
+
+            return ToLocal(hit[PhysicsDefines.PhysicsKey.Position].AsVector2());
+        }
+    }
+
+    private WorldLayer GetFireLayer(Character owner, Vector2 localTarget)
+    {
+        WorldLayer fireLayer = owner.Layer;
+
+        if (fireLayer == WorldLayer.Trench &&
+            IsAiming(owner) &&
+            GetTargetLayer(owner, localTarget) == WorldLayer.Ground)
+        {
+            return WorldLayer.Ground;
+        }
+
+        return fireLayer;
+    }
+
+    private bool IsAiming(Character owner)
+        => Input.IsMouseButtonPressed(MouseButton.Right) ||
+            owner.ActionState.HasFlag(CharacterState.Aiming);
+
+    private WorldLayer GetTargetLayer(Character owner, Vector2 localTarget)
+    {
+        Vector2 targetCell = ToGlobal(localTarget) / CommonDefines.CellSize;
+        if (owner.ClientState.Chunks.TryGetTile((int)targetCell.X, (int)targetCell.Y, out TileType? tile))
+        {
+            return TileLayerConversion.LayerOf(tile);
+        }
+
+        return WorldLayer.Ground;
+    }
+
+    private static uint GetScanLayer(WorldLayer channel)
+    {
+        return channel switch
+        {
+            WorldLayer.Trench => PhysicsDefines.Map.StructureLayer |
+                PhysicsDefines.Map.BarrierLayer |
+                PhysicsDefines.Map.CharacterLayer |
+                PhysicsDefines.Map.GroundTileLayer,
+            _ => PhysicsDefines.Map.StructureLayer |
+                PhysicsDefines.Map.BarrierLayer |
+                PhysicsDefines.Map.CharacterLayer,
+        };
+    }
+
+    private static bool CanHitCharacter(WorldLayer fireLayer, Character owner, Character target)
+    {
+        if (!target.IsActive || owner.Equals(target)) return false;
+        if (fireLayer == target.Layer) return true;
+
+        return fireLayer == WorldLayer.Ground &&
+            target.Layer == WorldLayer.Trench &&
+            target.ActionState.HasFlag(CharacterState.Aiming);
     }
 }

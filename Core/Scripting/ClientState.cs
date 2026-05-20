@@ -202,4 +202,5 @@ public interface IClientState
     public IReadOnlyDictionary<int, ClientTeam> Team { get; }
     public Character? PlayerCharacter { get; }
     public IReadOnlyPlayerState PlayerState { get; }
+    public ClientChunkArray Chunks { get; }
 }

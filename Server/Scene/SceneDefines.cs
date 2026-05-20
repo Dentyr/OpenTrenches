@@ -1,5 +1,6 @@
 using Godot;
 using OpenTrenches.Common.Combat;
+using OpenTrenches.Common.Scene;
 using OpenTrenches.Common.World;
 namespace OpenTrenches.Server.Scene;
 
@@ -8,45 +9,45 @@ public static class SceneDefines
 
     public static class Map
     {
-        public const uint NilLayer = 0;
-        public const uint BulletLayer = (uint)1 << 0;
-        public const uint CharacterLayer = (uint)1 << 1;
+        public const uint NilLayer = PhysicsDefines.Map.NilLayer;
+        public const uint BulletLayer = PhysicsDefines.Map.BulletLayer;
+        public const uint CharacterLayer = PhysicsDefines.Map.CharacterLayer;
 
-        public const uint StructureLayer = (uint)1 << 2;
+        public const uint StructureLayer = PhysicsDefines.Map.StructureLayer;
 
 
         /// <summary>
         /// Collision layer for trench tiles
         /// </summary>
-        public const uint TrenchTileLayer = (uint)1 << 4;
+        public const uint TrenchTileLayer = PhysicsDefines.Map.TrenchTileLayer;
         /// <summary>
         /// Collision layer for ground tiles
         /// </summary>
-        public const uint GroundTileLayer = (uint)1 << 5;
+        public const uint GroundTileLayer = PhysicsDefines.Map.GroundTileLayer;
         /// <summary>
         /// Inaccessible area
         /// </summary>
-        public const uint BarrierLayer = (uint)1 << 31;
+        public const uint BarrierLayer = PhysicsDefines.Map.BarrierLayer;
 
 
 
         
 
 
-        public const uint AllMask = 0xFFFFFFFF;
+        public const uint AllMask = PhysicsDefines.Map.AllMask;
 
-        public const uint BulletMask = CharacterLayer | GroundTileLayer;
+        public const uint BulletMask = PhysicsDefines.Map.BulletMask;
 
     }
 
     public static class PhysicsKey
     {
-        public const string Rid = "rid";
-        public const string Collider = "collider";
+        public const string Rid = PhysicsDefines.PhysicsKey.Rid;
+        public const string Collider = PhysicsDefines.PhysicsKey.Collider;
 
-        public const string Shape = "shape";
-        public const string Normal = "normal";
+        public const string Shape = PhysicsDefines.PhysicsKey.Shape;
+        public const string Normal = PhysicsDefines.PhysicsKey.Normal;
 
-        public const string Position = "position";
+        public const string Position = PhysicsDefines.PhysicsKey.Position;
     }
 }
