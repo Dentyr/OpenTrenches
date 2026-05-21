@@ -43,17 +43,20 @@ public static class TaskServices
     /// <summary>
     /// Make <paramref name="character"/> fire if able, reloading if necessary
     /// </summary>
-    public static void ReasonAttack(Character character)
+    public static void ReasonAttack(Character character, Vector2 target)
     {
         // if character is in middle of reloading or has run out of ammo, return
         if (!character.PrimarySlot.Reloaded) return;
-        if (character.PrimarySlot.AmmoStored == 0)
+        if (character.PrimarySlot.Reloaded && character.PrimarySlot.AmmoLoaded <= 0)
         {
             character.TryReload();
             return;
         }
 
         character.TrySet(Common.Contracts.Defines.CharacterState.Shooting);
+        character.TrySet(Common.Contracts.Defines.CharacterState.Aiming);
+
+        character.Direction = target;
     }
 
     /// <summary>

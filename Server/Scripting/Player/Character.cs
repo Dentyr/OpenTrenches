@@ -314,6 +314,18 @@ public class Character : IIdObject, IWorldObject
         else TryClear(CharacterState.Shooting);
     }
 
+
+    /// <summary>
+    /// Stops combat actions like shooting and aiming
+    /// </summary>
+    public void CancelAttack()
+    {
+        State &= ~CharacterState.Aiming;
+        State &= ~CharacterState.Shooting;
+    }
+    /// <summary>
+    /// Stops every state action this character is doing
+    /// </summary>
     public void CancelTasks()
     {
         State = 0;

@@ -77,13 +77,12 @@ public class HoldTask : AbstractAgentTask
         
         if (TaskServices.EnemyValid(character, _currentTarget, 20)) 
         {
-            character.Direction = _currentTarget.Position;
-            TaskServices.ReasonAttack(character);
+            TaskServices.ReasonAttack(character, _currentTarget.Position);
         }
         else
         {
             _currentTarget = null;
-            character.TryClear(CharacterState.Shooting);
+            character.CancelAttack();
         }
     }
 }
