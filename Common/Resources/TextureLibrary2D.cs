@@ -27,6 +27,14 @@ public static class TextureLibrary2D
     public static class Character
     {
         public static Texture2D DefaultCharacter = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Default.png");
+
+        public static Texture2D Rifle = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Weapon/Rifle.png");
+        public static Texture2D Shotgun = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Weapon/Shotgun.png");
+        public static Texture2D Machingun = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Weapon/Machinegun.png");
+
+        public static Texture2D RifleFired = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Weapon/RifleFired.png");
+        public static Texture2D ShotgunFired = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Weapon/ShotgunFired.png");
+        public static Texture2D MachingunFired = ResourceLoader.Load<Texture2D>("Common/Resources/Img/Character/Weapon/MachinegunFired.png");
     }
 
     public static class Structure

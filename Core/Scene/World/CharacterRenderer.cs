@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Common.Scene;
@@ -20,13 +21,22 @@ public partial class CharacterRenderer : Area2D
     {
         Position = Character.Position * CommonDefines.CellSize;
     }
+    private void SyncWeaponRotation()
+    {
+        if (_weaponSprite is not null) 
+            _weaponSprite.Rotation = Character.Rotation;
+    }
 
     public bool OnPlayerTeam => _clientState.PlayerCharacter?.Team == Character.Team;
     public bool PlayerCharacter => _clientState.PlayerCharacter == Character;
     
     //* GD
     private CharacterFloat _floatLabel;
-    private Sprite2D _sprite;
+    
+    private Sprite2D _bodySprite;
+    private Sprite2D _weaponSprite;
+
+
     private CollisionShape2D _hitbox;
 
 
@@ -34,18 +44,27 @@ public partial class CharacterRenderer : Area2D
     {
         _clientState = ClientState;
         this.Character = Character;
+        Character.OnPrimaryChangedEvent += UpdateWeaponTexture;
         SyncPosition();
 
         _floatLabel = new(Character);
         AddChild(_floatLabel);
 
-        _sprite = new()
+        _bodySprite = new()
         {
             Texture = TextureLibrary2D.Character.DefaultCharacter,
             Modulate = TeamModulate.GetColor(Character.Team == ClientState.PlayerCharacter?.Team),
         };
-        _sprite.Scale = new Vector2(24f, 24f) / _sprite.Texture.GetSize();
-        AddChild(_sprite);
+        _bodySprite.Scale = new Vector2(24f, 24f) / _bodySprite.Texture.GetSize();
+        AddChild(_bodySprite);
+
+        _weaponSprite = new()
+        {
+            Texture = TextureLibrary2D.Character.Rifle,
+            Modulate = TeamModulate.GetColor(Character.Team == ClientState.PlayerCharacter?.Team),
+        };
+        _weaponSprite.Scale = new Vector2(24f, 24f) / _weaponSprite.Texture.GetSize();
+        AddChild(_weaponSprite);
 
         _hitbox = new()
         {
@@ -61,11 +80,25 @@ public partial class CharacterRenderer : Area2D
 
         Character.ActivatedEvent += ActivateCollision;
         Character.InactivatedEvent += DeactivateCollision;
+
+    }
+
+    private void UpdateWeaponTexture(FirearmEnum firearm)
+    {
+        Texture2D texture = firearm switch
+        {
+            FirearmEnum.Shotgun => TextureLibrary2D.Character.Shotgun,
+            FirearmEnum.MachineGun => TextureLibrary2D.Character.Machingun,
+            _ => TextureLibrary2D.Character.Rifle,
+        };
+        _weaponSprite.Texture = texture;
+        _weaponSprite.Scale = new Vector2(24f, 24f) / _weaponSprite.Texture.GetSize();
     }
 
     public override void _Process(double delta)
     {        
         SyncPosition();
+        SyncWeaponRotation();
         Character.Process((float)delta);
     }
 

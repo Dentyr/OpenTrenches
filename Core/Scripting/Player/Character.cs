@@ -30,6 +30,9 @@ public class Character : IIdObject
 
     public Vector2 Position { get; private set; }
 
+    public Vector2 _viewTarget;
+    public float Rotation => (_viewTarget - Position).Angle();
+
     public WorldLayer Layer { get; private set; }
 
 
@@ -119,6 +122,7 @@ public class Character : IIdObject
                 Hp = Serialization.Deserialize<float>(update.Payload);
                 break;
             case CharacterAttribute.Direction:
+                _viewTarget = Serialization.Deserialize<Vector2>(update.Payload);
                 break;
             case CharacterAttribute.State:
                 ActionState = Serialization.Deserialize<CharacterState>(update.Payload);
