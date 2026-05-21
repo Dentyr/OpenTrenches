@@ -293,10 +293,14 @@ public class Character : IIdObject, IWorldObject
 
                 WorldLayer fireLayer = Layer;
 
-                // If the character is aiming at a ground tile from inside a trench, they shoot from ground level
+                // If the character is inside a trench and aiming, then if they're aiming at a ground tile (above the trench) or aiming at a trench, but one that's blocked by ground, they will shoot out from the trench
                 if (fireLayer == WorldLayer.Trench && 
                     State.HasFlag(CharacterState.Aiming) && 
-                    GetTargetLayer() == WorldLayer.Ground)
+                    (
+                        GetTargetLayer() == WorldLayer.Ground ||
+                        TileArrayGeometryService.LineContainsTile(ServerState.Chunks, Position, Direction, TileType.Clear)
+                    )
+                    )
                 {
                     fireLayer = WorldLayer.Ground;
                 }

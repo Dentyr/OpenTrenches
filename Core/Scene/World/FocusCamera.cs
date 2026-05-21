@@ -83,7 +83,7 @@ public partial class FocusCamera : Node2D
         if (origin.DistanceSquaredTo(target) < 0.01f) return localTarget;
 
         Character owner = _ownerRenderer.Character;
-        WorldLayer fireLayer = GetFireLayer(owner, localTarget);
+        WorldLayer fireLayer = GetFireLayer(owner, origin, target);
         uint collisionMask = GetScanLayer(fireLayer);
         Godot.Collections.Array<Rid> exclude = [_ownerRenderer.GetRid()];
 
@@ -113,18 +113,35 @@ public partial class FocusCamera : Node2D
         }
     }
 
-    private WorldLayer GetFireLayer(Character owner, Vector2 localTarget)
+    /// <summary>
+    /// Returns the layer for <paramref name="owner"/> to shoot into if they are aiming from <paramref name="origin"/> to <paramref name="target"/> in engine space
+    /// </summary>
+    private WorldLayer GetFireLayer(Character owner, Vector2 origin, Vector2 target)
     {
         WorldLayer fireLayer = owner.Layer;
 
+        // if owner is aiming from a trench, then if their destination is a ground tile or is impeded by a ground tile they will shoot out of the trench
         if (fireLayer == WorldLayer.Trench &&
             IsAiming(owner) &&
-            GetTargetLayer(owner, localTarget) == WorldLayer.Ground)
-        {
+            LineIntersectsGround(origin, target)
+        ) {
             return WorldLayer.Ground;
         }
 
         return fireLayer;
+    }
+    private bool LineIntersectsGround(Vector2 origin, Vector2 target)
+    {
+        Godot.Collections.Dictionary hit = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
+        {
+            From = origin,
+            To = target,
+            CollisionMask = PhysicsDefines.Map.GroundTileLayer,
+            CollideWithAreas = true,
+            CollideWithBodies = true,
+        });
+
+        return hit.Count > 0;
     }
 
     private bool IsAiming(Character owner)
