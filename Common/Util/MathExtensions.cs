@@ -20,6 +20,7 @@ public static class MathExtensions
 
         float maxAngleRad = (float)(minuteOfAngle / 60 * Math.PI / 180);
         float angle = (GD.Randf() - 0.5f) * 2 * maxAngleRad;
+        // float angle = 0;
 
         return dir.Rotated(angle);
     }

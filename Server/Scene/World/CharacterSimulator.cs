@@ -73,7 +73,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
     FireHitResult ICharacterAdapter.AdaptFire(WorldLayer channel, Vector2 target)
     {
         // move from logical space to engine space
-        target *= CommonDefines.CellSize;
+        var targetPosition = target * CommonDefines.CellSize;
 
         Godot.Collections.Array<Rid> exclude = [];
 
@@ -82,7 +82,7 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
             var hits = GetViewport().World2D.DirectSpaceState.IntersectRay(new PhysicsRayQueryParameters2D()
             {
                 From = Position,
-                To = target,
+                To = targetPosition,
                 CollisionMask = PhysicsLayerInterpreter.GetScanLayer(channel),
                 Exclude = exclude,
             });
