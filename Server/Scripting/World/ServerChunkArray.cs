@@ -54,6 +54,8 @@ public class ServerChunkArray : ChunkArray2D, IServerChunkArray
     /// </summary>
     private PolledQueue<WorldGridAttributeUpdateDTO> Updates { get; } = new();
 
+    public event Action<StructureUpdateDTO>? StructureChangeEvent;
+
     
     /// <summary>
     /// Initializes empty chunks

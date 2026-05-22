@@ -3,6 +3,7 @@ using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Common.Scene;
 using OpenTrenches.Common.World;
+using OpenTrenches.Core.Scene.Combat;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Graphics;
 using OpenTrenches.Core.Scripting.World;
@@ -11,7 +12,9 @@ namespace OpenTrenches.Core.Scene.World;
 
 public partial class StructureRenderer : StaticBody2D
 {
-    private ClientStructure _structure { get; }
+    private readonly ClientStructure _structure;
+
+    private readonly StructureHpBar _hpBar;
 
     public StructureRenderer(ClientStructure Structure, IClientState ClientState)
     {
@@ -29,6 +32,9 @@ public partial class StructureRenderer : StaticBody2D
             Modulate = TeamModulate.GetColor(Structure.Team == ClientState.PlayerCharacter?.Team)
         };
         AddChild(sprite);
+
+        _hpBar = new(Structure);
+        AddChild(_hpBar);
 
         AddChild(new CollisionShape2D()
         {

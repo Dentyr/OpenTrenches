@@ -7,10 +7,8 @@ public record class StructureUpdateDTO
 (
     StructureAttribute Attribute, 
     byte[] Payload,
-    [property: Key(2)] int X,
-    [property: Key(3)] int Y
-) : AbstractUpdateDTO<StructureAttribute>(Attribute, Payload)
-{}
+    [property: Key(2)] int Id
+) : AbstractUpdateDTO<StructureAttribute>(Attribute, Payload);
 
 public enum StructureAttribute : byte
 {

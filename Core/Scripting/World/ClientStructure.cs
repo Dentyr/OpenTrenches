@@ -1,5 +1,7 @@
 using System;
 using Godot;
+using OpenTrenches.Common.Contracts;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
 using OpenTrenches.Core.Scripting.Teams;
 
@@ -14,7 +16,7 @@ public class ClientStructure
 
     public StructureEnum Enum { get; }
 
-    public float Health { get; private set; }
+    public float Hp { get; private set; }
 
     public event Action? DestroyedEvent;
 
@@ -26,7 +28,16 @@ public class ClientStructure
         Enum = Type.Enum;
         
         this.Position = Position;
-        this.Health = Hp;
+        this.Hp = Hp;
     }
 
+    public void Update(StructureUpdateDTO structureUpdateDTO)
+    {
+        switch (structureUpdateDTO.Attribute)
+        {
+            case StructureAttribute.Health:
+                Hp = Serialization.Deserialize<float>(structureUpdateDTO.Payload);
+                break;
+        }
+    }
 }

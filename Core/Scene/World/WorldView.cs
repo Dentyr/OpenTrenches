@@ -106,17 +106,6 @@ public partial class WorldView : Node2D
 
     }
 
-    public override void _Process(double delta)
-    {
-
-        //* ui elements
-
-        foreach(var tuple in _characters.Values) 
-        {
-            tuple.Label.Position = new (tuple.CharacterNode.Position.X, tuple.CharacterNode.Position.Y);
-            // tuple.Label.Position -= ne
-        }
-    }
 
     public void RenderProjectile(Vector2 start, Vector2 end)
     {
@@ -124,15 +113,16 @@ public partial class WorldView : Node2D
     }
 }
 
+/// <summary>
+/// Legacy class kept so that UI elements like HP and names can be moved to an alternate layer in the future
+/// </summary>
 public class CharacterNodesRecord
 {
     public CharacterRenderer CharacterNode { get; }
-    public CharacterFloat Label { get; }
 
     public CharacterNodesRecord(IClientState clientState, Character character)
     {
         CharacterNode = new CharacterRenderer(clientState, character);
-        Label = new CharacterFloat(character);
 
         character.InactivatedEvent += Deactivate;
         character.ActivatedEvent += Activate;
@@ -144,11 +134,9 @@ public class CharacterNodesRecord
     private void Deactivate()
     {
         CharacterNode.Hide();
-        Label.Hide();
     }
     private void Activate()
     {
         CharacterNode.Show();
-        Label.Show();
     }
 }

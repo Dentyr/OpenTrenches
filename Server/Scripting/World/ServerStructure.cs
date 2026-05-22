@@ -1,7 +1,10 @@
 using System;
 using Godot;
 using OpenTrenches.Common.Combat;
+using OpenTrenches.Common.Contracts;
+using OpenTrenches.Common.Contracts.DTO.UpdateModel;
 using OpenTrenches.Common.World;
+using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Server.Scripting.Teams;
 
 namespace OpenTrenches.Server.Scripting.World;
@@ -16,15 +19,23 @@ public class ServerStructure : IWorldObject
 
     public StructureEnum Enum { get; }
 
-    public float Hp { get; private set; }
-    public bool Destroyed => Hp <= 0;
+    private readonly UpdateableProperty<float> _hp;
+    public float Hp
+    {
+        get => _hp;
+        private set => _hp.Value = value;
+    }
+    public bool Destroyed => _hp <= 0;
 
 
     /// <summary>
-    /// Event when <see cref="Hp"/> reaches 0.
+    /// Event when <see cref="_hp"/> reaches 0.
     /// </summary>
     public event Action? DestroyedEvent;
 
+    public event Action<StructureUpdateDTO>? StructureUpdateEvent;
+    private void PropagateUpdate<T>(StructureAttribute type, T value)
+        => StructureUpdateEvent?.Invoke(new StructureUpdateDTO(type, Serialization.Serialize(value), Id));
 
     public ServerStructure(int Id, Team Team, StructureType Type, Vector2I Position)
     {
@@ -33,7 +44,7 @@ public class ServerStructure : IWorldObject
         Enum = Type.Enum;
         
         this.Position = Position;
-        Hp = Type.Hp;
+        _hp = new(Type.Hp, x => PropagateUpdate(StructureAttribute.Health, x));
     }
 
     public void TakeDamage(float damage) => Hp -= damage;

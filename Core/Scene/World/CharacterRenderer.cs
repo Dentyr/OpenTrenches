@@ -4,6 +4,7 @@ using OpenTrenches.Common.Combat;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Resources;
 using OpenTrenches.Common.Scene;
+using OpenTrenches.Core.Scene.Combat;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.Graphics;
 using OpenTrenches.Core.Scripting.Player;
@@ -12,7 +13,7 @@ namespace OpenTrenches.Core.Scene.World;
 
 public partial class CharacterRenderer : Area2D
 {
-    private IClientState _clientState { get; }
+    private readonly IClientState _clientState;
     public Character Character { get; }
     /// <summary>
     /// Sets local position to match <see cref="Scripting.Player.Character"/>'s position
@@ -31,29 +32,29 @@ public partial class CharacterRenderer : Area2D
     public bool PlayerCharacter => _clientState.PlayerCharacter == Character;
     
     //* GD
-    private CharacterFloat _floatLabel;
+    private readonly CharacterHpBar _hpBar;
     
-    private Sprite2D _bodySprite;
-    private Sprite2D _weaponSprite;
+    private readonly Sprite2D _bodySprite;
+    private readonly Sprite2D _weaponSprite;
 
 
-    private CollisionShape2D _hitbox;
+    private readonly CollisionShape2D _hitbox;
 
 
-    public CharacterRenderer(IClientState ClientState, Character Character)
+    public CharacterRenderer(IClientState clientState, Character character)
     {
-        _clientState = ClientState;
-        this.Character = Character;
-        Character.OnPrimaryChangedEvent += UpdateWeaponTexture;
+        _clientState = clientState;
+        Character = character;
+        character.OnPrimaryChangedEvent += UpdateWeaponTexture;
         SyncPosition();
 
-        _floatLabel = new(Character);
-        AddChild(_floatLabel);
+        _hpBar = new(character);
+        AddChild(_hpBar);
 
         _bodySprite = new()
         {
             Texture = TextureLibrary2D.Character.DefaultCharacter,
-            Modulate = TeamModulate.GetColor(Character.Team == ClientState.PlayerCharacter?.Team),
+            Modulate = TeamModulate.GetColor(character.Team == clientState.PlayerCharacter?.Team),
         };
         _bodySprite.Scale = new Vector2(24f, 24f) / _bodySprite.Texture.GetSize();
         AddChild(_bodySprite);
@@ -61,7 +62,7 @@ public partial class CharacterRenderer : Area2D
         _weaponSprite = new()
         {
             Texture = TextureLibrary2D.Character.Rifle,
-            Modulate = TeamModulate.GetColor(Character.Team == ClientState.PlayerCharacter?.Team),
+            Modulate = TeamModulate.GetColor(character.Team == clientState.PlayerCharacter?.Team),
         };
         _weaponSprite.Scale = new Vector2(24f, 24f) / _weaponSprite.Texture.GetSize();
         AddChild(_weaponSprite);
@@ -76,11 +77,10 @@ public partial class CharacterRenderer : Area2D
         AddChild(_hitbox);
 
         CollisionMask = PhysicsDefines.Map.NilLayer;
-        SetCollisionEnabled(Character.IsActive);
+        SetCollisionEnabled(character.IsActive);
 
-        Character.ActivatedEvent += ActivateCollision;
-        Character.InactivatedEvent += DeactivateCollision;
-
+        character.ActivatedEvent += ActivateCollision;
+        character.InactivatedEvent += DeactivateCollision;
     }
 
     private void UpdateWeaponTexture(FirearmEnum firearm)

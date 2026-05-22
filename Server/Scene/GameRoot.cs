@@ -140,6 +140,7 @@ public partial class GameRoot : Node
     {
         World.AddStructure(structure);
         BroadCastStructure(structure);
+        structure.StructureUpdateEvent += NetworkAdapter.Send;
     }
 
     #endregion

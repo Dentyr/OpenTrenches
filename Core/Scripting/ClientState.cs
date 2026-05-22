@@ -111,6 +111,10 @@ public sealed class ClientState : IClientState
         {
             _playerState.Update(playerUpdateDTO);
         }
+        else if (update is StructureUpdateDTO structureUpdateDTO)
+        {
+            Chunks.StructureDict[structureUpdateDTO.Id].Update(structureUpdateDTO);
+        }
     }
     public void Create(AbstractCreateDTO dTO)
     {
