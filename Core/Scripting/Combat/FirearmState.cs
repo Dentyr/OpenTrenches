@@ -12,6 +12,7 @@ public interface IReadOnlyFirearmState
 {
     int AmmoLoaded { get;  }
     int AmmoStored { get;  }
+    float Recoil { get; }
 }
 
 public class FirearmState : IReadOnlyFirearmState

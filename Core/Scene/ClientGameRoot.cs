@@ -145,7 +145,7 @@ public partial class ClientGameRoot : Node
     }
     private void SetPlayer(LocalPlayerView player)
     {
-        World.AddPlayerComponents(player.Character);
+        World.AddPlayerComponents(player.Character, player.PlayerState);
         _characterUI.SetPlayer(player);
         KeyboardListener.SetPlayer(player.Character);
     }

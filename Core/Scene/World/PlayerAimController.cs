@@ -17,17 +17,24 @@ public partial class PlayerAimController : Node2D
     private const float BaseMoveVelocity = 100f;
     private const float MoveVelocityDistanceFactor = 10f;
 
-    private Line2D _aimLine;
-    private Camera2D _camera;
     private CharacterRenderer? _ownerRenderer;
+
+
+    private Camera2D _camera;
+    private Cursor _cursor;
+    private Line2D _aimLine;
 
     private Vector2 _viewVector;
     private Vector2 _targetVector;
 
     private float _moveVelocity = 0;
 
-    public PlayerAimController()
+    private readonly IReadOnlyPlayerState _playerState;
+
+    public PlayerAimController(IReadOnlyPlayerState state)
     {
+        _playerState = state;
+
         _aimLine = new()
         {
             Width = 2f,
@@ -36,6 +43,9 @@ public partial class PlayerAimController : Node2D
             Visible = false,
         };
         AddChild(_aimLine);
+
+        _cursor = new();
+        AddChild(_cursor);
 
         _camera = new();
         AddChild(_camera);
@@ -49,6 +59,8 @@ public partial class PlayerAimController : Node2D
         float zoom = 1f / (1f + (vector.Length() / 1000f));
         _camera.Position = vector * ViewMultiplier;
         _camera.Zoom = Vector2.One * zoom;
+
+        _cursor.Position = vector * ViewMultiplier;
 
         Vector2 mouseWorldPosition = _camera.Position + (vector / zoom);
         _aimLine.SetPointPosition(1, ClipAimToCollision(mouseWorldPosition));
@@ -65,16 +77,22 @@ public partial class PlayerAimController : Node2D
     {
         Vector2 center = GetViewportRect().Size / 2f;
 
+        if (_playerState.PrimarySlotState is not null)
+            _cursor.SetRecoil(_playerState.PrimarySlotState.Recoil);
+
+
         if (Input.IsMouseButtonPressed(MouseButton.Right))
         {
             _targetVector = GetViewport().GetMousePosition() - center;
             if (!_aimLine.Visible) _aimLine.Visible = true;
+            if (!_cursor.Visible) _cursor.Visible = true;
             // _aimLine.Points = [Vector2.Zero, Position];
         }
         else
         {
             _targetVector = new(0, 0);
             if (_aimLine.Visible) _aimLine.Visible = false;
+            if (_cursor.Visible) _cursor.Visible = false;
         }
 
         if (_viewVector != _targetVector)

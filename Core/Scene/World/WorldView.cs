@@ -97,11 +97,11 @@ public partial class WorldView : Node2D
         foreach(var node in _characterLayer.GetChildren()) node.SetPhysicsProcess(false);
     }
 
-    public void AddPlayerComponents(Character character)
+    public void AddPlayerComponents(Character character, IReadOnlyPlayerState state)
     {
         if (_characters.TryGetValue(character.ID, out var record)) 
         {
-            record.CharacterNode.AddChild(new PlayerAimController());
+            record.CharacterNode.AddChild(new PlayerAimController(state));
         }
 
     }
