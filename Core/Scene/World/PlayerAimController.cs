@@ -6,9 +6,9 @@ using OpenTrenches.Core.Scripting.Player;
 
 namespace OpenTrenches.Core.Scene.World;
 /// <summary>
-/// <see cref="CharacterRenderer"/> component for a client's player character.
+/// Manages player aim and associated zoom/indicators
 /// </summary>
-public partial class FocusCamera : Node2D
+public partial class PlayerAimController : Node2D
 {
     /// <summary>
     /// How far the camera should see
@@ -26,7 +26,7 @@ public partial class FocusCamera : Node2D
 
     private float _moveVelocity = 0;
 
-    public FocusCamera()
+    public PlayerAimController()
     {
         _aimLine = new()
         {

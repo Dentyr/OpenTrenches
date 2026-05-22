@@ -101,7 +101,7 @@ public partial class WorldView : Node2D
     {
         if (_characters.TryGetValue(character.ID, out var record)) 
         {
-            record.CharacterNode.AddChild(new FocusCamera());
+            record.CharacterNode.AddChild(new PlayerAimController());
         }
 
     }
