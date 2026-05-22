@@ -14,24 +14,15 @@ public partial class FocusCamera : Node2D
     /// How far the camera should see
     /// </summary>
     private const float ViewMultiplier = 1.5f;
+    private const float BaseMoveVelocity = 100f;
+    private const float MoveVelocityDistanceFactor = 10f;
 
     private Line2D _aimLine;
     private Camera2D _camera;
     private CharacterRenderer? _ownerRenderer;
 
     private Vector2 _viewVector;
-
-    public void SetViewVector(Vector2 vector)
-    {
-        _viewVector = vector;
-
-        float zoom = 1f / (1f + (vector.Length() / 1000f));
-        _camera.Position = vector * ViewMultiplier;
-        _camera.Zoom = Vector2.One * zoom;
-
-        Vector2 mouseWorldPosition = _camera.Position + (vector / zoom);
-        _aimLine.SetPointPosition(1, ClipAimToCollision(mouseWorldPosition));
-    }
+    private Vector2 _targetVector;
 
     private float _moveVelocity = 0;
 
@@ -48,9 +39,21 @@ public partial class FocusCamera : Node2D
 
         _camera = new();
         AddChild(_camera);
-        // Position = new Vector2(0, 0);
-        // Zoom = new Vector2(0.4f, 0.4f);
     }
+
+
+    private void SetViewVector(Vector2 vector)
+    {
+        _viewVector = vector;
+
+        float zoom = 1f / (1f + (vector.Length() / 1000f));
+        _camera.Position = vector * ViewMultiplier;
+        _camera.Zoom = Vector2.One * zoom;
+
+        Vector2 mouseWorldPosition = _camera.Position + (vector / zoom);
+        _aimLine.SetPointPosition(1, ClipAimToCollision(mouseWorldPosition));
+    }
+
 
     public override void _Ready()
     {
@@ -64,13 +67,26 @@ public partial class FocusCamera : Node2D
 
         if (Input.IsMouseButtonPressed(MouseButton.Right))
         {
-            SetViewVector(GetViewport().GetMousePosition() - center);
+            _targetVector = GetViewport().GetMousePosition() - center;
             if (!_aimLine.Visible) _aimLine.Visible = true;
             // _aimLine.Points = [Vector2.Zero, Position];
         }
         else
         {
+            _targetVector = new(0, 0);
             if (_aimLine.Visible) _aimLine.Visible = false;
+        }
+
+        if (_viewVector != _targetVector)
+        {
+            var difference = _targetVector - _viewVector;
+            float distLeft = difference.Length();
+            float distToTraverse = (BaseMoveVelocity + (distLeft * MoveVelocityDistanceFactor)) * (float)delta;
+
+            if (distLeft <= distToTraverse)
+                SetViewVector(_targetVector);
+            else 
+                SetViewVector(_viewVector + (difference.Normalized() * distToTraverse));
         }
     }
 
