@@ -11,7 +11,7 @@ public partial class Cursor : Node2D
 
     public override void _Draw()
     {
-        float gap = Mathf.Lerp(5f, 28f, Mathf.Clamp(Recoil / 200f, 0f, 1f));
+        float gap = Mathf.Lerp(5f, 28f, Mathf.Clamp(Recoil / 200f, 0f, 5f));
         float tick = 8f;
 
         Color color = new(0.9f, 0.9f, 0.8f, 0.8f);

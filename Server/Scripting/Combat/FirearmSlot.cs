@@ -11,6 +11,19 @@ namespace OpenTrenches.Server.Scripting.Combat;
 
 public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
 {
+    private const float BaseRecoil = 15f;
+
+    private const float BaseRecoilCooldown = 100f;
+    /// <summary>
+    /// How much current recoil modifies recoil cooldown speed, as it's easier to broadly correct recoil that percisely return to the original position
+    /// </summary>
+    private const float RecoilCooldownModifier = 0.4f;
+
+    /// <summary>
+    /// Before recoil is applied from firing, the existing recoil will be multiplied by this decay to prevent unbounded recoil growth
+    /// </summary>
+    private const float RecoilDecay = 0.94f;
+
     public FirearmType? Equipment
     {
         get => EquipmentTypes.TryGet(EquipmentEnum, out var equipment) ? equipment : null;
@@ -78,14 +91,21 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
     }
 
     /// <summary>
-    /// Reduces fire cooldown, reload cooldown, and recoil
+    /// Reduces fire cooldown, reload cooldown, and recoil. Not <paramref name="aiming"/> will reduce maximum recoil recovery and speed of recovery
     /// </summary>
     /// <param name="delta"></param>
-    public void Cooldown(float delta)
+    public void Cooldown(float delta, bool aiming)
     {
+        float targetRecoil = aiming ? 0 : BaseRecoil;
+        float recoverModifier = aiming ? 1f : 0.3f;
+
         if (ReloadCooldown > 0) ReloadCooldown -= delta;
         else if (FireCooldown > 0) FireCooldown -= delta;
-        if (Recoil > 0) Recoil -= 50f * delta;
+        if (Recoil > targetRecoil) 
+        {
+            Recoil -= (BaseRecoilCooldown + RecoilCooldownModifier * Recoil) * delta * recoverModifier;
+            if (Recoil < 0) Recoil = 0;
+        }
     }
 
     /// <summary>
@@ -134,7 +154,7 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
         if (Equipment is not null)
         {
             FireCooldown = 60 / Equipment.Stats.RateOfFire;
-            Recoil *= 0.9f;
+            Recoil *= RecoilDecay;
             Recoil += Equipment.Stats.Recoil;
         }
 

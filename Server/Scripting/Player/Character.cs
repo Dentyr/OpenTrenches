@@ -205,7 +205,7 @@ public class Character : IIdObject, IWorldObject
 
         // Cooldowns
         foreach (var abiltiy in Abilities) abiltiy.ProgressTimer(delta);
-        _primarySlot.Cooldown(delta);
+        _primarySlot.Cooldown(delta, State.HasFlag(CharacterState.Aiming));
         
 
 
