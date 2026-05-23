@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Scene;
@@ -215,5 +216,10 @@ public partial class PlayerAimController : Node2D
         return fireLayer == WorldLayer.Ground &&
             target.Layer == WorldLayer.Trench &&
             target.ActionState.HasFlag(CharacterState.Aiming);
+    }
+
+    public void ActivateCamera()
+    {
+        _camera.MakeCurrent();
     }
 }

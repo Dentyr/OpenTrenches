@@ -97,9 +97,9 @@ public class PlayerNetworkHandler : AbstractNetworkHandler
         {
             Character.TryActivate(commandRequest.Idx);
         }
-        else if (command is RespawnCommandRequest)
+        else if (command is RespawnCommandRequest respawnReq)
         {
-            Character.RequestRespawn();
+            Character.RequestRespawn(respawnReq.CampId);
         }
         else if (command is ReloadCommandRequest)
         {

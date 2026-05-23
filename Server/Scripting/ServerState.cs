@@ -68,7 +68,7 @@ public class ServerState : IServerState
             ID: _charId ++, 
             Team: _teams.MinBy(team => team.Value.CharcaterCount).Value);
         
-        var spawnPoint = character.Team.SpawnPoint;
+        var spawnPoint = character.Team.DefaultSpawnPoint;
         character.Position = new(
             spawnPoint.X + (Random.Shared.NextSingle() * 10f - 5f),
             spawnPoint.Y + (Random.Shared.NextSingle() * 10f - 5f));
@@ -120,7 +120,6 @@ public class ServerState : IServerState
 
     private void HandleStructureCreated(ServerStructure structure)
     {
-        if (_teams.TryGetValue(structure.Id, out Team? team)) team.AddStructure(structure);
         StructureCreatedEvent?.Invoke(structure);
     }
         

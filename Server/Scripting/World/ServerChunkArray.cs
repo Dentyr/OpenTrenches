@@ -178,6 +178,8 @@ public class ServerChunkArray : ChunkArray2D, IServerChunkArray
         ServerStructure structure = new(RequestNextStructureId(), team, type, position);
         _structuresDictionary.Add(structure.Id, structure);
 
+        team.AddStructure(structure);
+
         NewStructureEvent?.Invoke(structure);
         return structure;
     }

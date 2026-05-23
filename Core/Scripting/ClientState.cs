@@ -70,6 +70,18 @@ public sealed class ClientState : IClientState
             return null;
         }
     }
+    public ClientTeam? PlayerTeam
+    {
+        get
+        {
+            if (PlayerCharacter is not null && Team.TryGetValue(PlayerCharacter.Team, out var team))
+            {
+                return team;
+            }
+            else return null;
+        }
+    }
+
 
     //* 
     public ClientChunkArray Chunks { get; } = new(); //TODO send required size in create message
@@ -79,6 +91,8 @@ public sealed class ClientState : IClientState
     private void AddStructure(ClientStructure structure)
     {
         Chunks.AddStructure(structure);
+        if (structure.Enum == StructureEnum.Camp)
+            _teams[structure.Team].MarkCamp(structure);
         StructureAddedEvent?.Invoke(structure);
     }
 
@@ -204,7 +218,9 @@ public interface IClientState
 {
     public IReadOnlyDictionary<int, Character> Characters { get; }
     public IReadOnlyDictionary<int, ClientTeam> Team { get; }
+
     public Character? PlayerCharacter { get; }
+    public ClientTeam? PlayerTeam { get; }
     public IReadOnlyPlayerState PlayerState { get; }
     public ClientChunkArray Chunks { get; }
 }

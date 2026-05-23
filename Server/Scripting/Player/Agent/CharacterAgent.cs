@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using OpenTrenches.Common.World;
 using OpenTrenches.Server.Scripting.Teams;
@@ -34,7 +35,11 @@ public class CharacterAgent
     public void Plan(IWorld2DQueryService queryService, IServerChunkArray chunks)
     {
         if (Character.Hp <= 0)
-            Character.RequestRespawn();
+        {
+            var camp = Character.Team.Camps.FirstOrDefault(camp => camp.Hp > 0);
+            if (camp is not null)
+                Character.RequestRespawn(camp.Id);
+        }
 
         if (Task.Reason(Character, queryService, chunks))
         {

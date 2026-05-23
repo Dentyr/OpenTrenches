@@ -16,6 +16,7 @@ using OpenTrenches.Server.Scripting.Ability;
 using OpenTrenches.Server.Scripting.Adapter;
 using OpenTrenches.Server.Scripting.Combat;
 using OpenTrenches.Server.Scripting.Teams;
+using OpenTrenches.Server.Scripting.World;
 namespace OpenTrenches.Server.Scripting.Player;
 
 public class Character : IIdObject, IWorldObject
@@ -188,7 +189,7 @@ public class Character : IIdObject, IWorldObject
         _primarySlot.AttributeChangedEvent += PropagateUpdate;
         _logistics = new(100, x => PropagateUpdate(PlayerAttribute.Logistics, x));
 
-        Respawn();
+        Respawn(Team.Camps.FirstOrDefault());
     }
 
 
@@ -378,12 +379,25 @@ public class Character : IIdObject, IWorldObject
 
     
     /// <summary>
-    /// Sets character back to full health and at team spawnpoint.
+    /// Sets character back to full health and spawns them around <paramref name="structure"/>
     /// </summary>
-    public void Respawn()
+    public void Respawn(ServerStructure? structure)
     {
         Hp = CommonDefines.MaxHp; 
-        Position = Team.SpawnPoint;
+
+        // spawn near structure
+        if (structure is not null)
+        {
+            Vector2 offset = Vector2.Zero;
+            if (StructureTypes.TryGet(structure.Enum, out var type))
+                offset = type.Profile.Size + type.Profile.Position;
+
+            Position = structure.Position.CellToPosition() + offset;
+        }
+        else Position = Team.DefaultSpawnPoint;
+
+        // clear timers
+
         foreach (var ability in Abilities) ability.ClearTimer();
         Layer = WorldLayer.Ground;
         _primarySlot.ResetState();
@@ -394,10 +408,18 @@ public class Character : IIdObject, IWorldObject
     /// <summary>
     /// Attempt by the character to respawn.
     /// </summary>
-    public void RequestRespawn()
+    public void RequestRespawn(int campId)
     {
-        if (Hp <= 0 && ServerState.ServerTick >= _allowRespawnTick)
-            Respawn();
+        // If character is dead and respawn timer is finished, will respawn if camp is of the same team and alive.
+        if (Hp <= 0 && 
+            ServerState.ServerTick >= _allowRespawnTick &&
+            ServerState.Chunks.StructureDict.TryGetValue(campId, out var camp) &&
+            camp.Team == Team &&
+            camp.Enum == StructureEnum.Camp &&
+            !camp.Destroyed
+        ) {
+            Respawn(camp);
+        }
     }
 
     /// <summary>

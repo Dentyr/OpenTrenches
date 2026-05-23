@@ -11,14 +11,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_02q2n")
 
-[node name="Panel" type="Panel" parent="." unique_id=328071349]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
 [node name="Label" type="Label" parent="." unique_id=1617642695]
 layout_mode = 1
 anchors_preset = 8
@@ -27,9 +19,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -134.5
-offset_top = -87.0
+offset_top = -308.0
 offset_right = 134.5
-offset_bottom = 1.0
+offset_bottom = -220.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 64
@@ -45,10 +37,39 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = 66.0
+offset_top = 216.0
 offset_right = 200.0
-offset_bottom = 146.0
+offset_bottom = 296.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Respawn"
+
+[node name="LeftBase" type="Button" parent="." unique_id=536579779]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = -120.0
+offset_right = 120.0
+offset_bottom = -50.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 42
+text = "<"
+
+[node name="RightBase" type="Button" parent="." unique_id=1876573245]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = -120.0
+offset_right = -50.0
+offset_bottom = -50.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 42
+text = ">"

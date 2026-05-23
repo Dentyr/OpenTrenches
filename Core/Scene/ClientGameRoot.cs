@@ -69,6 +69,9 @@ public partial class ClientGameRoot : Node
         _gameEndScreen.Visible = false;
         _gameEndScreen.ReturnRequestEvent += HandleReturnAttempt;
 
+        //* intercom
+        _deathScreen.TargetBaseChangedEvetn += World.ToggleDeathCam;
+
     }
 
 
@@ -90,10 +93,13 @@ public partial class ClientGameRoot : Node
     {
         ArgumentNullException.ThrowIfNull(State);
 
+        _deathScreen.SetState(State);
+
 
         World.SetClientState(State);
 
         //* Hook rendered events
+
 
         //* Hook state changes
         State.PlayerCharacterSetEvent += SetPlayer;
@@ -106,6 +112,9 @@ public partial class ClientGameRoot : Node
 
         State.PlayerDeathEvent += _deathScreen.Prompt;
         State.PlayerRespawnEvent += _deathScreen.Hide;
+
+        State.PlayerRespawnEvent += World.TogglePlayerCam;
+
 
         State.GameEndEvent += victor => _gameEndScreen.ShowEnd(victor, State);
 
@@ -121,7 +130,11 @@ public partial class ClientGameRoot : Node
     /// <summary>
     /// Sends a respawn attempt to the server.
     /// </summary>
-    public void HandleRespawnAttempt() => OutgoingCommandEvent?.Invoke(new RespawnCommandRequest());
+    public void HandleRespawnAttempt()
+    {
+        if (_deathScreen.TargetBase is not null)
+            OutgoingCommandEvent?.Invoke(new RespawnCommandRequest(_deathScreen.TargetBase.Id));
+    }
 
     public void HandleReturnAttempt() => ExitGameEvent?.Invoke();
 

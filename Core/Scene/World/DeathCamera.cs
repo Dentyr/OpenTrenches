@@ -13,7 +13,7 @@ public partial class DeathCamera : Camera2D
 
     public DeathCamera()
     {
-        
+        Zoom = new(0.5f, 0.5f);
     }
 
     public void Follow(ClientStructure focusCamp)

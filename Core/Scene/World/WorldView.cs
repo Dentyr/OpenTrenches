@@ -24,6 +24,10 @@ public partial class WorldView : Node2D
     private ClientChunkLayer ChunkLayer { get; set; } = null!;
     
 
+    //* cameras and controls
+    private PlayerAimController? _aimController;
+    private DeathCamera _deathCam;
+
     private bool ChildPhysicsEnabled { get; set; } = true;
 
     public WorldView()
@@ -44,6 +48,9 @@ public partial class WorldView : Node2D
             Name = "Characters",
         };
         AddChild(_characterLayer);
+
+        _deathCam = new();
+        AddChild(_deathCam);
     }
 
     public void SetClientState(ClientState State)
@@ -107,7 +114,9 @@ public partial class WorldView : Node2D
     {
         if (_characters.TryGetValue(character.ID, out var record)) 
         {
-            record.CharacterNode.AddChild(new PlayerAimController(state));
+            _aimController = new PlayerAimController(state);
+            record.CharacterNode.AddChild(_aimController);
+            _aimController.ActivateCamera();
         }
 
     }
@@ -116,6 +125,18 @@ public partial class WorldView : Node2D
     public void RenderProjectile(Vector2 start, Vector2 end)
     {
         AddChild(new BulletRay2D(start, end));
+    }
+
+
+    public void ToggleDeathCam(ClientStructure? strucutre)
+    {
+        _deathCam.MakeCurrent();
+        if (strucutre is not null)
+            _deathCam.Follow(strucutre);
+    }
+    public void TogglePlayerCam()
+    {
+        _aimController?.ActivateCamera();
     }
 }
 

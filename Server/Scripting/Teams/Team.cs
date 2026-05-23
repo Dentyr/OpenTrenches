@@ -23,6 +23,7 @@ public class Team(int ID, FactionEnum Faction, Vector2 SpawnPoint)
     public IReadOnlyList<Character> Characters => _characters;
 
     private readonly List<ServerStructure> _camps = [];
+    public IReadOnlyList<ServerStructure> Camps => _camps;
     private readonly List<ServerStructure> _structures = [];
 
     /// <returns>True if all camps are destroyed, false if there is any non-destroyed camp</returns>
@@ -58,5 +59,8 @@ public class Team(int ID, FactionEnum Faction, Vector2 SpawnPoint)
 
     public bool RemoveCharacter(Character character) => _characters.Remove(character);
 
-    public Vector2 SpawnPoint { get; } = SpawnPoint;
+    /// <summary>
+    /// Characters will use this spawnpoint when no cmaps are found (for debug)
+    /// </summary>
+    public Vector2 DefaultSpawnPoint { get; } = SpawnPoint;
 }

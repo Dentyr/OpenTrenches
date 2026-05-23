@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace OpenTrenches.Common.World;
@@ -31,14 +32,14 @@ public static class StructureTypes
         if (type is StructureEnum firearmEnum) return TryGet(firearmEnum, out equipment);
         return false;
     }
-    public static bool TryGet(StructureEnum? type, out StructureType? equipment)
+    public static bool TryGet(StructureEnum? type, [NotNullWhen(true)] out StructureType? structure)
     {
         if (type is not StructureEnum notnull)
         {
-            equipment = null;
+            structure = null;
             return false;
         }
-        equipment = Get(notnull);
+        structure = Get(notnull);
         return true;
     }
     public static StructureType Get(StructureEnum type) =>
