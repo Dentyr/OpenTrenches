@@ -374,12 +374,16 @@ public class Character : IIdObject, IWorldObject
 
     
     /// <summary>
-    /// Sets character back to full health and at team spawnpoint
+    /// Sets character back to full health and at team spawnpoint.
     /// </summary>
     public void Respawn()
     {
         Hp = CommonDefines.MaxHp; 
         Position = Team.SpawnPoint;
+        foreach (var ability in Abilities) ability.ClearTimer();
+        Layer = WorldLayer.Ground;
+        _primarySlot.ResetState();
+
         RespawnEvent?.Invoke();
     }
 

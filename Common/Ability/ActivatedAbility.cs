@@ -29,6 +29,12 @@ public class ActivatedAbility(AbilityRecord Record) : IActivatedAbility
         Duration = Math.Max(0, Duration - time);
     }
 
+    public void ClearTimer()
+    {
+        TimeLeft = 0;
+        Duration = 0;
+    }
+
     /// <summary>
     /// Acts as if the ability has been activated, setting timer to cooldown and duration to ability duration.
     /// </summary>

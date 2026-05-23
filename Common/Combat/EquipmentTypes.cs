@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 
@@ -93,7 +94,7 @@ public static class EquipmentTypes
         if (type is FirearmEnum firearmEnum) return TryGet(firearmEnum, out equipment);
         return false;
     }
-    public static bool TryGet(FirearmEnum? type, out FirearmType? equipment)
+    public static bool TryGet(FirearmEnum? type, [NotNullWhen(true)] out FirearmType? equipment)
     {
         if (type is not FirearmEnum notnull)
         {

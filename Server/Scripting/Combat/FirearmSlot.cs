@@ -33,14 +33,10 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
             if (EquipmentEnum != value?.Id)
             {
                 EquipmentEnum = value?.Id;
-                if (Equipment is FirearmType firearmType) SetAmmoToDefault(firearmType);
+                if (Equipment is FirearmType firearmType)
+                    ResetState(firearmType);
             }
         }
-    }
-    private void SetAmmoToDefault(FirearmType firearmType)
-    {
-        AmmoLoaded = firearmType.Stats.MagazineSize;
-        AmmoStored = AmmoLoaded * 5;
     }
 
 
@@ -87,7 +83,24 @@ public class FirearmSlot : EquipmentSlot<FirearmEnum>, IReadOnlyFirearmSlot
         _ammoStored = new(x => PropagateAttributeUpdate(FirearmSlotAttribute.AmmoStored, x));
         _recoil = new(x => PropagateAttributeUpdate(FirearmSlotAttribute.Recoil, x));
 
-        SetAmmoToDefault(equipment);
+        ResetState(equipment);
+    }
+
+    /// <summary>
+    /// Fills ammo, clears timers
+    /// </summary>
+    public void ResetState()
+    {
+        if (EquipmentTypes.TryGet(EquipmentEnum, out var equipment)) 
+            ResetState(equipment);
+    }
+    private void ResetState(FirearmType type)
+    {
+        Recoil = BaseRecoil;
+        FireCooldown = 0;
+        ReloadCooldown = 0;
+        AmmoLoaded = type.Stats.MagazineSize;
+        AmmoStored = type.Stats.MagazineSize * 5;
     }
 
     /// <summary>
