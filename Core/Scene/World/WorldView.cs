@@ -5,12 +5,13 @@ using OpenTrenches.Core.Scene.Combat;
 using OpenTrenches.Common.World;
 using OpenTrenches.Core.Scripting;
 using OpenTrenches.Core.Scripting.World;
+using OpenTrenches.Common.Scene;
 
 namespace OpenTrenches.Core.Scene.World;
 
 public partial class WorldView : Node2D
 {
-    private readonly IClientState _clientState;
+    private ClientState? _clientState;
     //* Characters
     private readonly Dictionary<int, CharacterNodesRecord> _characters = [];
     private Node2D _characterLayer { get; }
@@ -21,21 +22,14 @@ public partial class WorldView : Node2D
 
     //* tiles
     private ClientChunkLayer ChunkLayer { get; set; } = null!;
-
-    //* UI floats
-    private Node CharacterUILayer { get; }
-
-    //* environment settings
-    private WorldEnvironment WorldEnvironment { get; }
     
 
     private bool ChildPhysicsEnabled { get; set; } = true;
 
-    public WorldView(ClientState State)
+    public WorldView()
     {
-        _clientState = State;
         
-        ChunkLayer = new(State.Chunks);
+        ChunkLayer = new();
         AddChild(ChunkLayer);
 
         
@@ -50,29 +44,38 @@ public partial class WorldView : Node2D
             Name = "Characters",
         };
         AddChild(_characterLayer);
+    }
 
-        
+    public void SetClientState(ClientState State)
+    {
+        //* cleanup
+        foreach (var record in _characters.Values) record.CharacterNode.QueueFreeDeferred();
+        foreach (var node in _structure.Values) node.QueueFreeDeferred();
+        _characters.Clear();
+        _structure.Clear();
 
-        CharacterUILayer = new();
-        AddChild(CharacterUILayer);
-
-        WorldEnvironment = new()
-        {
-            Environment = SceneDefines.IlluminatedEnvironment,
-        };
-        AddChild(WorldEnvironment);
-
+        _clientState = State;
+        ChunkLayer.SetArray(State.Chunks);
 
 
         //* Load from state
         foreach(var chara in State.Characters.Values) AddCharacter(chara);
         foreach(var structure in State.Chunks.StructureDict.Values) AddStructure(structure);
+
+        //* events
+
+        State.CharacterAddedEvent += AddCharacter;
+        State.StructureAddedEvent += AddStructure;
+        State.FireEvent += RenderProjectile;
     }
 
 
 
     public void AddCharacter(Character character)
     {
+        if (_clientState is null)
+            return;
+            
         if (_characters.TryAdd(character.ID, new(_clientState, character)))
         {
             CharacterRenderer node = _characters[character.ID].CharacterNode;
@@ -85,6 +88,9 @@ public partial class WorldView : Node2D
 
     public void AddStructure(ClientStructure structure)
     {
+        if (_clientState is null)
+            return;
+
         StructureRenderer renderer = new(structure, _clientState);
         _structureLayer.AddChild(renderer);
         renderer.SetPhysicsProcess(ChildPhysicsEnabled);

@@ -48,6 +48,10 @@ public partial class ClientGameRoot : Node
         
         // Nodes
 
+        World = new();
+        World.DisablePhysics();
+        AddChild(World);
+
         KeyboardListener = new();
         AddChild(KeyboardListener);
     }
@@ -86,15 +90,10 @@ public partial class ClientGameRoot : Node
     {
         ArgumentNullException.ThrowIfNull(State);
 
-        //* World changes
-        SetWorld(State);
 
-
+        World.SetClientState(State);
 
         //* Hook rendered events
-        State.CharacterAddedEvent += World.AddCharacter;
-        State.StructureAddedEvent += World.AddStructure;
-        State.FireEvent += World.RenderProjectile;
 
         //* Hook state changes
         State.PlayerCharacterSetEvent += SetPlayer;
@@ -129,20 +128,6 @@ public partial class ClientGameRoot : Node
 
     //* Changing state
 
-    private void SetWorld(ClientState state)
-    {
-        // clean previous world
-        if (World is not null)
-        {
-            var temp = World;
-            RemoveChild(World);
-            temp.QueueFree();
-        }
-
-        World = new(state);
-        World.DisablePhysics();
-        AddChild(World);
-    }
     private void SetPlayer(LocalPlayerView player)
     {
         World.AddPlayerComponents(player.Character, player.PlayerState);
