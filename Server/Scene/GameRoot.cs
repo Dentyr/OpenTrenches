@@ -171,7 +171,10 @@ public partial class GameRoot : Node
     }
 
 
-
+    public override void _PhysicsProcess(double delta)
+    {
+        GameState.Tick();
+    }
 
     public override void _Process(double delta)
     {

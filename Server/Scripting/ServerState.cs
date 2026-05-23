@@ -19,6 +19,11 @@ public class ServerState : IServerState
 {
     public delegate void GameEndedDelegate(Team? victor);
 
+    /// <summary>
+    /// Server tick represents the number of physics ticks that have passed
+    /// </summary>
+    public long ServerTick { get; private set; }
+
     //* State
 
     //* chunks
@@ -157,6 +162,16 @@ public class ServerState : IServerState
             .Concat(Teams.Values.Select(ObjectToDTO.Convert))
             .Concat(_chunks.StructureDict.Values.Select(ObjectToDTO.Convert));
             // .Concat(Chunks.GetChunks().Select(chunk => CommonToDTO.Convert(chunk)));
+
+    //* Simulation
+
+    /// <summary>
+    /// This function is used for non-engine simulations. Anything requiring physics should not go in here.
+    /// </summary>
+    public void Tick()
+    {
+        ServerTick ++;
+    }
 }
 
 public interface IServerState
