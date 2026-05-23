@@ -105,7 +105,7 @@ public partial class ClientGameRoot : Node
 
 
 
-        State.PlayerDeathEvent += _deathScreen.Show;
+        State.PlayerDeathEvent += _deathScreen.Prompt;
         State.PlayerRespawnEvent += _deathScreen.Hide;
 
         State.GameEndEvent += victor => _gameEndScreen.ShowEnd(victor, State);

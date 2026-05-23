@@ -176,5 +176,7 @@ public class ServerState : IServerState
 
 public interface IServerState
 {
-    public IServerChunkArray Chunks { get; }
+    IServerChunkArray Chunks { get; }
+
+    long ServerTick { get; }
 }

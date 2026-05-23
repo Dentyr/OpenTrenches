@@ -93,6 +93,10 @@ public class Character : IIdObject, IWorldObject
         private set => _health.Value = value;
     }
 
+    /// <summary>
+    /// Once the server tick has surpassed this value, this character can respawn
+    /// </summary>
+    private long _allowRespawnTick = 0;
 
     private readonly UpdateableProperty<int> _logistics; //TODO debug logi
     public int Logistics
@@ -392,7 +396,8 @@ public class Character : IIdObject, IWorldObject
     /// </summary>
     public void RequestRespawn()
     {
-        if (Hp <= 0) Respawn();
+        if (Hp <= 0 && ServerState.ServerTick >= _allowRespawnTick)
+            Respawn();
     }
 
     /// <summary>
@@ -410,7 +415,11 @@ public class Character : IIdObject, IWorldObject
     {
         if (Hp < 0) return;
         Hp -= dmg / (Math.Max(0, GetDefense()) + 1);
-        if (Hp <= 0) DiedEvent?.Invoke();
+        if (Hp <= 0)
+        {
+            _allowRespawnTick = ServerState.ServerTick + (long)(Engine.PhysicsTicksPerSecond * CommonDefines.SecondsForCharacterRespawn);
+            DiedEvent?.Invoke();
+        }
     }
 
 
