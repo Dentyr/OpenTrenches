@@ -25,10 +25,9 @@ public class ServerState : IServerState
     private ServerChunkArray _chunks { get; } = new();
     public IServerChunkArray Chunks => _chunks;
 
-    //TODO change ushort to be consistent with other dictionaries
     //* characters
-    private readonly Dictionary<ushort, Character> _characters = [];
-    public IReadOnlyDictionary<ushort, Character> Characters => _characters;
+    private readonly Dictionary<int, Character> _characters = [];
+    public IReadOnlyDictionary<int, Character> Characters => _characters;
 
     private bool AddCharacter(Character Character)
     {
@@ -57,7 +56,7 @@ public class ServerState : IServerState
     public event GameEndedDelegate? GameEndedEvent;
 
     //* creation
-    private ushort _charId = 0;
+    private int _charId = 0;
     public Character CreateCharacter()
     {
         Character character = new(this, 
@@ -77,7 +76,7 @@ public class ServerState : IServerState
         if (!AddCharacter(character)) throw new Exception("Failed to create new character");
         return character;
     }
-    private ushort _teamId = 0;
+    private int _teamId = 0;
     private Team CreateTeam(FactionEnum faction, Vector2 spawnpoint)
     {
         Team team = new(_teamId ++, faction, spawnpoint);
@@ -144,7 +143,7 @@ public class ServerState : IServerState
 
     private PolledQueue<AbstractCommandDTO> _commandQueue = new();
 
-    private void HandleAbility(uint charaIdx, int abilityIdx)
+    private void HandleAbility(int charaIdx, int abilityIdx)
         => _commandQueue.Enqueue(new AbilityNotificationCommand(charaIdx, abilityIdx));
 
     private void HandleFire(Character character, Vector2 target) 

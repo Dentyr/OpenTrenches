@@ -22,7 +22,7 @@ public class Character : IIdObject, IWorldObject
 {
     //* Identification
     private IServerState ServerState { get; }
-    public ushort ID { get; }
+    public int ID { get; }
     public Team Team { get; }
 
     //* State in World
@@ -163,7 +163,7 @@ public class Character : IIdObject, IWorldObject
     private void PropagateUpdate(FirearmSlotAttribute type, byte[] payload)
         => PlayerUpdateEvent?.Invoke(new FirearmSlotUpdateDTO(type, payload));
 
-    public Character(IServerState ServerState, ushort ID, Team Team)
+    public Character(IServerState ServerState, int ID, Team Team)
     {
         this.ServerState = ServerState;
         this.ID = ID;

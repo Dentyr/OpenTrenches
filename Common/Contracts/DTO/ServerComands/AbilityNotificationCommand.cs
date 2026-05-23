@@ -10,6 +10,6 @@ namespace OpenTrenches.Common.Contracts.DTO.ServerComands;
 /// <param name="Idx">Index of ability</param>
 [MessagePackObject]
 public record AbilityNotificationCommand(
-    [property: Key(0)] uint Character,
+    [property: Key(0)] int Character,
     [property: Key(1)] int Idx
 ) : AbstractCommandDTO {}

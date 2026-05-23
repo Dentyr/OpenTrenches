@@ -19,7 +19,7 @@ public class Character : IIdObject
 {
     //* Identification
 
-    public ushort ID { get; }
+    public int ID { get; }
     public int Team { get; }
     //TODO consider removing
     public IClientState ClientState { get; }
@@ -78,7 +78,7 @@ public class Character : IIdObject
     public IReadOnlyList<ActivatedAbility> GetAbilities() => _abilities;
     // public event Action<int> AbilityActivated;
 
-    public Character(ushort ID, int Team, IClientState ClientState, Vector2 Position, float Health)
+    public Character(int ID, int Team, IClientState ClientState, Vector2 Position, float Health)
     {
         this.ID = ID;
         this.Team = Team;

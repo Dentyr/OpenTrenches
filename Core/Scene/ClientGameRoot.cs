@@ -111,7 +111,7 @@ public partial class ClientGameRoot : Node
         State.GameEndEvent += victor => _gameEndScreen.ShowEnd(victor, State);
 
         //* Initialize values
-        if (State.PlayerCharacterId is uint notnull && State.TryGetCharacter(notnull, out var player)) 
+        if (State.PlayerCharacterId is int notnull && State.TryGetCharacter(notnull, out var player)) 
             SetPlayer(new LocalPlayerView(player, State.PlayerState));
         _characterUI.SetLogistics(State.PlayerState.Logistics);
         

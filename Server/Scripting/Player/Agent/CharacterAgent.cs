@@ -13,7 +13,7 @@ public class CharacterAgent
 {
     public readonly Character Character;
     public Team Team => Character.Team;
-    public ushort CharacterId => Character.ID;
+    public int CharacterId => Character.ID;
 
     public AbstractAgentTask Task { get; private set; }
 

@@ -4,10 +4,10 @@ using MessagePack;
 namespace OpenTrenches.Common.Contracts.DTO.UpdateModel;
 
 [MessagePackObject]
-public record class CharacterUpdateDTO(CharacterAttribute Attribute, byte[] Payload, ushort TargetId) : AbstractUpdateDTO<CharacterAttribute>(Attribute, Payload)
+public record class CharacterUpdateDTO(CharacterAttribute Attribute, byte[] Payload, int TargetId) : AbstractUpdateDTO<CharacterAttribute>(Attribute, Payload)
 {
     [Key(2)]
-    public ushort TargetId { get; } = TargetId;
+    public int TargetId { get; } = TargetId;
 
     public override bool Streamed => Attribute == CharacterAttribute.Position;
 }

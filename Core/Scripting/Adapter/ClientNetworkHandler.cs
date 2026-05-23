@@ -9,7 +9,7 @@ namespace OpenTrenches.Core.Scripting.Adapter;
 
 public class ClientNetworkHandler(INetworkConnectionAdapter Adapter) : AbstractNetworkHandler(Adapter)
 {
-    public ushort? PlayerID;
+    public int? PlayerID;
 
     public ClientState State = new();
 

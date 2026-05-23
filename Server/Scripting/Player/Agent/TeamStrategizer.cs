@@ -61,7 +61,7 @@ public class TeamStrategizer
 
     //* agents
 
-    private readonly Dictionary<ushort, CharacterAgent> _agent = [];
+    private readonly Dictionary<int, CharacterAgent> _agent = [];
 
 
     /// <summary>

@@ -12,7 +12,7 @@ namespace OpenTrenches.Server.Scene.World;
 public partial class WorldNode : Node2D
 {
     //* Characters
-    private Dictionary<ushort, CharacterSimulator> _characters = [];
+    private Dictionary<int, CharacterSimulator> _characters = [];
     private Node2D CharacterLayer { get; }
 
     //* Structures

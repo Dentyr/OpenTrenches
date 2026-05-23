@@ -12,7 +12,7 @@ public partial class WorldView : Node2D
 {
     private readonly IClientState _clientState;
     //* Characters
-    private readonly Dictionary<ushort, CharacterNodesRecord> _characters = [];
+    private readonly Dictionary<int, CharacterNodesRecord> _characters = [];
     private Node2D _characterLayer { get; }
 
     //* Structure

@@ -47,9 +47,9 @@ public sealed class ClientState : IClientState
     //* State
 
     //* character
-    private readonly Dictionary<uint, Character> _characters = [];
-    public IReadOnlyDictionary<uint, Character> Characters => _characters;
-    public bool TryGetCharacter(uint id, [NotNullWhen(true)] out Character? character) => Characters.TryGetValue(id, out character);
+    private readonly Dictionary<int, Character> _characters = [];
+    public IReadOnlyDictionary<int, Character> Characters => _characters;
+    public bool TryGetCharacter(int id, [NotNullWhen(true)] out Character? character) => Characters.TryGetValue(id, out character);
 
     public event Action<Character>? CharacterAddedEvent;
 
@@ -63,10 +63,10 @@ public sealed class ClientState : IClientState
     public IReadOnlyPlayerState PlayerState => _playerState;
 
 
-    public uint? PlayerCharacterId { get; private set; }
+    public int? PlayerCharacterId { get; private set; }
     public Character? PlayerCharacter {
         get {
-            if (PlayerCharacterId is uint notnull && TryGetCharacter(notnull, out var character)) return character;
+            if (PlayerCharacterId is int notnull && TryGetCharacter(notnull, out var character)) return character;
             return null;
         }
     }
@@ -202,7 +202,7 @@ public record class LocalPlayerView
 
 public interface IClientState
 {
-    public IReadOnlyDictionary<uint, Character> Characters { get; }
+    public IReadOnlyDictionary<int, Character> Characters { get; }
     public IReadOnlyDictionary<int, ClientTeam> Team { get; }
     public Character? PlayerCharacter { get; }
     public IReadOnlyPlayerState PlayerState { get; }

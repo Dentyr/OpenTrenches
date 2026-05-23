@@ -4,5 +4,5 @@ namespace OpenTrenches.Server.Scripting;
 
 public interface IIdObject
 {
-    public ushort ID { get; }
+    public int ID { get; }
 }
