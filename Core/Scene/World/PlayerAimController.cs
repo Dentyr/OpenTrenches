@@ -61,9 +61,9 @@ public partial class PlayerAimController : Node2D
         _camera.Position = vector * ViewMultiplier;
         _camera.Zoom = Vector2.One * zoom;
 
-        _cursor.Position = vector * ViewMultiplier;
 
         Vector2 mouseWorldPosition = _camera.Position + (vector / zoom);
+        _cursor.Position = mouseWorldPosition;
         _aimLine.SetPointPosition(1, ClipAimToCollision(mouseWorldPosition));
     }
 
