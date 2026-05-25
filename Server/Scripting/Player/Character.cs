@@ -402,6 +402,9 @@ public class Character : IIdObject, IWorldObject
         Layer = WorldLayer.Ground;
         _primarySlot.ResetState();
 
+        // clear equipment
+        _primarySlot.Equipment = EquipmentTypes.Get(FirearmEnum.Rifle);
+
         RespawnEvent?.Invoke();
     }
 
