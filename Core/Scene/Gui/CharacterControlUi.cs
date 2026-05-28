@@ -29,7 +29,7 @@ public partial class CharacterControlUi : Control
 
     private FirearmSlotDisplay _primarySlotDisplay = null!;
 
-    private FirearmUpgradePanel _equipmentUpgradePanel = null!;
+    private EquipmentUpgradeControl _equipmentUpgradeControl = null!;
 
 
     //* user commands
@@ -49,7 +49,7 @@ public partial class CharacterControlUi : Control
         //*
 
         _primarySlotDisplay = GetNode<FirearmSlotDisplay>("PrimarySlot");
-        _equipmentUpgradePanel = GetNode<FirearmUpgradePanel>("EquipmentUpgradePanel");
+        _equipmentUpgradeControl = GetNode<EquipmentUpgradeControl>("UpgradeController");
 
         //*
 
@@ -57,12 +57,13 @@ public partial class CharacterControlUi : Control
 
 
         //* events
-        _equipmentUpgradePanel.EquipmentSelectedEvent += RequestUpgrade;
+        _equipmentUpgradeControl.EquipmentSelectedEvent += RequestUpgrade;
     }
 
     public void SetPlayer(LocalPlayerView player)
     {
         _primarySlotDisplay.SetState(player.PlayerState.PrimarySlotState);
+        _equipmentUpgradeControl.ShowUpgrades(player.PlayerState);
 
         _character = player.Character;
 

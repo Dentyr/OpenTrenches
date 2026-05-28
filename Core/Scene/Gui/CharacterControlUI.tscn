@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://b5lnf6y37g43i" path="res://Core/Scene/Gui/CharacterControlUi.cs" id="1_m2ewg"]
 [ext_resource type="Script" uid="uid://dtfyw8hhhkj5p" path="res://Core/Scene/Gui/IconDisplay.cs" id="3_g61sg"]
 [ext_resource type="Texture2D" uid="uid://bdpmqm4pv8po5" path="res://Common/Resources/Img/UI/Logistics.png" id="4_cbcig"]
-[ext_resource type="Script" uid="uid://bi7qwx1iay5x4" path="res://Core/Scene/Gui/FirearmUpgradePanel.cs" id="5_cbcig"]
 [ext_resource type="Script" uid="uid://c170dcuuyswof" path="res://Core/Scene/Gui/FirearmSlotDisplay.cs" id="6_dkbvg"]
 [ext_resource type="Script" uid="uid://267h3f3on23x" path="res://Core/Scene/Gui/EquipmentUpgradeControl.cs" id="7_a1ag5"]
 
@@ -31,10 +30,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -305.0
-offset_top = -88.0
-offset_right = -80.0
-offset_bottom = -38.0
+offset_left = -299.0
+offset_top = -98.0
+offset_right = -74.0
+offset_bottom = -48.0
 grow_horizontal = 0
 grow_vertical = 0
 alignment = 2
@@ -89,7 +88,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -254.0
-offset_top = -27.0
+offset_top = -37.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/fill = SubResource("StyleBoxFlat_f3ajp")
@@ -114,32 +113,15 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -155.0
-offset_top = -138.0
-offset_right = -115.0
-offset_bottom = -98.0
+offset_left = -299.0
+offset_top = -40.0
+offset_right = -259.0
 grow_horizontal = 0
-grow_vertical = 2
+grow_vertical = 0
 script = ExtResource("3_g61sg")
 Text = "1"
 Texture = ExtResource("4_cbcig")
 metadata/_custom_type_script = "uid://dtfyw8hhhkj5p"
-
-[node name="EquipmentUpgradePanel" type="Control" parent="." unique_id=1134080077]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -109.0
-offset_top = -135.0
-offset_right = -14.0
-offset_bottom = -100.0
-grow_horizontal = 0
-grow_vertical = 0
-script = ExtResource("5_cbcig")
-Open = true
 
 [node name="PrimarySlot" type="Control" parent="." unique_id=1012168235]
 layout_mode = 1
@@ -148,10 +130,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -76.0
-offset_top = -97.0
-offset_right = -15.0
-offset_bottom = -32.0
+offset_left = -70.0
+offset_top = -107.0
+offset_right = -9.0
+offset_bottom = -42.0
 grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("6_dkbvg")
