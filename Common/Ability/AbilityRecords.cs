@@ -9,5 +9,6 @@ public static class AbilityRecords
         DefenseMod = 5,
         Cooldown = 60f,
         Duration = 15f,
+        Cost = 5,
     };
 }

@@ -93,7 +93,7 @@ public partial class CharacterControlUi : Control
         _primarySlotDisplay.StartReloadTimer();
     }
 
-    private void NotifyAbilityCommand(int idx) => _queuedCommands.Enqueue(new UseAbilityCommandRequest(0));
+    private void NotifyAbilityCommand(int idx) => _queuedCommands.Enqueue(new UseAbilityCommandRequest(idx));
     private void RequestUpgrade(FirearmEnum equipment) => _queuedCommands.Enqueue(new PurchaseCommandRequest(equipment));
 
 
@@ -110,4 +110,3 @@ public partial class CharacterControlUi : Control
 
 
 }
-

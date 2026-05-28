@@ -34,7 +34,7 @@ public partial class AbilityButton : Control
         {
             Icon = AbilityTextureRecordLibrary.Textures[ability].Thumbnail,
             ExpandIcon = true,
-            TooltipText = $"{ability.Name}: {ability.Description}",
+            TooltipText = $"{ability.Name} ({ability.Cost} logistics): {ability.Description}",
         };
         _button.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         AddChild(_button);

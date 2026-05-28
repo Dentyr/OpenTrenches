@@ -430,8 +430,15 @@ public class Character : IIdObject, IWorldObject
     /// </summary>
     public void TryActivate(int AbilityIdx)
     {
-        if (AbilityIdx >= 0 && AbilityIdx < Abilities.Length && Abilities[AbilityIdx].TryDo(this))
+        if (AbilityIdx < 0 || AbilityIdx >= Abilities.Length) return;
+
+        var ability = Abilities[AbilityIdx];
+
+        if (Logistics < ability.Record.Cost) return;
+
+        if (ability.TryDo(this))
         {
+            Logistics -= ability.Record.Cost;
             ActivatedAbilityEvent?.Invoke(AbilityIdx);
         }
     }
