@@ -445,7 +445,7 @@ public class Character : IIdObject, IWorldObject
 
     private void ApplyDamage(float dmg)
     {
-        if (Hp < 0) return;
+        if (Hp <= 0) return;
         Hp -= dmg / (Math.Max(0, GetDefense()) + 1);
         if (Hp <= 0)
         {
