@@ -6,6 +6,9 @@
 [ext_resource type="PackedScene" uid="uid://llvxnvmisr8n" path="res://Core/Scene/Main/ServersPage.tscn" id="2_hdp2h"]
 [ext_resource type="Texture2D" uid="uid://cow450kyughsh" path="res://Common/Resources/Img/SolidDarkGray.png" id="2_ox55e"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u34f0"]
+bg_color = Color(0.3779188, 0.3779189, 0.37791875, 1)
+
 [node name="MainMenuLayer" type="CanvasLayer" unique_id=1246626505]
 script = ExtResource("1_stls8")
 
@@ -32,3 +35,30 @@ layout_mode = 1
 
 [node name="Servers" parent="Pages" unique_id=647736506 instance=ExtResource("2_hdp2h")]
 layout_mode = 1
+
+[node name="LoadingScreen" type="Panel" parent="." unique_id=146218160]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_u34f0")
+
+[node name="Label" type="Label" parent="LoadingScreen" unique_id=1161347653]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -341.5
+offset_top = -79.5
+offset_right = 341.5
+offset_bottom = 79.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 76
+text = "Loading ..."
+horizontal_alignment = 1
+vertical_alignment = 1
