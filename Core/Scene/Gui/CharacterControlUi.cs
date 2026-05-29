@@ -102,7 +102,7 @@ public partial class CharacterControlUi : Control
     {
         if (_character is not null)
         {
-            _healthLabel.Text = _character.Hp + "/" + CommonDefines.MaxHp;
+            _healthLabel.Text = Math.Ceiling(_character.Hp) + "/" + CommonDefines.MaxHp;
             _healthBar.Value = _character.Hp / CommonDefines.MaxHp;
         }
     }
