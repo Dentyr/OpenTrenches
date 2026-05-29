@@ -23,3 +23,4 @@ mouse_filter = 2
 [node name="GameEndScreen" parent="GameRoot/UICanvas" unique_id=1399647118 instance=ExtResource("4_77orb")]
 
 [node name="MainMenu" parent="." unique_id=1406957760 instance=ExtResource("6_iq41g")]
+layer = 2
