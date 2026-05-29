@@ -473,7 +473,16 @@ public class Character : IIdObject, IWorldObject
 
     public void TryReload()
     {
-        if (_primarySlot.TryReload()) ReloadEvent?.Invoke(this);
+        if (_primarySlot.Equipment is not FirearmType firearm) return;
+
+        int reloadCost = firearm.Stats.ReloadLogisticsCost;
+        if (Logistics < reloadCost) return;
+
+        if (_primarySlot.TryReload())
+        {
+            Logistics -= reloadCost;
+            ReloadEvent?.Invoke(this);
+        }
     }
 
     /// <summary>

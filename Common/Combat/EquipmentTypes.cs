@@ -18,6 +18,8 @@ public static class EquipmentTypes
                 logisticsCost: 5,
                 new FirearmStats
                 {
+                    ReloadCost = 0f,
+
                     ProjectileDistance = 40f,
 
                     DamagePerProjectile = 10f,
@@ -42,6 +44,8 @@ public static class EquipmentTypes
                 logisticsCost: 25,
                 new FirearmStats
                 {   //based on WWI issue trench gun
+                    ReloadCost = 1f,
+
                     ProjectileDistance = 17f,
 
                     DamagePerProjectile = 8f,
@@ -65,6 +69,8 @@ public static class EquipmentTypes
                 logisticsCost: 50,
                 new FirearmStats
                 {
+                    ReloadCost = 5f,
+
                     ProjectileDistance = 55f,
 
                     DamagePerProjectile = 15,

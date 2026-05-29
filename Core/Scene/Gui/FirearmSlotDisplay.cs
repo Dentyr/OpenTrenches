@@ -81,12 +81,19 @@ public partial class FirearmSlotDisplay : Control
         if (_equipment is not null)
         {
             if (EquipmentTextureLibrary.Textures.TryGetValue(_equipment.Id, out var texture)) _texture.Texture = texture;
-            TooltipText = $"{_equipment.Name}: {_equipment.Description}";
+            TooltipText = $"{_equipment.Name}: {_equipment.Description}\nReload cost: {FormatReloadCost(_equipment.Stats)}";
         }
         else
         {
             TooltipText = "Empty Slot";
         }
+    }
+
+    private static string FormatReloadCost(FirearmStats stats)
+    {
+        return stats.ReloadLogisticsCost > 0
+            ? $"{stats.ReloadLogisticsCost} logistics"
+            : "Free";
     }
 
     public override void _Process(double delta)

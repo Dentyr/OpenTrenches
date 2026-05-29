@@ -75,7 +75,7 @@ public partial class EquipmentUpgradeControl : Control
             Button upgradeButton = new()
             {
                 Text = $"{upgrade.Name} ({upgrade.LogisticsCost})",
-                TooltipText = $"{upgrade.Description}\nCost: {upgrade.LogisticsCost} logistics",
+                TooltipText = $"{upgrade.Description}\nCost: {upgrade.LogisticsCost} logistics\nReload cost: {FormatReloadCost(upgrade.Stats)}",
                 ClipText = true,
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
             };
@@ -86,6 +86,13 @@ public partial class EquipmentUpgradeControl : Control
             _upgradeButtons[upgradeId] = upgradeButton;
             _availability[upgradeId] = false;
         }
+    }
+
+    private static string FormatReloadCost(FirearmStats stats)
+    {
+        return stats.ReloadLogisticsCost > 0
+            ? $"{stats.ReloadLogisticsCost} logistics"
+            : "Free";
     }
 
     private void RefreshUpgradeAvailability()

@@ -1,8 +1,13 @@
+using System;
+
 namespace OpenTrenches.Common.Combat;
 
 public record class FirearmStats
 {
     public EquipmentCategory Category => EquipmentCategory.Firearm;
+
+    public float ReloadCost { get; init; } = 0f;
+    public int ReloadLogisticsCost => Math.Max(0, (int)Math.Ceiling(ReloadCost));
 
     public float DamagePerProjectile { get; init; }
     public float ProjectileDistance { get; init; } = 1000f;
