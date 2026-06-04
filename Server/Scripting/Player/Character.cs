@@ -21,6 +21,16 @@ namespace OpenTrenches.Server.Scripting.Player;
 
 public class Character : IIdObject, IWorldObject
 {
+    private const int LogisticsBountyBase = 1;
+    /// <summary>
+    /// Multiplier to the equipment valaue of a character to give to its killer
+    /// </summary>
+    private const float LogisticsValueBountyMult = 0.5f;
+    /// <summary>
+    /// Multiplier to the seconds alive that should be granted as logistics ot the killer
+    /// </summary>
+    private const float AliveValueBountyMult = 1f / 15f; // 1 point every 15 seconds
+
     //* Identification
     private IServerState ServerState { get; }
     public int ID { get; }
@@ -99,11 +109,13 @@ public class Character : IIdObject, IWorldObject
     /// </summary>
     private long _allowRespawnTick = 0;
 
-    private readonly UpdateableProperty<int> _logistics; //TODO debug logi
+    private long _tickRespawned = 0;
+
+    private readonly UpdateableProperty<int> _logistics;
     public int Logistics
     {
         get => _logistics.Value;
-        set => _logistics.Value = value;
+        private set => _logistics.Value = value;
     }
     private float _logisticsProgress = 0;
 
@@ -192,6 +204,7 @@ public class Character : IIdObject, IWorldObject
         Respawn(Team.Camps.FirstOrDefault());
     }
 
+    //* Simulation
 
     /// <summary>
     /// Called when the adapter simulates time passing
@@ -311,7 +324,14 @@ public class Character : IIdObject, IWorldObject
                 }
                 
                 FireHitResult result = adapter.AdaptFire(fireLayer, Position + kineticTarget);
-                if (result is FireHitResult.HitCharacter hit && hit.Character.Team != Team) hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
+                if (result is FireHitResult.HitCharacter hit && hit.Character.Team != Team)
+                {
+                    // if dealt killing blow, add logistics
+                    if (hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile))
+                    {
+                        Logistics += hit.Character.GetLogisticsBounty();
+                    }
+                }
                 else if (result is FireHitResult.HitStructure hitStruct && hitStruct.Structure.Team != Team) hitStruct.Structure.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
                 FireEvent?.Invoke(this, result.Position);
@@ -362,6 +382,12 @@ public class Character : IIdObject, IWorldObject
         State &= ~flag;
     }
 
+    private int GetLogisticsBounty()
+    {
+        int bountyAlive = (int)((ServerState.ServerTick - this._tickRespawned) / Engine.PhysicsTicksPerSecond * AliveValueBountyMult);
+        int bountyEquipment = (int)((PrimarySlot.Equipment?.LogisticsCost ?? 0) * LogisticsValueBountyMult);
+        return LogisticsBountyBase + bountyAlive + bountyEquipment;
+    }
     //* combat
 
     /// <summary>
@@ -401,6 +427,8 @@ public class Character : IIdObject, IWorldObject
         foreach (var ability in Abilities) ability.ClearTimer();
         Layer = WorldLayer.Ground;
         _primarySlot.ResetState();
+
+        _tickRespawned = ServerState.ServerTick;
 
         // clear equipment
         _primarySlot.Equipment = EquipmentTypes.Get(FirearmEnum.Rifle);
@@ -443,15 +471,20 @@ public class Character : IIdObject, IWorldObject
         }
     }
 
-    private void ApplyDamage(float dmg)
+    /// <summary>
+    /// Returns true if dealing <paramref name="dmg"/> is the killing blow
+    /// </summary>
+    private bool ApplyDamage(float dmg)
     {
-        if (Hp <= 0) return;
+        if (Hp <= 0) return false;
         Hp -= dmg / (Math.Max(0, GetDefense()) + 1);
         if (Hp <= 0)
         {
             _allowRespawnTick = ServerState.ServerTick + (long)(Engine.PhysicsTicksPerSecond * CommonDefines.SecondsForCharacterRespawn);
             DiedEvent?.Invoke();
+            return true;
         }
+        return false;
     }
 
 

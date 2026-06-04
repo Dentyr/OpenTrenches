@@ -15,7 +15,7 @@ public static class EquipmentTypes
             FirearmEnum.Rifle,
             new FirearmType(
                 FirearmEnum.Rifle,
-                logisticsCost: 5,
+                logisticsCost: 0,
                 new FirearmStats
                 {
                     ReloadCost = 0f,
