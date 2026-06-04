@@ -73,7 +73,7 @@ public class Character : IIdObject
     }
     public Action<FirearmEnum>? OnPrimaryChangedEvent;
 
-    private ActivatedAbility[] _abilities { get; } = [new ActivatedAbility(AbilityRecords.StimulantAbility)]; //TODO change when new abilities are added
+    private ActivatedAbility[] _abilities { get; } = AbilityRecords.DefaultAbilities.Select(ability => new ActivatedAbility(ability)).ToArray();
     public IActivatedAbility GetAbility(int index) => _abilities[index];
     public IReadOnlyList<ActivatedAbility> GetAbilities() => _abilities;
     // public event Action<int> AbilityActivated;

@@ -13,8 +13,15 @@ public static class AbilityEffectRecords
     public readonly static IReadOnlyDictionary<AbilityRecord, AbilityEffectRecord> Effects  = new Dictionary<AbilityRecord, AbilityEffectRecord>() {
         {
             AbilityRecords.StimulantAbility,
+            new ()
+        },
+        {
+            AbilityRecords.AirstrikeAbility,
             new (
-                CanUse: (chara) => true
+                FinishEffect: (Character, adapter) =>
+                {
+                    adapter.AdaptStrike(Character.Direction);
+                }
             )
         }
     };

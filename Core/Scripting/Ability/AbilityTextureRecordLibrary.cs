@@ -18,7 +18,13 @@ public static class AbilityTextureRecordLibrary
         {
             AbilityRecords.StimulantAbility, 
             new(
-                Thumbnail: TextureLibrary2D.StimulantThumbnail
+                Thumbnail: TextureLibrary2D.Ability.Stimulant
+            )
+        },
+        {
+            AbilityRecords.AirstrikeAbility, 
+            new(
+                Thumbnail: TextureLibrary2D.Ability.Airstrike
             )
         }
     };

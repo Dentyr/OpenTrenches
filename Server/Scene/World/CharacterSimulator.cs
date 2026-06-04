@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Godot.Collections;
 using OpenTrenches.Common.Contracts.Defines;
 using OpenTrenches.Common.Util;
 using OpenTrenches.Common.World;
@@ -111,6 +112,52 @@ public partial class CharacterSimulator : CharacterBody2D, ICharacterAdapter
                 // hit something else
                 else 
                     return new FireHitResult.Miss(hitPos);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates an airstrike at the location
+    /// </summary>
+    /// <param name="location"></param>
+    public void AdaptStrike(Vector2 location)
+    {
+        // convert to engine position
+        Vector2 targetLoation = location * CommonDefines.CellSize;
+        float attackRadius = CommonDefines.AirstrikeRadius * CommonDefines.CellSize;
+
+        var hits = GetViewport().World2D.DirectSpaceState.IntersectShape(new PhysicsShapeQueryParameters2D()
+        {
+            Transform = GeometryServices.MakeTranslate(targetLoation),
+            Shape = new CircleShape2D()
+            {
+                Radius = attackRadius,
+            },
+            CollisionMask = SceneDefines.Map.CharacterLayer
+        });
+        foreach (var hit in hits)
+        {
+            //if hit something
+            GodotObject hitObject = hit[SceneDefines.PhysicsKey.Collider].AsGodotObject();
+
+
+            // hit valid
+            if (hitObject is CharacterSimulator charaSim)
+            {
+                // damage based on distance, only hitting enemies
+
+                float dist = location.DistanceTo(charaSim.Character.Position);
+                float ratio = (float)(1 - dist / CommonDefines.AirstrikeRadius);
+                float damage = 
+                    (
+                        ratio * 
+                        (CommonDefines.AirstrikeDamageLerpMax - CommonDefines.AirstrikeDamageLerpMin)
+                    )
+                    + CommonDefines.AirstrikeDamageLerpMin;
+                damage = Math.Clamp(damage, CommonDefines.AirstrikeDamageLerpMin, CommonDefines.AirstrikeDamageLerpMax);
+
+                if (charaSim.Character.Team != Character.Team)
+                    charaSim.Character.Hit(damage, Character);
             }
         }
     }

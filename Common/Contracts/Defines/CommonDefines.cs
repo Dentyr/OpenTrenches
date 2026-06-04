@@ -39,4 +39,8 @@ public static class CommonDefines
     public const float MaxHp = 25f;
 
     public const float SecondsForCharacterRespawn = 5f;
+
+    public const float AirstrikeRadius = 15;
+    public const float AirstrikeDamageLerpMax = 200;
+    public const float AirstrikeDamageLerpMin = 5;
 }

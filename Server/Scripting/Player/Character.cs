@@ -148,7 +148,7 @@ public class Character : IIdObject, IWorldObject
         return _baseDefense + Abilities.Sum(x => x.Active ? x.Record.DefenseMod : 0);
     }
 
-    private CharacterAbility[] Abilities { get; } = [new(AbilityRecords.StimulantAbility)];
+    private CharacterAbility[] Abilities { get; } = AbilityRecords.DefaultAbilities.Select(ability => new CharacterAbility(ability)).ToArray();
     public event Action<int>? ActivatedAbilityEvent;
 
 
@@ -222,7 +222,15 @@ public class Character : IIdObject, IWorldObject
         }
 
         // Cooldowns
-        foreach (var abiltiy in Abilities) abiltiy.ProgressTimer(delta);
+        foreach (var ability in Abilities) 
+        {
+            var wasactive = ability.Active;
+            ability.ProgressTimer(delta);
+            if (wasactive && !ability.Active)
+            {
+                ability.FinishEffect(this, adapter);
+            }
+        }
         _primarySlot.Cooldown(delta, State.HasFlag(CharacterState.Aiming));
         
 
@@ -327,10 +335,7 @@ public class Character : IIdObject, IWorldObject
                 if (result is FireHitResult.HitCharacter hit && hit.Character.Team != Team)
                 {
                     // if dealt killing blow, add logistics
-                    if (hit.Character.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile))
-                    {
-                        Logistics += hit.Character.GetLogisticsBounty();
-                    }
+                    hit.Character.Hit(_primarySlot.Equipment.Stats.DamagePerProjectile, this);
                 }
                 else if (result is FireHitResult.HitStructure hitStruct && hitStruct.Structure.Team != Team) hitStruct.Structure.ApplyDamage(_primarySlot.Equipment.Stats.DamagePerProjectile);
                 
@@ -471,6 +476,16 @@ public class Character : IIdObject, IWorldObject
         }
     }
 
+    /// <summary>
+    /// Takes an attack from <paramref name="source"/>, dealing <paramref name="dmg"/>, granting logistics on defeat
+    /// </summary>
+    public void Hit(float dmg, Character source)
+    {
+        if (ApplyDamage(dmg))
+        {
+            source.Logistics += GetLogisticsBounty();
+        }
+    }
     /// <summary>
     /// Returns true if dealing <paramref name="dmg"/> is the killing blow
     /// </summary>
