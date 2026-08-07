@@ -1,7 +1,7 @@
 # OpenTrenches
 
-OpenTrenches is a work multiplayer trench-warfare game built with
-Godot and C#. It combines server-simulated armies with player combat, trench digging, equipment, and abilities.
+OpenTrenches is a multiplayer trench-warfare game built with
+Godot and C#. It combines server-simulated armies with player combat, trench digging, equipment, and abilities. It is currently in pre-alpha and not deployed.
 
 ## Demos
 
